@@ -1,0 +1,35 @@
+@import "tom-select/dist/css/tom-select.css";
+@import 'sweetalert2/dist/sweetalert2.min.css';
+@import 'katex/dist/katex.min.css';
+@import 'quill/dist/quill.snow.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#editor .ql-formula {
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+.ql-customMath {
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.backdrop-glass {
+    @apply backdrop-blur-md bg-white/80 dark:bg-gray-800/80 shadow-lg;
+}
+
+/* Tom Select dark/light styling */
+.ts-control {
+    @apply border rounded-md px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600;
+}
+.ts-control .item {
+    @apply bg-indigo-500 dark:bg-indigo-600 text-white rounded px-1 mr-1;
+}
+.ts-dropdown {
+    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg;
+}
+.ts-dropdown .option {
+    @apply px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700;
+}
