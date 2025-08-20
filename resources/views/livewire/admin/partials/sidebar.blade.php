@@ -16,7 +16,7 @@
 
     {{-- Nav --}}
     <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-        <a wire:navigate href="{{ route('admin.dashboard') }}"
+        <a href="{{ route('admin.dashboard') }}"
            class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/dashboard') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
             <x-heroicon-o-chart-bar class="w-5 h-5"/>
             <span class="sidebar-text">Dashboard</span>
