@@ -35,7 +35,9 @@
                     <x-heroicon-o-question-mark-circle class="w-5 h-5"/>
                     <span class="sidebar-text">Questions</span>
                 </span>
-                <x-heroicon-o-chevron-down class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }"/>
+                <x-heroicon-o-chevron-down
+                    class="w-4 h-4 transition-transform"
+                    x-bind:class="{ 'rotate-180': open }"/>
             </button>
 
             <div x-show="open" class="space-y-1 pl-8 mt-1" x-cloak>
