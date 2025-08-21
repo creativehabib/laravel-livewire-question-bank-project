@@ -15,6 +15,11 @@ class Create extends Component
         ['option_text' => '', 'is_correct' => false],
     ];
 
+    public function updatedSubjectId()
+    {
+        $this->chapter_id = null;
+    }
+
     public function save()
     {
         $this->validate([

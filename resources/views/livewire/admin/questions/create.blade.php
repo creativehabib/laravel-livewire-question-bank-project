@@ -1,25 +1,27 @@
 <div x-data class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
     <form wire:submit.prevent="save" class="space-y-6">
-        {{-- Subject --}}
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
-            <select wire:model="subject_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">-- Select --</option>
-                @foreach($subjects as $s)
-                    <option value="{{ $s->id }}">{{ $s->name }}</option>
-                @endforeach
-            </select>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- Subject --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
+                <select wire:model="subject_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($subjects as $s)
+                        <option value="{{ $s->id }}">{{ $s->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        {{-- Chapter --}}
-        <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
-            <select wire:model="chapter_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">-- Select --</option>
-                @foreach($chapters as $c)
-                    <option value="{{ $c->id }}">{{ $c->name }}</option>
-                @endforeach
-            </select>
+            {{-- Chapter --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+                <select wire:model="chapter_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($chapters as $c)
+                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
         {{-- Main Question --}}
@@ -77,11 +79,16 @@
         let quillEditors = {};
 
         function initEditors() {
-            window.quillEditors = {};
+            const main = document.getElementById('editor');
+            if (!main || main.classList.contains('ql-container')) return;
+
+            quillEditors = {};
+            window.quillEditors = quillEditors;
+
             const toolbarOptions = [
                 ['bold', 'italic'],
                 [{ 'script': 'sub' }, { 'script': 'super' }],
-                ['customMath'], // আমাদের কাস্টম popup button
+                ['customMath'],
                 ['clean']
             ];
 
@@ -109,6 +116,7 @@
 
             // --- Options Editors ---
             document.querySelectorAll('[id^="opt_editor_"]').forEach(el => {
+                if (el.classList.contains('ql-container')) return;
                 let index = el.id.replace('opt_editor_', '');
                 let optEditor = new Quill(`#${el.id}`, {
                     theme: 'snow',
@@ -149,11 +157,7 @@
             @this.set('tagIds', window.tsTags.items);
         }
 
-        if (document.readyState !== 'loading') {
-            initEditors();
-        } else {
-            document.addEventListener('DOMContentLoaded', initEditors);
-        }
+        document.addEventListener('livewire:load', initEditors);
         document.addEventListener('livewire:navigated', initEditors);
     </script>
 @endpush
