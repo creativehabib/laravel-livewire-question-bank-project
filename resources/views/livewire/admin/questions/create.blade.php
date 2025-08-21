@@ -1,9 +1,9 @@
-<div x-data>
-    <form wire:submit.prevent="save" class="space-y-4">
+<div x-data class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <form wire:submit.prevent="save" class="space-y-6">
         {{-- Subject --}}
         <div>
-            <label>Subject</label>
-            <select wire:model="subject_id" class="border p-2 rounded w-full">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
+            <select wire:model="subject_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">-- Select --</option>
                 @foreach($subjects as $s)
                     <option value="{{ $s->id }}">{{ $s->name }}</option>
@@ -13,8 +13,8 @@
 
         {{-- Chapter --}}
         <div>
-            <label>Chapter</label>
-            <select wire:model="chapter_id" class="border p-2 rounded w-full">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+            <select wire:model="chapter_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">-- Select --</option>
                 @foreach($chapters as $c)
                     <option value="{{ $c->id }}">{{ $c->name }}</option>
@@ -24,14 +24,14 @@
 
         {{-- Main Question --}}
         <div wire:ignore>
-            <label>Question</label>
-            <div id="editor" class="border min-h-32 p-2 rounded"></div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Question</label>
+            <div id="editor" class="mt-1 border border-gray-300 dark:border-gray-600 rounded-md min-h-32 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
         </div>
 
         {{-- Difficulty --}}
         <div>
-            <label>Difficulty</label>
-            <select wire:model="difficulty" class="border p-2 rounded">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Difficulty</label>
+            <select wire:model="difficulty" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
@@ -40,8 +40,8 @@
 
         {{-- Tags --}}
         <div wire:ignore>
-            <label>Tags</label>
-            <select id="tags" class="w-full" multiple>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags</label>
+            <select id="tags" class="w-full mt-1" multiple>
                 @foreach($allTags as $tag)
                     <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
                 @endforeach
@@ -49,21 +49,22 @@
         </div>
 
         {{-- Options --}}
-        <div class="space-y-2">
-            <label>Options</label>
+        <div class="space-y-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
             @foreach($options as $i => $opt)
-                <div wire:key="opt-{{ $i }}" class="flex items-center gap-2">
+                <div wire:key="opt-{{ $i }}" class="flex items-start gap-2">
                     <div wire:ignore class="flex-1">
-                        <div id="opt_editor_{{ $i }}" class="border min-h-24 p-2 rounded"></div>
+                        <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600 rounded-md min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
                     </div>
-                    <label>
-                        <input type="checkbox" wire:model="options.{{ $i }}.is_correct"> Correct
+                    <label class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                        <span>Correct</span>
                     </label>
                 </div>
             @endforeach
         </div>
 
-        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
+        <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
             Save Question
         </button>
     </form>

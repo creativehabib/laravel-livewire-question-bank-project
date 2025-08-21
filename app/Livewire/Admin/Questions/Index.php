@@ -14,6 +14,11 @@ class Index extends Component
 
     protected $listeners = ['questionDeleted' => '$refresh'];
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function delete($id)
     {
         $question = Question::findOrFail($id);
@@ -29,9 +34,14 @@ class Index extends Component
     public function render()
     {
         $questions = Question::with('subject', 'chapter')
-            ->when($this->search, fn($q) =>
-            $q->where('title', 'like', '%' . $this->search . '%')
-            )
+            ->when($this->search, function ($q) {
+                $search = $this->search;
+                $q->where(function ($sub) use ($search) {
+                    $sub->where('title', 'like', "%{$search}%")
+                        ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%"))
+                        ->orWhereHas('chapter', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
+                });
+            })
             ->latest()
             ->paginate(10);
 
