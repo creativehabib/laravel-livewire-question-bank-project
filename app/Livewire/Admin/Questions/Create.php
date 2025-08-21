@@ -15,9 +15,14 @@ class Create extends Component
         ['option_text' => '', 'is_correct' => false],
     ];
 
-    public function updatedSubjectId()
+    public function updatedSubjectId($value)
     {
         $this->chapter_id = null;
+        $chapters = Chapter::where('subject_id', $value)
+            ->get()
+            ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
+            ->all();
+        $this->dispatch('chaptersUpdated', chapters: $chapters);
     }
 
     public function save()

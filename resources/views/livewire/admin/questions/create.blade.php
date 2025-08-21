@@ -2,23 +2,23 @@
     <form wire:submit.prevent="save" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {{-- Subject --}}
-            <div>
+            <div wire:ignore>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
-                <select wire:model="subject_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <select id="subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
                     @foreach($subjects as $s)
-                        <option value="{{ $s->id }}">{{ $s->name }}</option>
+                        <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option>
                     @endforeach
                 </select>
             </div>
 
             {{-- Chapter --}}
-            <div>
+            <div wire:ignore>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
-                <select wire:model="chapter_id" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
                     @foreach($chapters as $c)
-                        <option value="{{ $c->id }}">{{ $c->name }}</option>
+                        <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -77,6 +77,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         let quillEditors = {};
+        let tsSubject, tsChapter;
 
         function initEditors() {
             const main = document.getElementById('editor');
@@ -145,6 +146,22 @@
                 btn.innerHTML = '∑';
             });
 
+            if (tsSubject) tsSubject.destroy();
+            tsSubject = new TomSelect('#subject', {
+                onChange: (value) => {
+                    @this.set('subject_id', value);
+                }
+            });
+            tsSubject.setValue(@json($subject_id));
+
+            if (tsChapter) tsChapter.destroy();
+            tsChapter = new TomSelect('#chapter', {
+                onChange: (value) => {
+                    @this.set('chapter_id', value);
+                }
+            });
+            tsChapter.setValue(@json($chapter_id));
+
             if (window.tsTags) window.tsTags.destroy();
             window.tsTags = new TomSelect('#tags', {
                 plugins: ['remove_button'],
@@ -156,6 +173,14 @@
             });
             @this.set('tagIds', window.tsTags.items);
         }
+
+        window.addEventListener('chaptersUpdated', e => {
+            if (!tsChapter) return;
+            tsChapter.clearOptions();
+            tsChapter.addOptions(e.detail.chapters);
+            tsChapter.refreshOptions(false);
+            tsChapter.setValue('');
+        });
 
         document.addEventListener('livewire:load', initEditors);
         document.addEventListener('livewire:navigated', initEditors);
