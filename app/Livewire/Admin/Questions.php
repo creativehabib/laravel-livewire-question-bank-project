@@ -2,41 +2,68 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Question;
 use Livewire\Component;
+use Livewire\WithPagination;
+use App\Models\Question;
 
 class Questions extends Component
 {
-    public $title, $content, $options = [], $answer;
+    use WithPagination;
 
-    public function addOption()
+    /**
+     * Search term for filtering questions.
+     *
+     * @var string
+     */
+    public $search = '';
+
+    /**
+     * Refresh the component when a question is deleted.
+     *
+     * @var array
+     */
+    protected $listeners = ['questionDeleted' => '$refresh'];
+
+    /**
+     * Reset the pagination when the search term is updated.
+     */
+    public function updatingSearch(): void
     {
-        $this->options[] = '';
+        $this->resetPage();
     }
 
-    public function save()
+    /**
+     * Permanently delete a question along with its relations.
+     */
+    public function deleteQuestion(int $id): void
     {
-        $this->validate([
-            'title' => 'required',
-            'content' => 'required',
-            'options' => 'required|array|min:2',
-            'answer' => 'required'
-        ]);
+        $question = Question::with(['tags', 'options'])->findOrFail($id);
 
-        Question::create([
-            'title'   => $this->title,
-            'content' => $this->content,
-            'options' => json_encode($this->options), // Array → JSON
-            'answer'  => $this->answer,
-        ]);
+        $question->tags()->detach();
+        $question->options()->delete();
 
-        session()->flash('success', 'Question created successfully.');
-        $this->reset(['title', 'content', 'options', 'answer']);
+        $question->forceDelete();
+
+        $this->dispatch('questionDeleted');
+        session()->flash('success', 'Question deleted successfully.');
+        $this->resetPage();
     }
+
     public function render()
     {
-        return view('livewire.admin.questions',[
-            'questions' => Question::latest()->get()
-        ]);
+        $questions = Question::with('subject', 'chapter')
+            ->when($this->search, function ($q) {
+                $search = '%' . $this->search . '%';
+                $q->where('title', 'like', $search)
+                    ->orWhereRelation('subject', 'name', 'like', $search)
+                    ->orWhereRelation('chapter', 'name', 'like', $search);
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('livewire.admin.questions', [
+            'questions' => $questions,
+        ])->layout('layouts.admin', ['title' => 'Manage Questions']);
     }
 }
+

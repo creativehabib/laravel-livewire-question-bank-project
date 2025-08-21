@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\Dashboard;
-use App\Livewire\Admin\Questions\Index;
+use App\Livewire\Admin\Questions;
 use App\Livewire\Admin\Questions\Create;
 use App\Livewire\Admin\Questions\Edit;
 use App\Livewire\Admin\Settings;
@@ -24,7 +24,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
 
     // Questions
-    Route::get('/admin/questions', Index::class)->name('admin.questions.index');
+    Route::get('/admin/questions', Questions::class)->name('admin.questions.index');
     Route::get('/admin/questions/create', Create::class)->name('admin.questions.create');
     Route::get('/admin/questions/{question}/edit', Edit::class)->name('admin.questions.edit');
 
