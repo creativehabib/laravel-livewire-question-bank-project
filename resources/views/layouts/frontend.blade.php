@@ -19,5 +19,8 @@
     <main>
         @yield('content')
     </main>
+    <footer class="bg-white border-t mt-12 py-6 text-center text-sm text-gray-500">
+        &copy; {{ date('Y') }} MCQ Bank. All rights reserved.
+    </footer>
 </body>
 </html>
