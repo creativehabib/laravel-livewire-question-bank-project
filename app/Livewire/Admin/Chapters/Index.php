@@ -23,6 +23,7 @@ class Index extends Component
 
         $this->dispatch('chapterDeleted');
         session()->flash('success', 'Chapter deleted successfully.');
+        $this->resetPage();
     }
 
     public function render()

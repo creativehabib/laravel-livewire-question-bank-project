@@ -22,6 +22,7 @@ class Index extends Component
 
         $this->dispatch('questionDeleted');
         session()->flash('success', 'Question deleted successfully.');
+        $this->resetPage();
     }
 
 

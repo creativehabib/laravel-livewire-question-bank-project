@@ -3,13 +3,19 @@
 namespace App\Livewire\Admin\Tags;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Tag;
 
 class Index extends Component
 {
+    use WithPagination;
+
     public $name = '';
     public $editingId = null;
     public $editingName = '';
+    public $search = '';
+
+    protected $listeners = ['tagDeleted' => '$refresh'];
 
     public function save()
     {
@@ -22,11 +28,16 @@ class Index extends Component
         ]);
 
         $this->name = '';
+        $this->resetPage();
     }
 
     public function delete($id)
     {
         Tag::findOrFail($id)->delete();
+
+        $this->dispatch('tagDeleted');
+        session()->flash('success', 'Tag deleted successfully.');
+        $this->resetPage();
     }
 
     public function edit($id)
@@ -56,8 +67,14 @@ class Index extends Component
 
     public function render()
     {
+        $tags = Tag::when($this->search, fn($q) =>
+                $q->where('name', 'like', '%'.$this->search.'%')
+            )
+            ->orderBy('name')
+            ->paginate(10);
+
         return view('livewire.admin.tags.index', [
-            'tags' => Tag::all(),
+            'tags' => $tags,
         ])->layout('layouts.admin', ['title' => 'Tags']);
     }
 }
