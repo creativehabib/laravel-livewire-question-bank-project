@@ -31,6 +31,6 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.admin.subjects.edit')
-            ->layout('layouts.app', ['title' => 'Edit Subject']);
+            ->layout('layouts.admin', ['title' => 'Edit Subject']);
     }
 }

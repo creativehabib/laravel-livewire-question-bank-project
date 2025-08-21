@@ -31,6 +31,6 @@ class Index extends Component
 
         return view('livewire.admin.subjects.index', [
             'subjects' => $subjects,
-        ])->layout('layouts.app', ['title' => 'Manage Subjects']);
+        ])->layout('layouts.admin', ['title' => 'Manage Subjects']);
     }
 }

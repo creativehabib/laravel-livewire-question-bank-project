@@ -15,6 +15,9 @@ use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
 use App\Livewire\Admin\Students\Index as StudentIndex;
 use App\Livewire\Admin\Tags\Index as TagIndex;
 use App\Livewire\Practice;
+Route::view('/', 'frontend.landing')->name('landing');
+Route::view('/frontend', 'frontend.landing');
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     // Dashboard
@@ -55,3 +58,7 @@ Route::middleware('auth')->group(function () {
 });
 Route::get('/practice', Practice::class)->name('practice');
 include __DIR__.'/auth.php';
+
+Route::fallback(function () {
+    return redirect()->route('landing');
+});

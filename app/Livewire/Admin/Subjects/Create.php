@@ -24,6 +24,6 @@ class Create extends Component
     public function render()
     {
         return view('livewire.admin.subjects.create')
-            ->layout('layouts.app', ['title' => 'Create Subject']);
+            ->layout('layouts.admin', ['title' => 'Create Subject']);
     }
 }

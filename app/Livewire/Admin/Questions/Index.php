@@ -36,7 +36,7 @@ class Index extends Component
 
         return view('livewire.admin.questions.index', [
             'questions' => $questions
-        ])->layout('layouts.app', ['title' => 'Manage Questions']);
+        ])->layout('layouts.admin', ['title' => 'Manage Questions']);
     }
 }
 

@@ -60,6 +60,6 @@ class Edit extends Component
             'subjects' => Subject::all(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'allTags' => Tag::all(),
-        ])->layout('layouts.app', ['title' => 'Edit Question']);
+        ])->layout('layouts.admin', ['title' => 'Edit Question']);
     }
 }

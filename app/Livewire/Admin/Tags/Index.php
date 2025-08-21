@@ -58,6 +58,6 @@ class Index extends Component
     {
         return view('livewire.admin.tags.index', [
             'tags' => Tag::all(),
-        ])->layout('layouts.app', ['title' => 'Tags']);
+        ])->layout('layouts.admin', ['title' => 'Tags']);
     }
 }
