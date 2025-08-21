@@ -47,11 +47,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:teacher,student'])->group(function () {
     // Practice
-    Route::get('/practice', Practice::class)->name('practice');
+
 });
 
 Route::middleware('auth')->group(function () {
     Route::view('/profile', 'profile')->name('profile');
 });
-
+Route::get('/practice', Practice::class)->name('practice');
 include __DIR__.'/auth.php';
