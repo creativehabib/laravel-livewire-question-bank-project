@@ -19,11 +19,16 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function delete($id)
+    public function deleteQuestion($id)
     {
-        $question = Question::findOrFail($id);
-        $question->options()->delete(); // child delete
-        $question->delete();
+        $question = Question::with('tags')->findOrFail($id);
+
+        // remove related data first
+        $question->tags()->detach();
+        $question->options()->delete();
+
+        // force delete to remove the soft deleted record completely
+        $question->forceDelete();
 
         $this->dispatch('questionDeleted');
         session()->flash('success', 'Question deleted successfully.');
@@ -35,12 +40,10 @@ class Index extends Component
     {
         $questions = Question::with('subject', 'chapter')
             ->when($this->search, function ($q) {
-                $search = $this->search;
-                $q->where(function ($sub) use ($search) {
-                    $sub->where('title', 'like', "%{$search}%")
-                        ->orWhereHas('subject', fn($sq) => $sq->where('name', 'like', "%{$search}%"))
-                        ->orWhereHas('chapter', fn($cq) => $cq->where('name', 'like', "%{$search}%"));
-                });
+                $search = '%' . $this->search . '%';
+                $q->where('title', 'like', $search)
+                    ->orWhereRelation('subject', 'name', 'like', $search)
+                    ->orWhereRelation('chapter', 'name', 'like', $search);
             })
             ->latest()
             ->paginate(10);
