@@ -22,29 +22,44 @@
             <span class="sidebar-text">Dashboard</span>
         </a>
 
-        <a wire:navigate href="{{ route('admin.subjects.index') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/subjects*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-book-open class="w-5 h-5"/>
-            <span class="sidebar-text">Subjects</span>
-        </a>
+        @php
+            $questionsActive = request()->is('admin/questions*')
+                || request()->is('admin/subjects*')
+                || request()->is('admin/chapters*')
+                || request()->is('admin/tags*');
+        @endphp
+        <div x-data="{ open: {{ $questionsActive ? 'true' : 'false' }} }" class="space-y-1">
+            <button @click="open = !open"
+                    class="nav-link flex items-center justify-between w-full px-4 py-2.5 rounded-lg {{ $questionsActive ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                <span class="flex items-center gap-3">
+                    <x-heroicon-o-question-mark-circle class="w-5 h-5"/>
+                    <span class="sidebar-text">Questions</span>
+                </span>
+                <x-heroicon-o-chevron-down class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }"/>
+            </button>
 
-        <a wire:navigate href="{{ route('admin.chapters.index') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/chapters*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-rectangle-stack class="w-5 h-5"/>
-            <span class="sidebar-text">Chapters</span>
-        </a>
-
-        <a wire:navigate href="{{ route('admin.tags.index') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/tags*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-tag class="w-5 h-5"/>
-            <span class="sidebar-text">Tags</span>
-        </a>
-
-        <a wire:navigate href="{{ route('admin.questions.index') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/questions*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-question-mark-circle class="w-5 h-5"/>
-            <span class="sidebar-text">Questions</span>
-        </a>
+            <div x-show="open" class="space-y-1 pl-8 mt-1" x-cloak>
+                <a wire:navigate href="{{ route('admin.questions.index') }}"
+                   class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/questions*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                    <span class="sidebar-text">All Questions</span>
+                </a>
+                <a wire:navigate href="{{ route('admin.subjects.index') }}"
+                   class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/subjects*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                    <x-heroicon-o-book-open class="w-4 h-4"/>
+                    <span class="sidebar-text">Subjects</span>
+                </a>
+                <a wire:navigate href="{{ route('admin.chapters.index') }}"
+                   class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/chapters*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                    <x-heroicon-o-rectangle-stack class="w-4 h-4"/>
+                    <span class="sidebar-text">Chapters</span>
+                </a>
+                <a wire:navigate href="{{ route('admin.tags.index') }}"
+                   class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/tags*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                    <x-heroicon-o-tag class="w-4 h-4"/>
+                    <span class="sidebar-text">Tags</span>
+                </a>
+            </div>
+        </div>
 
         <a wire:navigate href="{{ route('admin.settings') }}"
            class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/settings') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
