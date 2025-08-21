@@ -44,8 +44,7 @@ class Questions extends Component
 
         $question->forceDelete();
 
-        $this->dispatch('questionDeleted');
-        session()->flash('success', 'Question deleted successfully.');
+        $this->dispatch('questionDeleted', message: 'Question deleted successfully.');
         $this->resetPage();
     }
 
