@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\ChatMessage;
 use App\Models\User;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -108,6 +109,7 @@ class Chat extends Component
             'users' => User::where('id', '!=', Auth::id())->get(),
             'messages' => $messages,
             'messageCounts' => $messageCounts,
+            'retentionDays' => Setting::get('chat_retention_days', config('chat.retention_days')),
         ]);
     }
 }
