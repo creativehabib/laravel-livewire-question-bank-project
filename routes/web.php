@@ -16,6 +16,7 @@ use App\Livewire\Admin\Students\Index as StudentIndex;
 use App\Livewire\Admin\Tags\Index as TagIndex;
 use App\Livewire\Practice;
 Route::view('/', 'frontend.landing')->name('landing');
+Route::view('/frontend', 'frontend.landing');
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
@@ -57,3 +58,7 @@ Route::middleware('auth')->group(function () {
 });
 
 include __DIR__.'/auth.php';
+
+Route::fallback(function () {
+    return redirect()->route('landing');
+});
