@@ -21,6 +21,7 @@ class Index extends Component
 
         $this->dispatch('subjectDeleted');
         session()->flash('success', 'Subject deleted successfully.');
+        $this->resetPage();
     }
 
     public function render()
