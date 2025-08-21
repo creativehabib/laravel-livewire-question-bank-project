@@ -27,7 +27,7 @@
         {{-- Main Question --}}
         <div wire:ignore>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Question</label>
-            <div id="editor" class="mt-1 border border-gray-300 dark:border-gray-600 rounded-md min-h-32 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
+            <div id="editor" class="border border-gray-300 dark:border-gray-600 min-h-32 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
         </div>
 
         {{-- Difficulty --}}
@@ -56,7 +56,7 @@
             @foreach($options as $i => $opt)
                 <div wire:key="opt-{{ $i }}" class="flex items-start gap-2">
                     <div wire:ignore class="flex-1">
-                        <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600 rounded-md min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
+                        <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600  min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
                     </div>
                     <label class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
                         <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
@@ -74,7 +74,6 @@
 
 {{-- Quill + KaTeX + SweetAlert --}}
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         let quillEditors = {};
 
