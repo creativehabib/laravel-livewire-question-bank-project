@@ -66,7 +66,19 @@
 
             scroll();
 
-            Livewire.on('chat-message-sent', scroll);
+            Livewire.on('chat-message-sent', () => {
+                scroll();
+                if (window.Swal) {
+                    Swal.fire({
+                        toast: true,
+                        icon: 'success',
+                        title: 'Message sent',
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+            });
         });
     </script>
 @endpush
