@@ -1,37 +1,39 @@
-<div x-data>
-    <form wire:submit.prevent="save" class="space-y-4">
-        {{-- Subject --}}
-        <div wire:ignore>
-            <label>Subject</label>
-            <select id="subject" class="border p-2 rounded w-full">
-                <option value="">-- Select --</option>
-                @foreach($subjects as $s)
-                    <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option>
-                @endforeach
-            </select>
-        </div>
+<div x-data class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <form wire:submit.prevent="save" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- Subject --}}
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
+                <select id="subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($subjects as $s)
+                        <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-        {{-- Chapter --}}
-        <div wire:ignore>
-            <label>Chapter</label>
-            <select id="chapter" class="border p-2 rounded w-full">
-                <option value="">-- Select --</option>
-                @foreach($chapters as $c)
-                    <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
-                @endforeach
-            </select>
+            {{-- Chapter --}}
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+                <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($chapters as $c)
+                        <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
         {{-- Main Question --}}
         <div wire:ignore>
-            <label>Question</label>
-            <div id="editor" class="border min-h-32 p-2 rounded">{!! $title !!}</div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Question</label>
+            <div id="editor" class="border border-gray-300 dark:border-gray-600 min-h-32 p-2 dark:bg-gray-700 dark:text-gray-100">{!! $title !!}</div>
         </div>
 
         {{-- Difficulty --}}
         <div>
-            <label>Difficulty</label>
-            <select wire:model="difficulty" class="border p-2 rounded">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Difficulty</label>
+            <select wire:model="difficulty" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="easy">Easy</option>
                 <option value="medium">Medium</option>
                 <option value="hard">Hard</option>
@@ -40,8 +42,8 @@
 
         {{-- Tags --}}
         <div wire:ignore>
-            <label>Tags</label>
-            <select id="tags" class="w-full" multiple>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags</label>
+            <select id="tags" class="w-full mt-1" multiple>
                 @foreach($allTags as $tag)
                     <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option>
                 @endforeach
@@ -49,28 +51,22 @@
         </div>
 
         {{-- Options --}}
-        <div class="space-y-2">
-            <label>Options</label>
+        <div class="space-y-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
             @foreach($options as $i => $opt)
-                <div wire:key="opt-{{ $i }}" class="flex items-center gap-2">
+                <div wire:key="opt-{{ $i }}" class="flex items-start gap-2">
                     <div wire:ignore class="flex-1">
-                        {{-- Load saved HTML for each option --}}
-                        <div id="opt_editor_{{ $i }}" class="min-h-200">
-                            {!! $opt['option_text'] ?? '' !!}
-                        </div>
+                        <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600 min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100">{!! $opt['option_text'] ?? '' !!}</div>
                     </div>
-                    <label class="flex items-center gap-1">
-                        <input type="checkbox"
-                               wire:model="options.{{ $i }}.is_correct"
-                               @if(!empty($opt['is_correct']) && $opt['is_correct']) checked @endif>
-                        Correct
+                    <label class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                        <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600" @if(!empty($opt['is_correct']) && $opt['is_correct']) checked @endif>
+                        <span>Correct</span>
                     </label>
                 </div>
             @endforeach
         </div>
 
-        {{-- Submit --}}
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">
+        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
             Update Question
         </button>
     </form>
@@ -78,18 +74,22 @@
 
 {{-- Quill + KaTeX + SweetAlert --}}
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         let quillEditors = {};
         let tsSubject, tsChapter;
 
         function initEditors() {
-            window.quillEditors = {};
+            const main = document.getElementById('editor');
+            if (!main || main.classList.contains('ql-container')) return;
+
+            quillEditors = {};
+            window.quillEditors = quillEditors;
+
             const toolbarOptions = [
                 ['bold', 'italic'],
                 [{ 'script': 'sub' }, { 'script': 'super' }],
-                ['customMath'], // আমাদের কাস্টম popup button
-                ['clean']
+                ['customMath'],
+                ['clean'],
             ];
 
             // --- Main Editor ---
@@ -105,7 +105,8 @@
                             }
                         }
                     }
-                }
+                },
+                placeholder: 'Compose an epic...',
             });
             quillEditors['title'] = mainEditor;
 
@@ -115,6 +116,7 @@
 
             // --- Options Editors ---
             document.querySelectorAll('[id^="opt_editor_"]').forEach(el => {
+                if (el.classList.contains('ql-container')) return;
                 let index = el.id.replace('opt_editor_', '');
                 let optEditor = new Quill(`#${el.id}`, {
                     theme: 'snow',
@@ -128,7 +130,8 @@
                                 }
                             }
                         }
-                    }
+                    },
+                    placeholder: 'Compose an epic...',
                 });
                 quillEditors[`option_${index}`] = optEditor;
 
@@ -178,11 +181,7 @@
             tsChapter.setValue('');
         });
 
-        if (document.readyState !== 'loading') {
-            initEditors();
-        } else {
-            document.addEventListener('DOMContentLoaded', initEditors);
-        }
+        document.addEventListener('livewire:load', initEditors);
         document.addEventListener('livewire:navigated', initEditors);
     </script>
 @endpush

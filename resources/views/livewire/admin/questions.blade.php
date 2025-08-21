@@ -45,3 +45,35 @@
     <div class="mt-4">{{ $questions->links() }}</div>
 </div>
 
+@push('scripts')
+    <script>
+        function showToast(message) {
+            if (!window.Swal) return;
+            Swal.fire({
+                toast: true,
+                icon: 'success',
+                title: message,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        }
+
+        window.sessionSuccess = @json(session('success'));
+
+        function handleSessionToast() {
+            if (window.sessionSuccess) {
+                showToast(window.sessionSuccess);
+                window.sessionSuccess = null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', handleSessionToast);
+        document.addEventListener('livewire:navigated', handleSessionToast);
+
+        window.addEventListener('questionDeleted', e => {
+            showToast(e.detail.message || 'Question deleted successfully.');
+        });
+    </script>
+@endpush
+
