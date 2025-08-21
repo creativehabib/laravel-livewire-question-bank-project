@@ -19,15 +19,18 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function deleteQuestion($id)
+    /**
+     * Permanently delete a question along with its relations.
+     */
+    public function deleteQuestion(int $id): void
     {
-        $question = Question::with('tags')->findOrFail($id);
+        // Load the question with its related tags and options
+        $question = Question::with(['tags', 'options'])->findOrFail($id);
 
-        // remove related data first
+        // Remove related records before forcing the delete
         $question->tags()->detach();
         $question->options()->delete();
 
-        // force delete to remove the soft deleted record completely
         $question->forceDelete();
 
         $this->dispatch('questionDeleted');

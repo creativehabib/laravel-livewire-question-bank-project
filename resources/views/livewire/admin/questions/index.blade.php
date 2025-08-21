@@ -29,7 +29,7 @@
                     <td class="px-4 py-2 space-x-2">
                         <a wire:navigate href="{{ route('admin.questions.edit', $q) }}"
                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
-                        <button wire:click.prevent="deleteQuestion({{ $q->id }})"
+                        <button type="button" wire:click="deleteQuestion({{ $q->id }})"
                                 onclick="return confirm('Delete this question?')"
                                 class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
                     </td>
