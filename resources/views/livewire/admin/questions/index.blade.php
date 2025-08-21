@@ -1,41 +1,47 @@
-<div>
-    <div class="flex justify-between mb-4">
-        <input type="text" wire:model.debounce.300ms="search"
-               placeholder="Search..." class="border p-2 rounded w-1/3">
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <input type="text" wire:model.debounce.300ms="search" placeholder="Search questions..."
+               class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
         <a wire:navigate href="{{ route('admin.questions.create') }}"
-           class="bg-blue-500 text-white px-4 py-2 rounded">+ New Question</a>
+           class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            + New Question
+        </a>
     </div>
 
-    <table class="w-full border-collapse border">
-        <thead>
-        <tr class="bg-gray-100">
-            <th class="border p-2">#</th>
-            <th class="border p-2">Question</th>
-            <th class="border p-2">Subject</th>
-            <th class="border p-2">Chapter</th>
-            <th class="border p-2">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @forelse($questions as $q)
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
-                <td class="border p-2">{{ $q->id }}</td>
-                <td class="border p-2">{!! $q->title !!}</td>
-                <td class="border p-2">{{ $q->subject->name }}</td>
-                <td class="border p-2">{{ $q->chapter->name }}</td>
-                <td class="border p-2 space-x-2">
-                    <a wire:navigate href="{{ route('admin.questions.edit', $q) }}"
-                       class="text-blue-600 underline">Edit</a>
-                    <button wire:click="delete({{ $q->id }})"
-                            onclick="return confirm('Delete this question?')"
-                            class="text-red-600 underline">Delete</button>
-                </td>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Question</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Subject</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Chapter</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
             </tr>
-        @empty
-            <tr><td colspan="5" class="p-4 text-center text-gray-500">No questions found.</td></tr>
-        @endforelse
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            @forelse($questions as $q)
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->id }}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{!! $q->title !!}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->subject->name }}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter->name }}</td>
+                    <td class="px-4 py-2 space-x-2">
+                        <a wire:navigate href="{{ route('admin.questions.edit', $q) }}"
+                           class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
+                        <button wire:click="delete({{ $q->id }})"
+                                onclick="return confirm('Delete this question?')"
+                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No questions found.</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div>
     <div class="mt-4">{{ $questions->links() }}</div>
 </div>
 
