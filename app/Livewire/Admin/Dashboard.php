@@ -32,6 +32,6 @@ class Dashboard extends Component
                     'title' => Str::limit(strip_tags($q->title), 20),
                     'views' => $q->views,
                 ]),
-        ])->layout('layouts.app', ['title' => 'Dashboard']);
+        ])->layout('layouts.admin', ['title' => 'Dashboard']);
     }
 }
