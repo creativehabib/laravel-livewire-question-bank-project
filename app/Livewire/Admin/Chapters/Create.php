@@ -31,6 +31,6 @@ class Create extends Component
     {
         return view('livewire.admin.chapters.create', [
             'subjects' => Subject::orderBy('name')->get(),
-        ])->layout('layouts.app', ['title' => 'Create Chapter']);
+        ])->layout('layouts.admin', ['title' => 'Create Chapter']);
     }
 }

@@ -39,6 +39,6 @@ class Edit extends Component
     {
         return view('livewire.admin.chapters.edit', [
             'subjects' => Subject::orderBy('name')->get(),
-        ])->layout('layouts.app', ['title' => 'Edit Chapter']);
+        ])->layout('layouts.admin', ['title' => 'Edit Chapter']);
     }
 }

@@ -36,6 +36,6 @@ class Index extends Component
         return view('livewire.admin.chapters.index', [
             'chapters' => $chapters,
             'subjects' => Subject::orderBy('name')->get(),
-        ])->layout('layouts.app', ['title' => 'Manage Chapters']);
+        ])->layout('layouts.admin', ['title' => 'Manage Chapters']);
     }
 }

@@ -15,6 +15,8 @@ use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
 use App\Livewire\Admin\Students\Index as StudentIndex;
 use App\Livewire\Admin\Tags\Index as TagIndex;
 use App\Livewire\Practice;
+Route::view('/', 'frontend.landing')->name('landing');
+
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     // Dashboard
