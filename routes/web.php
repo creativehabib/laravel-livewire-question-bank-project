@@ -50,4 +50,8 @@ Route::middleware(['auth', 'role:teacher,student'])->group(function () {
     Route::get('/practice', Practice::class)->name('practice');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::view('/profile', 'profile')->name('profile');
+});
+
 include __DIR__.'/auth.php';

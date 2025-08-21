@@ -46,6 +46,12 @@
             <span class="sidebar-text">Questions</span>
         </a>
 
+        <a wire:navigate href="{{ route('admin.settings') }}"
+           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/settings') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+            <x-heroicon-o-cog-6-tooth class="w-5 h-5"/>
+            <span class="sidebar-text">Settings</span>
+        </a>
+
         <a href=""
            class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/students*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
             <x-heroicon-o-user-group class="w-5 h-5"/>
