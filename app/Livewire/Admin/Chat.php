@@ -15,10 +15,15 @@ class Chat extends Component
     public $message = '';
     public $recipient_id = '';
 
-    protected $rules = [
-        'recipient_id' => 'required|exists:users,id',
-        'message' => 'required|string|max:500',
-    ];
+    protected function rules(): array
+    {
+        $max = Setting::get('chat_message_max_length', config('chat.message_max_length'));
+
+        return [
+            'recipient_id' => 'required|exists:users,id',
+            'message' => 'required|string|max:' . $max,
+        ];
+    }
 
     public function send()
     {
