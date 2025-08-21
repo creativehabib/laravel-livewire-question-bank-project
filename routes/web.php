@@ -5,6 +5,7 @@ use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Questions\Index;
 use App\Livewire\Admin\Questions\Create;
 use App\Livewire\Admin\Questions\Edit;
+use App\Livewire\Admin\Settings;
 use App\Livewire\Admin\Subjects\Index as SubjectIndex;
 use App\Livewire\Admin\Subjects\Create as SubjectCreate;
 use App\Livewire\Admin\Subjects\Edit as SubjectEdit;
@@ -36,6 +37,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/chapters', ChapterIndex::class)->name('admin.chapters.index');
     Route::get('/admin/chapters/create', ChapterCreate::class)->name('admin.chapters.create');
     Route::get('/admin/chapters/{chapter}/edit', ChapterEdit::class)->name('admin.chapters.edit');
+
+    // Settings
+    Route::get('/admin/settings', Settings::class)->name('admin.settings');
 
     // Students
     // Route::get('/admin/students', StudentIndex::class)->name('admin.students.index');
