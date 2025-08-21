@@ -11,8 +11,12 @@
         <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
             <a href="/" class="text-xl font-bold">MCQ Bank</a>
             <nav class="space-x-4">
-                <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
-                <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="text-sm text-gray-700 hover:text-gray-900">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
+                    <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                @endauth
             </nav>
         </div>
     </header>
