@@ -11,6 +11,13 @@
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Chat message max length</label>
+            <input type="number" min="1" wire:model="chat_message_max_length" class="w-full border rounded p-2">
+            @error('chat_message_max_length')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
         <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
     </form>
 </div>

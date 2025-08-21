@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\Admin\Chat;
 use App\Models\User;
 use App\Models\ChatMessage;
+use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
@@ -65,5 +66,21 @@ class ChatTest extends TestCase
             });
 
         $this->assertNotNull(ChatMessage::first()->fresh()->read_at);
+    }
+
+    public function test_message_respects_max_length_setting(): void
+    {
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        Setting::set('chat_message_max_length', 5);
+
+        $this->actingAs($sender);
+
+        Livewire::test(Chat::class)
+            ->set('recipient_id', $recipient->id)
+            ->set('message', 'toolong')
+            ->call('send')
+            ->assertHasErrors(['message' => 'max']);
     }
 }
