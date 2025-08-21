@@ -27,7 +27,7 @@ class Settings extends Component
 
     public function render()
     {
-        return view('livewire.admin.settings');
+        return view('livewire.admin.settings')->layout('layouts.app');
     }
 }
 
