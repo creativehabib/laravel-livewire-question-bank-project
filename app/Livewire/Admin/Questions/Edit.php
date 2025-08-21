@@ -54,6 +54,16 @@ class Edit extends Component
         return redirect('/admin/questions')->with('success', 'Question updated.');
     }
 
+    public function updatedSubjectId($value)
+    {
+        $this->chapter_id = null;
+        $chapters = Chapter::where('subject_id', $value)
+            ->get()
+            ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
+            ->all();
+        $this->dispatch('chaptersUpdated', chapters: $chapters);
+    }
+
     public function render()
     {
         return view('livewire.admin.questions.edit', [

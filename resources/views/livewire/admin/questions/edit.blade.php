@@ -1,23 +1,23 @@
 <div x-data>
     <form wire:submit.prevent="save" class="space-y-4">
         {{-- Subject --}}
-        <div>
+        <div wire:ignore>
             <label>Subject</label>
-            <select wire:model="subject_id" class="border p-2 rounded w-full">
+            <select id="subject" class="border p-2 rounded w-full">
                 <option value="">-- Select --</option>
                 @foreach($subjects as $s)
-                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                    <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option>
                 @endforeach
             </select>
         </div>
 
         {{-- Chapter --}}
-        <div>
+        <div wire:ignore>
             <label>Chapter</label>
-            <select wire:model="chapter_id" class="border p-2 rounded w-full">
+            <select id="chapter" class="border p-2 rounded w-full">
                 <option value="">-- Select --</option>
                 @foreach($chapters as $c)
-                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                    <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
                 @endforeach
             </select>
         </div>
@@ -81,6 +81,7 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         let quillEditors = {};
+        let tsSubject, tsChapter;
 
         function initEditors() {
             window.quillEditors = {};
@@ -141,6 +142,22 @@
                 btn.innerHTML = '∑';
             });
 
+            if (tsSubject) tsSubject.destroy();
+            tsSubject = new TomSelect('#subject', {
+                onChange: (value) => {
+                    @this.set('subject_id', value);
+                }
+            });
+            tsSubject.setValue(@json($subject_id));
+
+            if (tsChapter) tsChapter.destroy();
+            tsChapter = new TomSelect('#chapter', {
+                onChange: (value) => {
+                    @this.set('chapter_id', value);
+                }
+            });
+            tsChapter.setValue(@json($chapter_id));
+
             if (window.tsTags) window.tsTags.destroy();
             window.tsTags = new TomSelect('#tags', {
                 plugins: ['remove_button'],
@@ -152,6 +169,14 @@
             });
             @this.set('tagIds', window.tsTags.items);
         }
+
+        window.addEventListener('chaptersUpdated', e => {
+            if (!tsChapter) return;
+            tsChapter.clearOptions();
+            tsChapter.addOptions(e.detail.chapters);
+            tsChapter.refreshOptions(false);
+            tsChapter.setValue('');
+        });
 
         if (document.readyState !== 'loading') {
             initEditors();
