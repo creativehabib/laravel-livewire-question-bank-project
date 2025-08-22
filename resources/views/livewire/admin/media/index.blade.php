@@ -1,10 +1,12 @@
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/dropzone@6.0.0/dist/dropzone.css" />
+@endpush
+
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-    <div class="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
-        <div class="flex-1 flex flex-col sm:flex-row gap-2">
-            <input type="file" wire:model="file" class="flex-1" />
-            <input type="text" wire:model="name" placeholder="Name" class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-            <button wire:click="upload" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">Upload</button>
-        </div>
+    <div class="mb-4">
+        <form action="{{ route('admin.media.upload') }}" id="media-dropzone" class="dropzone border-2 border-dashed rounded-md"></form>
+    </div>
+    <div class="mb-4">
         <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..." class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
     </div>
 
@@ -62,6 +64,7 @@
 </div>
 
 @push('scripts')
+<script src="https://unpkg.com/dropzone@6.0.0/dist/dropzone-min.js"></script>
 <script>
     function showToast(message) {
         if (!window.Swal) return;
@@ -92,10 +95,22 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        window.addEventListener('mediaUploaded', e => showToast(e.detail.message));
         window.addEventListener('mediaUpdated', e => showToast(e.detail.message));
         window.addEventListener('mediaReplaced', e => showToast(e.detail.message));
         window.addEventListener('mediaDeleted', e => showToast(e.detail.message));
+
+        Dropzone.autoDiscover = false;
+        const dz = new Dropzone('#media-dropzone', {
+            url: '{{ route('admin.media.upload') }}',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            maxFilesize: 10,
+        });
+
+        dz.on('success', (file, response) => {
+            showToast(response.message);
+            Livewire.dispatch('refreshMedia');
+            dz.removeFile(file);
+        });
     });
 </script>
 @endpush

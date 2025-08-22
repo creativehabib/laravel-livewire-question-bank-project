@@ -12,8 +12,6 @@ class Index extends Component
 {
     use WithPagination, WithFileUploads;
 
-    public $file;
-    public $name = '';
     public $search = '';
 
     public $editingId = null;
@@ -24,6 +22,7 @@ class Index extends Component
 
     protected $listeners = [
         'mediaDeleted' => '$refresh',
+        'refreshMedia' => '$refresh',
         'deleteMediaConfirmed' => 'delete',
     ];
 
@@ -32,33 +31,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function upload(): void
-    {
-        $this->validate([
-            'file' => 'required|file|max:10240',
-            'name' => 'nullable|string|max:255',
-        ]);
 
-        $path = $this->file->store('media', 'public');
-        $mime = $this->file->getMimeType();
-        $size = $this->file->getSize();
-        $dimensions = str_starts_with($mime, 'image/') ? getimagesize($this->file->getRealPath()) : null;
-
-        Media::create([
-            'name' => $this->name ?: $this->file->getClientOriginalName(),
-            'filename' => basename($path),
-            'mime_type' => $mime,
-            'path' => $path,
-            'size' => $size,
-            'width' => $dimensions[0] ?? null,
-            'height' => $dimensions[1] ?? null,
-            'created_by' => auth()->id(),
-        ]);
-
-        $this->reset(['file', 'name']);
-        $this->resetPage();
-        $this->dispatch('mediaUploaded', message: 'Media uploaded successfully.');
-    }
 
     public function edit($id): void
     {
