@@ -33,14 +33,17 @@
                                 <button type="button" wire:click="cancelEdit" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
                             </form>
                         @else
-                            <button type="button" onclick='showDetails(@json([
-                                "name" => $media->name,
-                                "mime" => $media->mime_type,
-                                "size" => $media->size,
-                                "width" => $media->width,
-                                "height" => $media->height,
-                                "url" => Storage::url($media->path),
-                            ]))' class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $media->name }}</button>
+                            @php
+                                $details = [
+                                    'name' => $media->name,
+                                    'mime' => $media->mime_type,
+                                    'size' => $media->size,
+                                    'width' => $media->width,
+                                    'height' => $media->height,
+                                    'url' => Storage::url($media->path),
+                                ];
+                            @endphp
+                            <button type="button" onclick='showDetails(@json($details))' class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $media->name }}</button>
                         @endif
                     </td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $media->mime_type }}</td>
