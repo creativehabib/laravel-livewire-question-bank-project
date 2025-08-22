@@ -69,10 +69,12 @@ class Create extends Component
 
     public function render()
     {
+        $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
+
         return view('livewire.admin.questions.create', [
             'subjects' => Subject::all(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'allTags' => Tag::all(),
-        ])->layout('layouts.admin', ['title' => 'Create Question']);
+        ])->layout($layout, ['title' => 'Create Question']);
     }
 }

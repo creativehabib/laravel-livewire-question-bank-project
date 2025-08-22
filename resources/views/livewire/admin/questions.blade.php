@@ -18,7 +18,7 @@
                 @endforeach
             </select>
         </div>
-        <a wire:navigate href="{{ route('admin.questions.create') }}"
+        <a wire:navigate href="{{ route(auth()->user()->isAdmin() ? 'admin.questions.create' : 'teacher.questions.create') }}"
            class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             + New Question
         </a>
@@ -43,10 +43,12 @@
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->subject->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter->name }}</td>
                     <td class="px-4 py-2 space-x-2">
-                        <a wire:navigate href="{{ route('admin.questions.edit', $q) }}"
+                        <a wire:navigate href="{{ route(auth()->user()->isAdmin() ? 'admin.questions.edit' : 'teacher.questions.edit', $q) }}"
                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
-                        <button type="button" onclick="confirmDelete({{ $q->id }})"
-                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                        @if(auth()->user()->isAdmin())
+                            <button type="button" onclick="confirmDelete({{ $q->id }})"
+                                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                        @endif
                     </td>
                 </tr>
             @empty
