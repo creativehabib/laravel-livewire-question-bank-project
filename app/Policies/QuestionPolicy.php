@@ -14,7 +14,7 @@ class QuestionPolicy
 
     public function view(User $user, Question $question): bool
     {
-        return $user->isAdmin() || $question->user_id === $user->id;
+        return $user->isAdmin() || $question->user_id == $user->id;
     }
 
     public function create(User $user): bool
@@ -24,7 +24,7 @@ class QuestionPolicy
 
     public function update(User $user, Question $question): bool
     {
-        return $user->isAdmin() || ($user->isTeacher() && $question->user_id === $user->id);
+        return $user->isAdmin() || ($user->isTeacher() && $question->user_id == $user->id);
     }
 
     public function delete(User $user, Question $question): bool
