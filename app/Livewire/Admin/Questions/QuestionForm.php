@@ -3,10 +3,13 @@
 namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\{Subject, Chapter, Question, Tag};
 
 class QuestionForm extends Component
 {
+    use AuthorizesRequests;
+
     public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে
     public $subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
     public $options = [];
@@ -20,6 +23,8 @@ class QuestionForm extends Component
             $this->questionId = $id;
             $q = Question::with('options', 'tags')->findOrFail($id);
 
+            $this->authorize('update', $q);
+
             $this->subject_id = $q->subject_id;
             $this->chapter_id = $q->chapter_id;
             $this->title = $q->title;
@@ -27,6 +32,7 @@ class QuestionForm extends Component
             $this->tagIds = $q->tags()->pluck('tags.id')->toArray();
             $this->options = $q->options->toArray();
         } else {
+            $this->authorize('create', Question::class);
             $this->options = [
                 ['option_text' => '', 'is_correct' => false],
                 ['option_text' => '', 'is_correct' => false],
@@ -55,6 +61,7 @@ class QuestionForm extends Component
 
         if ($this->questionId) {
             $q = Question::findOrFail($this->questionId);
+            $this->authorize('update', $q);
             $q->update([
                 'subject_id' => $this->subject_id,
                 'chapter_id' => $this->chapter_id,
@@ -65,18 +72,21 @@ class QuestionForm extends Component
             $q->options()->delete();
             $q->options()->createMany($this->options);
         } else {
+            $this->authorize('create', Question::class);
             $q = Question::create([
                 'subject_id' => $this->subject_id,
                 'chapter_id' => $this->chapter_id,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
+                'user_id' => auth()->id(),
             ]);
             $q->tags()->sync($tagIds);
             $q->options()->createMany($this->options);
         }
 
         session()->flash('success', 'Question saved successfully.');
-        return redirect()->route('admin.questions.index');
+        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        return redirect()->route($route);
     }
 
     public function render()

@@ -3,15 +3,20 @@
 namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\{Subject, Chapter, Question, Tag};
 
 class Edit extends Component
 {
+    use AuthorizesRequests;
+
     public Question $question;
     public $subject_id, $chapter_id, $title, $difficulty, $tagIds = [], $options = [];
 
     public function mount(Question $question)
     {
+        $this->authorize('update', $question);
+
         $this->question = $question;
         $this->subject_id = $question->subject_id;
         $this->chapter_id = $question->chapter_id;
@@ -23,6 +28,8 @@ class Edit extends Component
 
     public function save()
     {
+        $this->authorize('update', $this->question);
+
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'required|exists:chapters,id',
@@ -51,7 +58,8 @@ class Edit extends Component
             $this->question->options()->create($opt);
         }
 
-        return redirect('/admin/questions')->with('success', 'Question updated.');
+        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        return redirect()->route($route)->with('success', 'Question updated.');
     }
 
     public function updatedSubjectId($value)
