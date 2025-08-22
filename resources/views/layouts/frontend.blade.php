@@ -12,7 +12,7 @@
             <a href="/" class="text-xl font-bold">MCQ Bank</a>
             <nav class="space-x-4">
                 @auth
-                    <a href="{{ route('admin.dashboard') }}" class="text-sm text-gray-700 hover:text-gray-900">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="text-sm text-gray-700 hover:text-gray-900">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
                     <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>

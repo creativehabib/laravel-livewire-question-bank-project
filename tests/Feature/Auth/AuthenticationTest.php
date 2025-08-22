@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use App\Enums\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -32,7 +33,7 @@ class AuthenticationTest extends TestCase
 
         $component
             ->assertHasNoErrors()
-            ->assertRedirect(route('admin.dashboard', absolute: false));
+            ->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertAuthenticated();
     }
@@ -56,7 +57,7 @@ class AuthenticationTest extends TestCase
 
     public function test_navigation_menu_can_be_rendered(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => Role::ADMIN]);
 
         $this->actingAs($user);
 
