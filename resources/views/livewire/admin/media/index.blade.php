@@ -3,8 +3,8 @@
 @endpush
 
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-    <div class="mb-4">
-        <form action="{{ route('admin.media.upload') }}" id="media-dropzone" class="dropzone border-2 border-dashed rounded-md"></form>
+    <div class="mb-4 flex justify-end">
+        <button id="open-uploader" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Add Media</button>
     </div>
     <div class="mb-4">
         <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..." class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
@@ -33,7 +33,14 @@
                                 <button type="button" wire:click="cancelEdit" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
                             </form>
                         @else
-                            <span class="text-gray-700 dark:text-gray-300">{{ $media->name }}</span>
+                            <button type="button" onclick='showDetails(@json([
+                                "name" => $media->name,
+                                "mime" => $media->mime_type,
+                                "size" => $media->size,
+                                "width" => $media->width,
+                                "height" => $media->height,
+                                "url" => Storage::url($media->path),
+                            ]))' class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $media->name }}</button>
                         @endif
                     </td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $media->mime_type }}</td>
@@ -61,6 +68,21 @@
         </table>
     </div>
     <div class="mt-4">{{ $mediaItems->links() }}</div>
+</div>
+
+<div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-lg">
+        <div class="mb-4">
+            <form action="{{ route('admin.media.upload') }}" id="media-dropzone" class="dropzone border-2 border-dashed rounded-md"></form>
+        </div>
+        <div class="flex mb-4">
+            <input type="text" id="media-url" placeholder="Media URL" class="flex-1 px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+            <button id="upload-url-btn" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Upload</button>
+        </div>
+        <div class="text-right">
+            <button id="close-uploader" class="px-3 py-1 bg-gray-200 rounded-md dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">Close</button>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -94,7 +116,26 @@
         });
     }
 
+    function showDetails(media) {
+        if (!window.Swal) return;
+        let html = `<p><strong>Name:</strong> ${media.name}</p>` +
+            `<p><strong>Mime:</strong> ${media.mime}</p>` +
+            `<p><strong>Size:</strong> ${(media.size / 1024).toFixed(2)} KB</p>`;
+        if (media.width && media.height) {
+            html += `<p><strong>Dimensions:</strong> ${media.width}x${media.height}</p>`;
+        }
+        html += `<p><a href="${media.url}" target="_blank" class="text-indigo-600">Open file</a></p>`;
+        Swal.fire({
+            title: 'Media Details',
+            html: html,
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('upload-modal');
+        document.getElementById('open-uploader').addEventListener('click', () => modal.classList.remove('hidden'));
+        document.getElementById('close-uploader').addEventListener('click', () => modal.classList.add('hidden'));
+
         window.addEventListener('mediaUpdated', e => showToast(e.detail.message));
         window.addEventListener('mediaReplaced', e => showToast(e.detail.message));
         window.addEventListener('mediaDeleted', e => showToast(e.detail.message));
@@ -110,6 +151,31 @@
             showToast(response.message);
             Livewire.dispatch('refreshMedia');
             dz.removeFile(file);
+            modal.classList.add('hidden');
+        });
+
+        document.getElementById('upload-url-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = document.getElementById('media-url').value;
+            if (!url) return;
+            fetch('{{ route('admin.media.upload') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({ url })
+            }).then(res => res.json().then(data => ({ ok: res.ok, data })))
+            .then(res => {
+                if (res.ok) {
+                    showToast(res.data.message);
+                    Livewire.dispatch('refreshMedia');
+                    document.getElementById('media-url').value = '';
+                    modal.classList.add('hidden');
+                } else {
+                    alert(res.data.message || 'Upload failed');
+                }
+            });
         });
     });
 </script>
