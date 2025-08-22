@@ -151,7 +151,7 @@
                     @this.set('subject_id', value);
                 }
             });
-            tsSubject.setValue(@json($subject_id));
+            tsSubject.setValue(@json($subject_id), true);
 
             if (tsChapter) tsChapter.destroy();
             tsChapter = new TomSelect('#chapter', {
@@ -159,7 +159,7 @@
                     @this.set('chapter_id', value);
                 }
             });
-            tsChapter.setValue(@json($chapter_id));
+            tsChapter.setValue(@json($chapter_id), true);
 
             if (window.tsTags) window.tsTags.destroy();
             window.tsTags = new TomSelect('#tags', {
