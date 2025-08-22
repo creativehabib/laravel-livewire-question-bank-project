@@ -9,7 +9,7 @@
 @tailwind utilities;
 
 body {
-    font-family: 'Shurjo','Roboto',  sans-serif;
+    font-family: 'Shurjo', 'Roboto', sans-serif;
     font-size: 1rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;

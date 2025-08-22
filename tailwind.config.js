@@ -12,7 +12,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Shurjo','Roboto', ...defaultTheme.fontFamily.sans],
+                sans: ['Shurjo', 'Roboto', ...defaultTheme.fontFamily.sans],
             },
         },
     },
