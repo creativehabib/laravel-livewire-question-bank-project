@@ -15,6 +15,9 @@ use App\Livewire\Admin\Chapters\Create as ChapterCreate;
 use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
 use App\Livewire\Admin\Tags\Index as TagIndex;
 use App\Livewire\Admin\Users\Index as UserIndex;
+use App\Livewire\Admin\Jobs\Index as JobIndex;
+use App\Livewire\Admin\Jobs\Create as JobCreate;
+use App\Livewire\Admin\Jobs\Edit as JobEdit;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Practice;
@@ -43,6 +46,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/chapters', ChapterIndex::class)->name('admin.chapters.index');
     Route::get('/admin/chapters/create', ChapterCreate::class)->name('admin.chapters.create');
     Route::get('/admin/chapters/{chapter}/edit', ChapterEdit::class)->name('admin.chapters.edit');
+
+    // Jobs
+    Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');
+    Route::get('/admin/jobs/create', JobCreate::class)->name('admin.jobs.create');
+    Route::get('/admin/jobs/{job}/edit', JobEdit::class)->name('admin.jobs.edit');
 
     // Settings
     Route::get('/admin/settings', Settings::class)->name('admin.settings');
