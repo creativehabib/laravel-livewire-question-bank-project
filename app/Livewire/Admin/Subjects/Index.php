@@ -12,16 +12,22 @@ class Index extends Component
 
     public $search = '';
 
-    protected $listeners = ['subjectDeleted' => '$refresh'];
+    protected $listeners = [
+        'subjectDeleted' => '$refresh',
+        'deleteSubjectConfirmed' => 'delete',
+    ];
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function delete($id)
     {
-        $subject = Subject::findOrFail($id);
-        $subject->delete();
+        Subject::findOrFail($id)->delete();
 
-        $this->dispatch('subjectDeleted');
-        session()->flash('success', 'Subject deleted successfully.');
         $this->resetPage();
+        $this->dispatch('subjectDeleted', message: 'Subject deleted successfully.');
     }
 
     public function render()
