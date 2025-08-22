@@ -22,13 +22,14 @@
             <span class="sidebar-text">Dashboard</span>
         </a>
 
-        @php
-            $questionsActive = request()->is('admin/questions*')
-                || request()->is('admin/subjects*')
-                || request()->is('admin/chapters*')
-                || request()->is('admin/tags*');
-        @endphp
-        <div x-data="{ open: {{ $questionsActive ? 'true' : 'false' }} }" class="space-y-1">
+        @if(auth()->user()->isAdmin() || auth()->user()->isTeacher())
+            @php
+                $questionsActive = request()->is('admin/questions*')
+                    || request()->is('admin/subjects*')
+                    || request()->is('admin/chapters*')
+                    || request()->is('admin/tags*');
+            @endphp
+            <div x-data="{ open: {{ $questionsActive ? 'true' : 'false' }} }" class="space-y-1">
             <button @click="open = !open"
                     class="nav-link flex items-center justify-between w-full px-4 py-2.5 rounded-lg {{ $questionsActive ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
                 <span class="flex items-center gap-3">
@@ -61,19 +62,22 @@
                     <span class="sidebar-text">Tags</span>
                 </a>
             </div>
-        </div>
+            </div>
+        @endif
 
-        <a wire:navigate href="{{ route('admin.settings') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/settings') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-cog-6-tooth class="w-5 h-5"/>
-            <span class="sidebar-text">Settings</span>
-        </a>
+        @if(auth()->user()->isAdmin())
+            <a wire:navigate href="{{ route('admin.settings') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/settings') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                <x-heroicon-o-cog-6-tooth class="w-5 h-5"/>
+                <span class="sidebar-text">Settings</span>
+            </a>
 
-        <a wire:navigate href="{{ route('admin.users.index') }}"
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/users*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-            <x-heroicon-o-user-group class="w-5 h-5"/>
-            <span class="sidebar-text">Users</span>
-        </a>
+            <a wire:navigate href="{{ route('admin.users.index') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/users*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                <x-heroicon-o-user-group class="w-5 h-5"/>
+                <span class="sidebar-text">Users</span>
+            </a>
+        @endif
     </nav>
 
     {{-- Dark Mode Toggle --}}
