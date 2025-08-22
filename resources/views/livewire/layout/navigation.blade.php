@@ -33,6 +33,18 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @if(auth()->user()->isTeacher())
+                        <x-nav-link :href="route('teacher.questions.index')" :active="request()->routeIs('teacher.questions.*')" wire:navigate>
+                            {{ __('Questions') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if(auth()->user()->isTeacher() || auth()->user()->isStudent())
+                        <x-nav-link :href="route('practice')" :active="request()->routeIs('practice')" wire:navigate>
+                            {{ __('Practice') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -84,6 +96,18 @@ new class extends Component
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @if(auth()->user()->isTeacher())
+                <x-responsive-nav-link :href="route('teacher.questions.index')" :active="request()->routeIs('teacher.questions.*')" wire:navigate>
+                    {{ __('Questions') }}
+                </x-responsive-nav-link>
+            @endif
+
+            @if(auth()->user()->isTeacher() || auth()->user()->isStudent())
+                <x-responsive-nav-link :href="route('practice')" :active="request()->routeIs('practice')" wire:navigate>
+                    {{ __('Practice') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
