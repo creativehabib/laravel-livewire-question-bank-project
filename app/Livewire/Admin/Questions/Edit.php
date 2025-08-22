@@ -74,10 +74,12 @@ class Edit extends Component
 
     public function render()
     {
+        $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
+
         return view('livewire.admin.questions.edit', [
             'subjects' => Subject::all(),
             'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
             'allTags' => Tag::all(),
-        ])->layout('layouts.admin', ['title' => 'Edit Question']);
+        ])->layout($layout, ['title' => 'Edit Question']);
     }
 }
