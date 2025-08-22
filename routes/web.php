@@ -13,8 +13,8 @@ use App\Livewire\Admin\Subjects\Edit as SubjectEdit;
 use App\Livewire\Admin\Chapters\Index as ChapterIndex;
 use App\Livewire\Admin\Chapters\Create as ChapterCreate;
 use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
-use App\Livewire\Admin\Students\Index as StudentIndex;
 use App\Livewire\Admin\Tags\Index as TagIndex;
+use App\Livewire\Admin\Users\Index as UserIndex;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Practice;
@@ -47,8 +47,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Settings
     Route::get('/admin/settings', Settings::class)->name('admin.settings');
 
-    // Students
-    // Route::get('/admin/students', StudentIndex::class)->name('admin.students.index');
+    // Users
+    Route::get('/admin/users', UserIndex::class)->name('admin.users.index');
 });
 
 Route::middleware(['auth', 'role:teacher'])->group(function () {

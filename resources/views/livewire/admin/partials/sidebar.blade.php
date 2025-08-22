@@ -69,10 +69,10 @@
             <span class="sidebar-text">Settings</span>
         </a>
 
-        <a href=""
-           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/students*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+        <a wire:navigate href="{{ route('admin.users.index') }}"
+           class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/users*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
             <x-heroicon-o-user-group class="w-5 h-5"/>
-            <span class="sidebar-text">Students</span>
+            <span class="sidebar-text">Users</span>
         </a>
     </nav>
 
