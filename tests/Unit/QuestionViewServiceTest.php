@@ -6,6 +6,7 @@ use Tests\TestCase;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Chapter;
+use App\Models\User;
 use App\Services\QuestionViewService;
 use Illuminate\Support\Facades\Cache;
 
@@ -15,6 +16,7 @@ class QuestionViewServiceTest extends TestCase
     {
         Cache::flush();
 
+        $user = User::factory()->create();
         $subject = Subject::create(['name' => 'Math']);
         $chapter = Chapter::create(['subject_id' => $subject->id, 'name' => 'Algebra']);
         $question = Question::create([
@@ -23,6 +25,7 @@ class QuestionViewServiceTest extends TestCase
             'title' => '1 + 1 = ?',
             'difficulty' => 'easy',
             'slug' => '1-plus-1',
+            'user_id' => $user->id,
         ]);
 
         $service = new QuestionViewService();

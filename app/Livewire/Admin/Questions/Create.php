@@ -3,10 +3,13 @@
 namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\{Subject, Chapter, Question, Option, Tag};
 
 class Create extends Component
 {
+    use AuthorizesRequests;
+
     public $subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
     public $options = [
         ['option_text' => '', 'is_correct' => false],
@@ -27,6 +30,8 @@ class Create extends Component
 
     public function save()
     {
+        $this->authorize('create', Question::class);
+
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
             'chapter_id' => 'required|exists:chapters,id',
@@ -41,6 +46,7 @@ class Create extends Component
             'chapter_id' => $this->chapter_id,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
+            'user_id' => auth()->id(),
         ]);
 
         if ($this->tagIds) {
@@ -57,7 +63,8 @@ class Create extends Component
             $question->options()->create($opt);
         }
 
-        return redirect('/admin/questions')->with('success', 'Question created.');
+        $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
+        return redirect()->route($route)->with('success', 'Question created.');
     }
 
     public function render()

@@ -61,7 +61,7 @@ Route::middleware(['auth', 'role:student'])->group(function () {
 
 Route::middleware(['auth', 'role:teacher,student'])->group(function () {
     // Practice
-
+    Route::get('/practice', Practice::class)->name('practice');
 });
 
 Route::get('/dashboard', function () {
@@ -77,7 +77,12 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::view('/profile', 'profile')->name('profile');
 });
-Route::get('/practice', Practice::class)->name('practice');
+
+Route::middleware(['auth', 'role:teacher'])->group(function () {
+    Route::get('/teacher/questions', Questions::class)->name('teacher.questions.index');
+    Route::get('/teacher/questions/create', Create::class)->name('teacher.questions.create');
+    Route::get('/teacher/questions/{question}/edit', Edit::class)->name('teacher.questions.edit');
+});
 include __DIR__.'/auth.php';
 
 Route::fallback(function () {
