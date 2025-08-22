@@ -14,16 +14,27 @@ class Index extends Component
     public $search = '';
     public $subjectId = '';
 
-    protected $listeners = ['chapterDeleted' => '$refresh'];
+    protected $listeners = [
+        'chapterDeleted' => '$refresh',
+        'deleteChapterConfirmed' => 'delete',
+    ];
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSubjectId(): void
+    {
+        $this->resetPage();
+    }
 
     public function delete($id)
     {
-        $chapter = Chapter::findOrFail($id);
-        $chapter->delete();
+        Chapter::findOrFail($id)->delete();
 
-        $this->dispatch('chapterDeleted');
-        session()->flash('success', 'Chapter deleted successfully.');
         $this->resetPage();
+        $this->dispatch('chapterDeleted', message: 'Chapter deleted successfully.');
     }
 
     public function render()

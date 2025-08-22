@@ -15,7 +15,15 @@ class Index extends Component
     public $editingName = '';
     public $search = '';
 
-    protected $listeners = ['tagDeleted' => '$refresh'];
+    protected $listeners = [
+        'tagDeleted' => '$refresh',
+        'deleteTagConfirmed' => 'delete',
+    ];
+
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function save()
     {
@@ -29,15 +37,15 @@ class Index extends Component
 
         $this->name = '';
         $this->resetPage();
+        $this->dispatch('tagSaved', message: 'Tag added successfully.');
     }
 
     public function delete($id)
     {
         Tag::findOrFail($id)->delete();
 
-        $this->dispatch('tagDeleted');
-        session()->flash('success', 'Tag deleted successfully.');
         $this->resetPage();
+        $this->dispatch('tagDeleted', message: 'Tag deleted successfully.');
     }
 
     public function edit($id)
@@ -57,6 +65,7 @@ class Index extends Component
 
         $this->editingId = null;
         $this->editingName = '';
+        $this->dispatch('tagUpdated', message: 'Tag updated successfully.');
     }
 
     public function cancelEdit()
