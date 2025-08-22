@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Enums\Role;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -73,8 +74,17 @@ class User extends Authenticatable
             ->exists();
     }
 
-    public function getAvatarUrlAttribute(): string
+    public function getAvatarUrlAttribute(): ?string
     {
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
+        return $this->attributes['avatar_url'] ?? null;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        return collect(explode(' ', $this->name))
+            ->filter()
+            ->map(fn (string $segment) => Str::upper(Str::substr($segment, 0, 1)))
+            ->take(2)
+            ->join('');
     }
 }
