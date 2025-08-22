@@ -44,7 +44,7 @@ class Practice extends Component
 
     public function render()
     {
-        return view('livewire.practice')->layout('layouts.frontend', ['title' => 'Practice']);
+        return view('livewire.practice')->layout('layouts.admin', ['title' => 'Practice']);
     }
 }
 

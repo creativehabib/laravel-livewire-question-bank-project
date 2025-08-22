@@ -1,4 +1,20 @@
 <div>
+    <div class="mb-4 flex flex-col sm:flex-row gap-2">
+        <select wire:model="subjectId" class="border rounded px-3 py-2">
+            <option value="">All Subjects</option>
+            @foreach($subjects as $subject)
+                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+            @endforeach
+        </select>
+        <select wire:model="chapterId" class="border rounded px-3 py-2">
+            <option value="">All Chapters</option>
+            @foreach($chapters as $chapter)
+                <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
+            @endforeach
+        </select>
+        <button wire:click="loadRandom" class="bg-indigo-500 text-white px-4 py-2 rounded">Load</button>
+    </div>
+
     @if($current)
         <div class="mb-4 prose max-w-none">{!! $current->title !!}</div>
 

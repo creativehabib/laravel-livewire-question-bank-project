@@ -96,7 +96,7 @@ class Questions extends Component
             'chapters' => Chapter::when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
                 ->orderBy('name')
                 ->get(),
-        ])->layout('layouts.admin', ['title' => 'Manage Questions']);
+        ])->layout($user->isAdmin() ? 'layouts.admin' : 'layouts.panel', ['title' => 'Manage Questions']);
     }
 }
 
