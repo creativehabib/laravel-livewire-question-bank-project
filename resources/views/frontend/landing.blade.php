@@ -5,7 +5,7 @@
     <h1 class="text-5xl font-bold mb-4">Welcome to MCQ Bank</h1>
     <p class="text-lg text-gray-600 mb-8">Practice and create multiple choice questions effortlessly.</p>
     @auth
-        <a href="{{ route('admin.dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
+        <a href="{{ route('dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
     @else
         <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Get Started</a>
     @endauth
@@ -31,7 +31,7 @@
 <section class="py-24 text-center bg-indigo-50">
     <h2 class="text-3xl font-bold mb-4">Ready to dive in?</h2>
     @auth
-        <a href="{{ route('admin.dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
+        <a href="{{ route('dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
     @else
         <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Create an Account</a>
     @endauth

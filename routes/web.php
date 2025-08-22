@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Enums\Role;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Questions;
 use App\Livewire\Admin\Questions\Create;
@@ -14,6 +15,8 @@ use App\Livewire\Admin\Chapters\Create as ChapterCreate;
 use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
 use App\Livewire\Admin\Students\Index as StudentIndex;
 use App\Livewire\Admin\Tags\Index as TagIndex;
+use App\Livewire\Teacher\Dashboard as TeacherDashboard;
+use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Practice;
 Route::view('/', 'frontend.landing')->name('landing');
 Route::view('/frontend', 'frontend.landing');
@@ -48,10 +51,28 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Route::get('/admin/students', StudentIndex::class)->name('admin.students.index');
 });
 
+Route::middleware(['auth', 'role:teacher'])->group(function () {
+    Route::get('/teacher/dashboard', TeacherDashboard::class)->name('teacher.dashboard');
+});
+
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('/student/dashboard', StudentDashboard::class)->name('student.dashboard');
+});
+
 Route::middleware(['auth', 'role:teacher,student'])->group(function () {
     // Practice
 
 });
+
+Route::get('/dashboard', function () {
+    $user = request()->user();
+
+    return match ($user->role) {
+        Role::ADMIN => redirect()->route('admin.dashboard'),
+        Role::TEACHER => redirect()->route('teacher.dashboard'),
+        Role::STUDENT => redirect()->route('student.dashboard'),
+    };
+})->middleware('auth')->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::view('/profile', 'profile')->name('profile');
