@@ -31,6 +31,6 @@ class Dashboard extends Component
             'latest' => $latest,
             'daily' => $daily,
             'weekly' => $weekly,
-        ])->layout('layouts.panel', ['title' => 'Student Dashboard']);
+        ])->layout('layouts.admin', ['title' => 'Student Dashboard']);
     }
 }

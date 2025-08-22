@@ -19,6 +19,6 @@ class Dashboard extends Component
         return view('livewire.teacher.dashboard', [
             'questionCount' => $questionCount,
             'subjects' => $subjects,
-        ])->layout('layouts.panel', ['title' => 'Teacher Dashboard']);
+        ])->layout('layouts.admin', ['title' => 'Teacher Dashboard']);
     }
 }
