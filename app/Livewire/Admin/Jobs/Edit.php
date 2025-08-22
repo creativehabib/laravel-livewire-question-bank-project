@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Jobs;
 use Livewire\Component;
 use App\Models\JobPost;
 use App\Enums\JobStatus;
+use Illuminate\Support\Str;
 
 class Edit extends Component
 {
@@ -41,6 +42,11 @@ class Edit extends Component
         $this->seo_title = $job->seo_title;
         $this->seo_description = $job->seo_description;
         $this->seo_keywords = $job->seo_keywords;
+    }
+
+    public function updatedTitle($value)
+    {
+        $this->slug = Str::slug($value);
     }
 
     public function update()

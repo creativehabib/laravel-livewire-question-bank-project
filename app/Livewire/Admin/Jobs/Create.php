@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Jobs;
 use Livewire\Component;
 use App\Models\JobPost;
 use App\Enums\JobStatus;
+use Illuminate\Support\Str;
 
 class Create extends Component
 {
@@ -16,12 +17,17 @@ class Create extends Component
     public $description;
     public $deadline;
     public $posted_at;
-    public $status = JobStatus::DRAFT;
+    public $status = JobStatus::DRAFT->value;
     public $featured = false;
     public $cover_image;
     public $seo_title;
     public $seo_description;
     public $seo_keywords;
+
+    public function updatedTitle($value)
+    {
+        $this->slug = Str::slug($value);
+    }
 
     public function save()
     {

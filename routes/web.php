@@ -21,6 +21,7 @@ use App\Livewire\Admin\Jobs\Edit as JobEdit;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Practice;
+use App\Http\Controllers\ImageController;
 Route::view('/', 'frontend.landing')->name('landing');
 Route::view('/frontend', 'frontend.landing');
 
@@ -51,6 +52,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');
     Route::get('/admin/jobs/create', JobCreate::class)->name('admin.jobs.create');
     Route::get('/admin/jobs/{job}/edit', JobEdit::class)->name('admin.jobs.edit');
+
+    // Images
+    Route::post('/admin/images/upload', [ImageController::class, 'store'])->name('admin.images.upload');
 
     // Settings
     Route::get('/admin/settings', Settings::class)->name('admin.settings');
