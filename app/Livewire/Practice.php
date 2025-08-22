@@ -3,12 +3,12 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Question;
+use App\Models\{Question, Subject, Chapter};
 use App\Services\QuestionViewService;
 
 class Practice extends Component
 {
-    public $current, $selectedOption;
+    public $current, $selectedOption, $subjectId = '', $chapterId = '';
 
     /**
      * Service used to record unique question views.
@@ -28,9 +28,18 @@ class Practice extends Component
         $this->loadRandom();
     }
 
+    public function updatedSubjectId(): void
+    {
+        $this->chapterId = '';
+    }
+
     public function loadRandom()
     {
-        $this->current = Question::with('options')->inRandomOrder()->first();
+        $query = Question::with('options')
+            ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
+            ->when($this->chapterId, fn($q) => $q->where('chapter_id', $this->chapterId));
+
+        $this->current = $query->inRandomOrder()->first();
         if ($this->current) {
             $this->views->record($this->current, request()->ip());
         }
@@ -44,7 +53,12 @@ class Practice extends Component
 
     public function render()
     {
-        return view('livewire.practice')->layout('layouts.admin', ['title' => 'Practice']);
+        return view('livewire.practice', [
+            'subjects' => Subject::orderBy('name')->get(),
+            'chapters' => Chapter::when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
+                ->orderBy('name')
+                ->get(),
+        ])->layout(auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel', ['title' => 'Practice']);
     }
 }
 
