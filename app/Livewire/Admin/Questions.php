@@ -4,7 +4,7 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Question;
+use App\Models\{Question, Subject, Chapter};
 
 class Questions extends Component
 {
@@ -12,22 +12,44 @@ class Questions extends Component
 
     /**
      * Search term for filtering questions.
-     *
-     * @var string
      */
     public $search = '';
+
+    /**
+     * Selected subject filter.
+     */
+    public $subjectId = '';
+
+    /**
+     * Selected chapter filter.
+     */
+    public $chapterId = '';
 
     /**
      * Refresh the component when a question is deleted.
      *
      * @var array
      */
-    protected $listeners = ['questionDeleted' => '$refresh'];
+    protected $listeners = [
+        'questionDeleted' => '$refresh',
+        'deleteQuestionConfirmed' => 'deleteQuestion',
+    ];
 
     /**
      * Reset the pagination when the search term is updated.
      */
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSubjectId(): void
+    {
+        $this->resetPage();
+        $this->chapterId = '';
+    }
+
+    public function updatingChapterId(): void
     {
         $this->resetPage();
     }
@@ -57,11 +79,17 @@ class Questions extends Component
                     ->orWhereRelation('subject', 'name', 'like', $search)
                     ->orWhereRelation('chapter', 'name', 'like', $search);
             })
+            ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
+            ->when($this->chapterId, fn($q) => $q->where('chapter_id', $this->chapterId))
             ->latest()
             ->paginate(10);
 
         return view('livewire.admin.questions', [
             'questions' => $questions,
+            'subjects' => Subject::orderBy('name')->get(),
+            'chapters' => Chapter::when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
+                ->orderBy('name')
+                ->get(),
         ])->layout('layouts.admin', ['title' => 'Manage Questions']);
     }
 }
