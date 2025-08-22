@@ -18,6 +18,7 @@ use App\Livewire\Admin\Users\Index as UserIndex;
 use App\Livewire\Admin\Jobs\Index as JobIndex;
 use App\Livewire\Admin\Jobs\Create as JobCreate;
 use App\Livewire\Admin\Jobs\Edit as JobEdit;
+use App\Livewire\Admin\Media\Index as MediaIndex;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Practice;
@@ -52,6 +53,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');
     Route::get('/admin/jobs/create', JobCreate::class)->name('admin.jobs.create');
     Route::get('/admin/jobs/{job}/edit', JobEdit::class)->name('admin.jobs.edit');
+    // Media
+    Route::get('/admin/media', MediaIndex::class)->name('admin.media.index');
 
     // Images
     Route::post('/admin/images/upload', [ImageController::class, 'store'])->name('admin.images.upload');
