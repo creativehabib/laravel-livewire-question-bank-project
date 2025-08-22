@@ -18,6 +18,9 @@
 
     {{-- Livewire Styles --}}
     @livewireStyles
+
+    {{-- Extra Styles --}}
+    @stack('styles')
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen flex bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">

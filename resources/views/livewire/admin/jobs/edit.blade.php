@@ -22,7 +22,9 @@
         </div>
         <div>
             <label class="block mb-1 text-sm font-medium">Description</label>
-            <textarea wire:model="description" class="w-full px-3 py-2 border rounded"></textarea>
+            <div wire:ignore>
+                <div id="description-editor" class="w-full px-3 py-2 border rounded"></div>
+            </div>
         </div>
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -69,3 +71,45 @@
         </div>
     </form>
 </div>
+
+@push('styles')
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+@endpush
+
+@push('scripts')
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<script>
+document.addEventListener('livewire:navigated', () => {
+    const editor = document.getElementById('description-editor');
+    if (editor && !editor.__quill) {
+        const quill = new Quill(editor, { theme: 'snow' });
+        quill.root.innerHTML = @js($description);
+        quill.on('text-change', function () {
+            @this.set('description', quill.root.innerHTML);
+        });
+        quill.getModule('toolbar').addHandler('image', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+            input.onchange = async () => {
+                const file = input.files[0];
+                const formData = new FormData();
+                formData.append('image', file);
+                const response = await fetch('/admin/images/upload', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: formData,
+                });
+                const data = await response.json();
+                const range = quill.getSelection(true);
+                quill.insertEmbed(range.index, 'image', data.url);
+            };
+        });
+        editor.__quill = quill;
+    }
+});
+</script>
+@endpush
