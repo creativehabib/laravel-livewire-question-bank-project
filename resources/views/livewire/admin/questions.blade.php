@@ -30,6 +30,7 @@
             <tr>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Question</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Created By</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Subject</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Chapter</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
@@ -40,14 +41,14 @@
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->id }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{!! $q->title !!}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->user->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->subject->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter->name }}</td>
                     <td class="px-4 py-2 space-x-2">
                         <a wire:navigate href="{{ route(auth()->user()->isAdmin() ? 'admin.questions.edit' : 'teacher.questions.edit', $q) }}"
                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
                         @if(auth()->user()->isAdmin())
-                            <button type="button" onclick="confirmDelete({{ $q->id }})"
-                                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                            <button type="button" onclick="confirmDelete({{ $q->id }})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
                         @endif
                     </td>
                 </tr>

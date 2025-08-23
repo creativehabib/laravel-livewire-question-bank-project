@@ -28,6 +28,7 @@
         <div wire:ignore>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Question</label>
             <div id="editor" class="border border-gray-300 dark:border-gray-600 min-h-32 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
+            @error('title')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
         </div>
 
         {{-- Difficulty --}}

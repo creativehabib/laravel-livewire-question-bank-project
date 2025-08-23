@@ -17,7 +17,12 @@
     {{-- Nav --}}
     <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         @php
-            $dashboardRoute = auth()->user()->isAdmin() ? 'admin.dashboard' : 'teacher.dashboard';
+            $dashboardRoute = match (true) {
+                auth()->user()->isAdmin()   => 'admin.dashboard',
+                auth()->user()->isTeacher() => 'teacher.dashboard',
+                auth()->user()->isStudent() => 'student.dashboard',
+                default => '#',
+            };
         @endphp
         <a href="{{ route($dashboardRoute) }}"
            class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->routeIs($dashboardRoute) ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">

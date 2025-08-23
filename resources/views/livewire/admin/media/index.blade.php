@@ -1,187 +1,280 @@
-@push('styles')
-<link rel="stylesheet" href="https://unpkg.com/dropzone@6.0.0/dist/dropzone.css" />
-@endpush
+<div x-data="mediaManager()">
+    <x-slot name="title">Media Library</x-slot>
 
-<div>
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <div class="mb-4 flex justify-end">
-            <button id="open-uploader" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Add Media</button>
-        </div>
-        <div class="mb-4">
-            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search..." class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Mime</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Size</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                @forelse($mediaItems as $media)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $media->id }}</td>
-                        <td class="px-4 py-2">
-                            @if($editingId === $media->id)
-                                <form wire:submit.prevent="update" class="flex w-full gap-2">
-                                    <input type="text" wire:model="editingName" class="flex-1 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-                                    <button type="submit" class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Save</button>
-                                    <button type="button" wire:click="cancelEdit" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
-                                </form>
-                            @else
-                                @php
-                                    $details = [
-                                        'name' => $media->name,
-                                        'mime' => $media->mime_type,
-                                        'size' => $media->size,
-                                        'width' => $media->width,
-                                        'height' => $media->height,
-                                        'url' => Storage::url($media->path),
-                                    ];
-                                @endphp
-                                <button type="button" onclick='showDetails(@json($details))' class="text-indigo-600 hover:underline dark:text-indigo-400">{{ $media->name }}</button>
-                            @endif
-                        </td>
-                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $media->mime_type }}</td>
-                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ number_format($media->size / 1024, 2) }} KB</td>
-                        <td class="px-4 py-2 space-x-2">
-                            @if($replacingId === $media->id)
-                                <form wire:submit.prevent="replace" class="flex gap-2">
-                                    <input type="file" wire:model="replaceFile" class="flex-1" />
-                                    <button type="submit" class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Save</button>
-                                    <button type="button" wire:click="cancelReplace" class="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200">Cancel</button>
-                                </form>
-                            @else
-                                <button wire:click="edit({{ $media->id }})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</button>
-                                <button wire:click="startReplace({{ $media->id }})" class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">Replace</button>
-                                <button type="button" onclick="confirmDelete({{ $media->id }})" class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">Delete</button>
-                            @endif
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No media found.</td>
-                    </tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-4">{{ $mediaItems->links() }}</div>
+    <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Media Library</h1>
+        <button @click="isUploaderOpen = true" type="button" class="flex items-center">
+            <x-heroicon-o-arrow-up-tray class="w-5 h-5 mr-2"/>
+            Add Media
+        </button>
     </div>
 
-    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-md w-full max-w-lg">
-            <div class="mb-4">
-                <form action="{{ route('admin.media.upload') }}" id="media-dropzone" class="dropzone border-2 border-dashed rounded-md"></form>
+    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-4 lg:grid-cols-9 gap-4 mt-6">
+        @forelse ($mediaItems as $item)
+            <div
+                wire:click="selectMedia({{ $item->id }})"
+                class="relative group aspect-square cursor-pointer">
+                <img src="{{ $item->url }}" alt="{{ $item->name }}" class="w-full h-full object-cover rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                <div class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <span class="text-white font-semibold">View Details</span>
+                </div>
             </div>
-            <div class="flex mb-4">
-                <input type="text" id="media-url" placeholder="Media URL" class="flex-1 px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-                <button id="upload-url-btn" class="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Upload</button>
+        @empty
+            <div class="col-span-full text-center py-12">
+                <p class="text-gray-500 dark:text-gray-400">No media found.</p>
             </div>
-            <div class="text-right">
-                <button id="close-uploader" class="px-3 py-1 bg-gray-200 rounded-md dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">Close</button>
+        @endforelse
+    </div>
+
+    @if ($mediaItems->hasPages())
+        <div class="mt-6">{{ $mediaItems->links() }}</div>
+    @endif
+
+    <div
+        x-show="isDetailsDrawerOpen"
+        @open-details-drawer.window="isDetailsDrawerOpen = true"
+        x-transition:enter="transition ease-in-out duration-300"
+        x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0"
+        x-transition:leave="transition ease-in-out duration-300"
+        x-transition:leave-start="translate-x-0"
+        x-transition:leave-end="translate-x-full"
+        class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-lg z-50"
+        x-cloak>
+
+        <div class="flex flex-col h-full">
+            @if($selectedMedia)
+                <div class="p-4 border-b dark:border-gray-700">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">File Details</h3>
+                        <button @click="isDetailsDrawerOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                            <x-heroicon-o-x-mark class="w-6 h-6"/>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-4 overflow-y-auto space-y-6">
+                    <div class="p-2 border rounded-lg dark:border-gray-700">
+                        <img src="{{ $selectedMedia->url }}" alt="{{ $selectedMedia->name }}" class="w-full h-auto object-contain rounded-md max-h-60">
+                    </div>
+
+                    <div x-data="{ isUploading: false, progress: 0 }"
+                         x-on:livewire-upload-start="isUploading = true"
+                         x-on:livewire-upload-finish="isUploading = false"
+                         x-on:livewire-upload-error="isUploading = false"
+                         x-on:livewire-upload-progress="progress = $event.detail.progress">
+                        <label for="replace-file" class="flex items-center w-full text-center cursor-pointer">
+                            <x-heroicon-o-arrow-path class="w-5 h-5 mr-2"/> <span>Replace Image</span>
+                        </label>
+                        <input id="replace-file" wire:model="newFile" type="file" class="sr-only">
+                        <div x-show="isUploading" class="w-full bg-gray-200 rounded-full mt-2">
+                            <div class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" :style="`width: ${progress}%`" x-text="`${progress}%`"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="media-name" class="label">Name</label>
+                            <input type="text" id="media-name" wire:model.defer="newName" class="input-form w-full">
+                        </div>
+                        <div>
+                            <label class="label">URL</label>
+                            <div class="flex">
+                                <input type="text" readonly value="{{ $selectedMedia->url }}" id="media-url-display" class="input-form flex-1 rounded-r-none bg-gray-100 dark:bg-gray-900">
+                                <button @click="copyToClipboard($el)" data-url="{{ $selectedMedia->url }}" class="btn btn-secondary rounded-l-none w-24">Copy</button>
+                            </div>
+                        </div>
+                        <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <dt class="font-medium text-gray-500 dark:text-gray-400">Dimensions</dt>
+                            <dd class="text-gray-800 dark:text-gray-200">{{ $selectedMedia->width ?? 'N/A' }} x {{ $selectedMedia->height ?? 'N/A' }}</dd>
+                            <dt class="font-medium text-gray-500 dark:text-gray-400">Size</dt>
+                            <dd class="text-gray-800 dark:text-gray-200">{{ number_format($selectedMedia->size / 1024, 2) }} KB</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="p-4 border-t dark:border-gray-700 flex justify-between items-center">
+                    <button
+                        @click="$dispatch('confirm-delete', { id: {{ $selectedMedia->id }} })"
+                        class="btn btn-danger">
+                        Delete Permanently
+                    </button>
+                    <button wire:click="updateMediaName" wire:loading.attr="disabled" class="btn btn-primary">
+                        <span wire:loading.remove wire:target="updateMediaName">Save Changes</span>
+                        <span wire:loading wire:target="updateMediaName">Saving...</span>
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <div x-show="isDetailsDrawerOpen" @click="isDetailsDrawerOpen = false" class="fixed inset-0 bg-black bg-opacity-50 z-40" x-cloak></div>
+
+    <div
+        x-show="isUploaderOpen"
+        x-transition
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        x-cloak>
+        <div
+            @click.outside="isUploaderOpen = false"
+            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl"
+            x-data="{ activeTab: 'upload' }">
+
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-white">Media Uploader</h3>
+                <button @click="isUploaderOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <x-heroicon-o-x-mark class="w-6 h-6"/>
+                </button>
+            </div>
+
+            <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
+                <nav class="flex space-x-4" aria-label="Tabs">
+                    <button @click="activeTab = 'upload'" :class="{ 'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'upload', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'upload' }" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                        Upload Media
+                    </button>
+                    <button @click="activeTab = 'url'" :class="{ 'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'url', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'url' }" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                        Upload From URL
+                    </button>
+                </nav>
+            </div>
+
+            <div x-show="activeTab === 'upload'">
+                <div x-data="{ isUploading: false, progress: 0 }"
+                     x-on:livewire-upload-start="isUploading = true"
+                     x-on:livewire-upload-finish="isUploading = false; isUploaderOpen = false;"
+                     x-on:livewire-upload-error="isUploading = false"
+                     x-on:livewire-upload-progress="progress = $event.detail.progress">
+
+                    <label for="file-upload" class="relative cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-10 text-center block hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <div class="text-center">
+                            <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">Drop files to upload</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">or</p>
+                            <span class="mt-2 btn btn-dark">Select Files</span>
+                        </div>
+                        <input id="file-upload" wire:model="file" type="file" class="sr-only">
+                    </label>
+
+                    <div x-show="isUploading" class="w-full bg-gray-200 rounded-full mt-4">
+                        <div class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" :style="`width: ${progress}%`" x-text="`${progress}%`"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="activeTab === 'url'">
+                <div class="flex">
+                    <input type="text" wire:model.defer="url" id="media-url-input" placeholder="https://example.com/image.jpg" class="flex-1 input-form" />
+                    <button wire:click.prevent="uploadFromUrl" wire:loading.attr="disabled" class="btn btn-primary rounded-l-none">
+                        <span wire:loading.remove wire:target="uploadFromUrl">Upload</span>
+                        <span wire:loading wire:target="uploadFromUrl">Uploading...</span>
+                    </button>
+                </div>
+                @error('url') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
         </div>
     </div>
 </div>
 
 @push('scripts')
-<script src="https://unpkg.com/dropzone@6.0.0/dist/dropzone-min.js"></script>
-<script>
-    function showToast(message) {
-        if (!window.Swal) return;
-        Swal.fire({
-            toast: true,
-            icon: 'success',
-            title: message,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 1500,
-        });
-    }
-
-    function confirmDelete(id) {
-        if (!window.Swal) return;
-        Swal.fire({
-            title: 'Delete this media?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Livewire.dispatch('deleteMediaConfirmed', { id: id });
+    <script>
+        function showToast(message, type = 'success') {
+            if (window.Swal) {
+                Swal.fire({
+                    toast: true,
+                    icon: type,
+                    title: message,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
             }
-        });
-    }
-
-    function showDetails(media) {
-        if (!window.Swal) return;
-        let html = `<p><strong>Name:</strong> ${media.name}</p>` +
-            `<p><strong>Mime:</strong> ${media.mime}</p>` +
-            `<p><strong>Size:</strong> ${(media.size / 1024).toFixed(2)} KB</p>`;
-        if (media.width && media.height) {
-            html += `<p><strong>Dimensions:</strong> ${media.width}x${media.height}</p>`;
         }
-        html += `<p><a href="${media.url}" target="_blank" class="text-indigo-600">Open file</a></p>`;
-        Swal.fire({
-            title: 'Media Details',
-            html: html,
-        });
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('upload-modal');
-        document.getElementById('open-uploader').addEventListener('click', () => modal.classList.remove('hidden'));
-        document.getElementById('close-uploader').addEventListener('click', () => modal.classList.add('hidden'));
-
-        window.addEventListener('mediaUpdated', e => showToast(e.detail.message));
-        window.addEventListener('mediaReplaced', e => showToast(e.detail.message));
-        window.addEventListener('mediaDeleted', e => showToast(e.detail.message));
-
-        Dropzone.autoDiscover = false;
-        const dz = new Dropzone('#media-dropzone', {
-            url: '{{ route('admin.media.upload') }}',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            maxFilesize: 10,
-        });
-
-        dz.on('success', (file, response) => {
-            showToast(response.message);
-            Livewire.dispatch('refreshMedia');
-            dz.removeFile(file);
-            modal.classList.add('hidden');
-        });
-
-        document.getElementById('upload-url-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            const url = document.getElementById('media-url').value;
-            if (!url) return;
-            fetch('{{ route('admin.media.upload') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('mediaManager', () => ({
+                isUploaderOpen: false,
+                isDetailsDrawerOpen: false,
+                openUploader() {
+                    this.isUploaderOpen = true;
                 },
-                body: JSON.stringify({ url })
-            }).then(res => res.json().then(data => ({ ok: res.ok, data })))
-            .then(res => {
-                if (res.ok) {
-                    showToast(res.data.message);
-                    Livewire.dispatch('refreshMedia');
-                    document.getElementById('media-url').value = '';
-                    modal.classList.add('hidden');
-                } else {
-                    alert(res.data.message || 'Upload failed');
+                init() {
+                    Livewire.on('open-details-drawer', () => {
+                        this.isDetailsDrawerOpen = true;
+                    });
+
+                    Livewire.on('mediaDeleted', (e) => {
+                        showToast(e.message);
+                        this.isDetailsDrawerOpen = false; // ডিলিট সফল হলে ড্রয়ার বন্ধ হবে
+                    });
+                },
+
+                // **** চূড়ান্ত এবং নির্ভরযোগ্য কপি ফাংশন ****
+                copyToClipboard(buttonEl) {
+                    const urlToCopy = buttonEl.dataset.url;
+
+                    if (navigator.clipboard && window.isSecureContext) {
+                        // আধুনিক এবং নিরাপদ পদ্ধতি
+                        navigator.clipboard.writeText(urlToCopy).then(() => {
+                            const originalText = buttonEl.innerText;
+                            buttonEl.innerText = 'Copied!';
+                            showToast('URL Copied!');
+                            setTimeout(() => {
+                                buttonEl.innerText = originalText;
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Modern copy failed: ', err);
+                            this.fallbackCopyToClipboard(urlToCopy, buttonEl);
+                        });
+                    } else {
+                        // পুরোনো কিন্তু নির্ভরযোগ্য বিকল্প পদ্ধতি
+                        this.fallbackCopyToClipboard(urlToCopy, buttonEl);
+                    }
+                },
+
+                fallbackCopyToClipboard(text, buttonEl) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed"; // Make it invisible
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        const originalText = buttonEl.innerText;
+                        buttonEl.innerText = 'Copied!';
+                        showToast('URL Copied!');
+                        setTimeout(() => {
+                            buttonEl.innerText = originalText;
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Fallback copy failed: ', err);
+                        showToast('Failed to copy URL!', 'error');
+                    }
+                    document.body.removeChild(textArea);
                 }
+
+            }));
+
+            window.addEventListener('confirm-delete', event => {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "This action cannot be undone!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch('deleteMediaConfirmed', { id: event.detail.id });
+                    }
+                });
             });
         });
-    });
-</script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Livewire.on('mediaUpdated', (e) => showToast(e.message, e.type || 'success'));
+        });
+    </script>
 @endpush

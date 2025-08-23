@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Media;
 use Illuminate\Support\Facades\Route;
 use App\Enums\Role;
 use App\Livewire\Admin\Dashboard;
@@ -60,6 +61,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Images
     Route::post('/admin/images/upload', [ImageController::class, 'store'])->name('admin.images.upload');
+    // মিডিয়া লাইব্রেরির সব ছবি পাঠানোর জন্য নতুন রাউট
+    Route::get('/media/all', function () { return Media::latest()->get(); })->name('admin.media.all');
 
     // Settings
     Route::get('/admin/settings', Settings::class)->name('admin.settings');
@@ -68,9 +71,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/users', UserIndex::class)->name('admin.users.index');
 });
 
-Route::middleware(['auth', 'role:teacher'])->group(function () {
-    Route::get('/teacher/dashboard', TeacherDashboard::class)->name('teacher.dashboard');
-});
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', StudentDashboard::class)->name('student.dashboard');
@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'role:teacher'])->group(function () {
+    Route::get('/teacher/dashboard', TeacherDashboard::class)->name('teacher.dashboard');
     Route::get('/teacher/questions', Questions::class)->name('teacher.questions.index');
     Route::get('/teacher/questions/create', Create::class)->name('teacher.questions.create');
     Route::get('/teacher/questions/{question}/edit', Edit::class)->name('teacher.questions.edit');
