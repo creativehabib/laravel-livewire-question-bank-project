@@ -4,6 +4,7 @@ namespace App\Livewire\Student;
 
 use Livewire\Component;
 use App\Models\ExamResult;
+use Illuminate\Support\Facades\Schema;
 
 class Dashboard extends Component
 {
@@ -11,21 +12,27 @@ class Dashboard extends Component
     {
         $user = auth()->user();
 
-        $latest = ExamResult::where('user_id', $user->id)->latest()->first();
+        $latest = null;
+        $daily = collect();
+        $weekly = collect();
 
-        $daily = ExamResult::where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
-            ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+        if (Schema::hasTable('exam_results')) {
+            $latest = ExamResult::where('user_id', $user->id)->latest()->first();
 
-        $weekly = ExamResult::where('user_id', $user->id)
-            ->where('created_at', '>=', now()->subWeeks(5)->startOfWeek())
-            ->selectRaw('YEARWEEK(created_at, 1) as week, COUNT(*) as total')
-            ->groupBy('week')
-            ->orderBy('week')
-            ->get();
+            $daily = ExamResult::where('user_id', $user->id)
+                ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
+                ->groupBy('date')
+                ->orderBy('date')
+                ->get();
+
+            $weekly = ExamResult::where('user_id', $user->id)
+                ->where('created_at', '>=', now()->subWeeks(5)->startOfWeek())
+                ->selectRaw('YEARWEEK(created_at, 1) as week, COUNT(*) as total')
+                ->groupBy('week')
+                ->orderBy('week')
+                ->get();
+        }
 
         return view('livewire.student.dashboard', [
             'latest' => $latest,
