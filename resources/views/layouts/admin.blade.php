@@ -29,6 +29,9 @@
         {{-- Mobile Sidebar Overlay --}}
         <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden"></div>
     </div>
+    @if(auth()->user()->isTeacher() || auth()->user()->isStudent())
+        <livewire:chat-popup />
+    @endif
     @livewireScripts
 
     <script>
