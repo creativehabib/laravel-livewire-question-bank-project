@@ -34,6 +34,19 @@ class Chat extends Component
             $chat->assigned_admin_id = Auth::id();
             $chat->save();
 
+            ChatMessage::where('user_id', $value)
+                ->whereNull('recipient_id')
+                ->update(['recipient_id' => Auth::id()]);
+
+            $pending = Cache::get('chat.pending', []);
+            foreach ($pending as &$msg) {
+                if ($msg['user_id'] == $value && empty($msg['recipient_id'])) {
+                    $msg['recipient_id'] = Auth::id();
+                }
+            }
+            unset($msg);
+            Cache::put('chat.pending', $pending, now()->addMinutes(1));
+
             event(new ChatAssigned($chat));
         }
     }
@@ -104,16 +117,28 @@ class Chat extends Component
             $messages = $messages->toBase()->merge($cached)->sortBy('created_at')->values();
         }
 
-        $dbCounts = ChatMessage::where('recipient_id', Auth::id())
+        $dbCountsAssigned = ChatMessage::where('recipient_id', Auth::id())
             ->whereNull('read_at')
             ->select('user_id', DB::raw('count(*) as count'))
             ->groupBy('user_id')
             ->pluck('count', 'user_id')
             ->toArray();
 
+        $dbCountsUnassigned = ChatMessage::whereNull('recipient_id')
+            ->whereNull('read_at')
+            ->select('user_id', DB::raw('count(*) as count'))
+            ->groupBy('user_id')
+            ->pluck('count', 'user_id')
+            ->toArray();
+
+        $dbCounts = $dbCountsAssigned;
+        foreach ($dbCountsUnassigned as $userId => $count) {
+            $dbCounts[$userId] = ($dbCounts[$userId] ?? 0) + $count;
+        }
+
         $cachedCounts = [];
         foreach (Cache::get('chat.pending', []) as $msg) {
-            if ($msg['recipient_id'] == Auth::id() && empty($msg['read_at'])) {
+            if ((empty($msg['recipient_id']) || $msg['recipient_id'] == Auth::id()) && empty($msg['read_at'])) {
                 $cachedCounts[$msg['user_id']] = ($cachedCounts[$msg['user_id']] ?? 0) + 1;
             }
         }
