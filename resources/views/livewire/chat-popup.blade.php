@@ -10,7 +10,7 @@
 
     <div x-show="open" x-transition class="mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl flex flex-col">
         <div class="flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700">
-            <span class="font-semibold text-gray-800 dark:text-gray-100">Chat with {{ $admin->name }}</span>
+            <span class="font-semibold text-gray-800 dark:text-gray-100">{{ $chatTitle }}</span>
             <button @click="open = false" class="text-gray-500">&times;</button>
         </div>
         <div id="chatMessages" class="p-2 overflow-y-auto space-y-2 h-64">
