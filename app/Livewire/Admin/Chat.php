@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Admin;
 
+use App\Events\ChatAssigned;
+use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
 use App\Models\Setting;
@@ -23,6 +25,17 @@ class Chat extends Component
             'recipient_id' => 'required|exists:users,id',
             'message' => 'required|string|max:' . $max,
         ];
+    }
+
+    public function updatedRecipientId($value): void
+    {
+        $chat = Chat::firstOrCreate(['user_id' => $value]);
+        if ($chat->assigned_admin_id !== Auth::id()) {
+            $chat->assigned_admin_id = Auth::id();
+            $chat->save();
+
+            event(new ChatAssigned($chat));
+        }
     }
 
     public function send()

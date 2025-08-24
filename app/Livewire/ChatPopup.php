@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Enums\Role;
+use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +13,21 @@ class ChatPopup extends Component
 {
     public $message = '';
     public $open = false;
+    public $assignedAdminId;
+
+    public function mount(): void
+    {
+        $chat = Chat::firstOrCreate(['user_id' => Auth::id()]);
+        $this->assignedAdminId = $chat->assigned_admin_id;
+    }
+
+    public function getListeners(): array
+    {
+        $userId = Auth::id();
+        return [
+            "echo-private:chat-assigned.{$userId},ChatAssigned" => 'setAdmin',
+        ];
+    }
 
     protected function rules(): array
     {
@@ -23,7 +38,12 @@ class ChatPopup extends Component
 
     protected function getAdminId(): ?int
     {
-        return User::where('role', Role::ADMIN)->value('id');
+        return $this->assignedAdminId;
+    }
+
+    public function setAdmin($event): void
+    {
+        $this->assignedAdminId = $event['admin_id'];
     }
 
     public function updatedOpen($value): void
@@ -128,12 +148,8 @@ class ChatPopup extends Component
         }
 
         $messages = $this->messages;
-        $adminMessage = $messages->first(function ($msg) {
-            return $msg->user && $msg->user->role === Role::ADMIN;
-        });
-        $chatTitle = $adminMessage
-            ? 'Chat with ' . $adminMessage->user->name
-            : 'Chat with Support Team';
+        $admin = $this->assignedAdminId ? User::find($this->assignedAdminId) : null;
+        $chatTitle = $admin ? 'Chat with ' . $admin->name : 'Chat with Support Team';
 
         return view('livewire.chat-popup', [
             'messages' => $messages,
