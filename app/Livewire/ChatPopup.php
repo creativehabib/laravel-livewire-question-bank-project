@@ -38,6 +38,12 @@ class ChatPopup extends Component
 
     protected function getAdminId(): ?int
     {
+        if (!$this->assignedAdminId) {
+            $chat = Chat::where('user_id', Auth::id())->first();
+            if ($chat) {
+                $this->assignedAdminId = $chat->assigned_admin_id;
+            }
+        }
         return $this->assignedAdminId;
     }
 
