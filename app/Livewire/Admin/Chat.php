@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Events\ChatAssigned;
-use App\Models\Chat;
+use App\Models\Chat as ChatModel;
 use App\Models\ChatMessage;
 use App\Models\User;
 use App\Models\Setting;
@@ -29,7 +29,7 @@ class Chat extends Component
 
     public function updatedRecipientId($value): void
     {
-        $chat = Chat::firstOrCreate(['user_id' => $value]);
+        $chat = ChatModel::firstOrCreate(['user_id' => $value]);
         if ($chat->assigned_admin_id !== Auth::id()) {
             $chat->assigned_admin_id = Auth::id();
             $chat->save();
