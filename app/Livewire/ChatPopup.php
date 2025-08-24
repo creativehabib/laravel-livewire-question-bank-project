@@ -127,10 +127,18 @@ class ChatPopup extends Component
             $this->markAsRead();
         }
 
+        $messages = $this->messages;
+        $adminMessage = $messages->first(function ($msg) {
+            return $msg->user && $msg->user->role === Role::ADMIN;
+        });
+        $chatTitle = $adminMessage
+            ? 'Chat with ' . $adminMessage->user->name
+            : 'Chat with Support Team';
+
         return view('livewire.chat-popup', [
-            'messages' => $this->messages,
+            'messages' => $messages,
             'unreadCount' => $this->unreadCount,
-            'admin' => User::where('role', Role::ADMIN)->first(),
+            'chatTitle' => $chatTitle,
         ]);
     }
 }
