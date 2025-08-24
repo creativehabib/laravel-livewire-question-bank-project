@@ -12,6 +12,8 @@
         <h2 class="text-xl font-semibold mb-2">Questions by Subject</h2>
         <div id="subjectChart" class="h-64"></div>
     </div>
+
+    <livewire:teacher.chat />
 </div>
 
 @push('scripts')
