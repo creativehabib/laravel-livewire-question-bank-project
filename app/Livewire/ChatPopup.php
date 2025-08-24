@@ -14,11 +14,14 @@ class ChatPopup extends Component
     public $message = '';
     public $open = false;
     public $assignedAdminId;
+    public $lastMessageKey;
 
     public function mount(): void
     {
         $chat = Chat::firstOrCreate(['user_id' => Auth::id()]);
         $this->assignedAdminId = $chat->assigned_admin_id;
+        $last = $this->messages->last();
+        $this->lastMessageKey = $last ? ($last->id ?? $last->created_at->timestamp) : null;
     }
 
     public function getListeners(): array
@@ -154,6 +157,14 @@ class ChatPopup extends Component
         }
 
         $messages = $this->messages;
+        $last = $messages->last();
+        $key = $last ? ($last->id ?? $last->created_at->timestamp) : null;
+
+        if ($last && $key !== $this->lastMessageKey && $last->user_id !== Auth::id()) {
+            $this->dispatch('chat-message-received');
+        }
+        $this->lastMessageKey = $key;
+
         $admin = $this->assignedAdminId ? User::find($this->assignedAdminId) : null;
         $chatTitle = $admin ? 'Chat with ' . $admin->name : 'Chat with Support Team';
 
