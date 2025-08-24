@@ -16,6 +16,7 @@ class Chat extends Component
 {
     public $message = '';
     public $recipient_id = '';
+    public $lastMessageKey;
 
     protected function rules(): array
     {
@@ -49,6 +50,8 @@ class Chat extends Component
 
             event(new ChatAssigned($chat));
         }
+
+        $this->lastMessageKey = null;
     }
 
     public function send()
@@ -115,6 +118,13 @@ class Chat extends Component
                 });
 
             $messages = $messages->toBase()->merge($cached)->sortBy('created_at')->values();
+
+            $last = $messages->last();
+            $key = $last ? ($last->id ?? $last->created_at->timestamp) : null;
+            if (!is_null($this->lastMessageKey) && $key !== $this->lastMessageKey && $last && $last->user_id !== Auth::id()) {
+                $this->dispatch('chat-message-received');
+            }
+            $this->lastMessageKey = $key;
         }
 
         $dbCountsAssigned = ChatMessage::where('recipient_id', Auth::id())
