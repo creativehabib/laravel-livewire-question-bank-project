@@ -1,0 +1,38 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Enums\Role;
+use App\Livewire\ChatPopup;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class ChatPopupTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_teacher_can_message_admin(): void
+    {
+        $admin = User::factory()->create(['role' => Role::ADMIN]);
+        $teacher = User::factory()->create(['role' => Role::TEACHER]);
+
+        $this->actingAs($teacher);
+
+        Livewire::test(ChatPopup::class)
+            ->set('message', 'Hello Admin')
+            ->call('send')
+            ->assertSet('message', '');
+
+        Artisan::call('chat:flush');
+
+        $this->assertDatabaseHas('chat_messages', [
+            'user_id' => $teacher->id,
+            'recipient_id' => $admin->id,
+            'message' => 'Hello Admin',
+        ]);
+    }
+}
+

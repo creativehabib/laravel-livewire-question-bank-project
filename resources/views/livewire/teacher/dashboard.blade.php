@@ -13,7 +13,6 @@
         <div id="subjectChart" class="h-64"></div>
     </div>
 
-    <livewire:teacher.chat />
 </div>
 
 @push('scripts')
