@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Livewire\Admin\Chat;
+use App\Livewire\ChatPopup;
 use App\Models\User;
 use App\Models\ChatMessage;
 use App\Models\Setting;
@@ -82,5 +83,34 @@ class ChatTest extends TestCase
             ->set('message', 'toolong')
             ->call('send')
             ->assertHasErrors(['message' => 'max']);
+    }
+
+    public function test_unassigned_messages_show_notification_and_assign_on_reply(): void
+    {
+        $admin = User::factory()->create();
+        $student = User::factory()->create();
+
+        $this->actingAs($student);
+        Livewire::test(ChatPopup::class)
+            ->set('message', 'Help me')
+            ->call('send');
+
+        Artisan::call('chat:flush');
+
+        $this->actingAs($admin);
+
+        Livewire::test(Chat::class)
+            ->assertViewHas('messageCounts', function ($counts) use ($student) {
+                return ($counts[$student->id] ?? 0) === 1;
+            })
+            ->set('recipient_id', $student->id)
+            ->assertViewHas('messageCounts', function ($counts) use ($student) {
+                return ($counts[$student->id] ?? 0) === 0;
+            });
+
+        $this->assertDatabaseHas('chat_messages', [
+            'user_id' => $student->id,
+            'recipient_id' => $admin->id,
+        ]);
     }
 }
