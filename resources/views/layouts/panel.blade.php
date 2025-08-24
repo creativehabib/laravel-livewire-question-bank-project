@@ -32,6 +32,9 @@
 </div>
 
 {{-- ✅ Scripts --}}
+@auth
+    <livewire:chat-popup />
+@endauth
 <script>
     // --- Sidebar Collapse / Expand ---
     const sidebar = document.getElementById('sidebar');
