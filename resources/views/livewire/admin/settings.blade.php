@@ -5,9 +5,18 @@
 
     <form wire:submit.prevent="save" class="space-y-4">
         <div>
-            <label class="block text-sm font-medium mb-1">Chat retention days</label>
-            <input type="number" min="1" wire:model="chat_retention_days" class="w-full border rounded p-2">
-            @error('chat_retention_days')
+            <label class="block text-sm font-medium mb-1">Chat retention period</label>
+            <div class="flex space-x-2">
+                <input type="number" min="1" wire:model="chat_retention_value" class="w-full border rounded p-2">
+                <select wire:model="chat_retention_unit" class="border rounded p-2">
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                </select>
+            </div>
+            @error('chat_retention_value')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+            @error('chat_retention_unit')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>

@@ -25,8 +25,8 @@ class ChatMessage extends Model
 
     public function prunable()
     {
-        $days = Setting::get('chat_retention_days', config('chat.retention_days'));
-        return static::where('created_at', '<', now()->subDays($days));
+        $hours = Setting::get('chat_retention_hours', config('chat.retention_hours'));
+        return static::where('created_at', '<', now()->subHours($hours));
     }
 
     public function user()

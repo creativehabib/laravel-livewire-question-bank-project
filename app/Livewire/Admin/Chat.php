@@ -158,7 +158,7 @@ class Chat extends Component
             'users' => User::where('id', '!=', Auth::id())->get(),
             'messages' => $messages,
             'messageCounts' => $messageCounts,
-            'retentionDays' => Setting::get('chat_retention_days', config('chat.retention_days')),
+            'retention' => $this->retentionPeriod(),
         ]);
     }
 
@@ -170,5 +170,13 @@ class Chat extends Component
     public function getIsTypingProperty(): bool
     {
         return $this->typing && now()->diffInSeconds($this->typing) < 5;
+    }
+
+    protected function retentionPeriod(): string
+    {
+        $hours = Setting::get('chat_retention_hours', config('chat.retention_hours'));
+        return $hours % 24 === 0
+            ? ($hours / 24) . ' days'
+            : $hours . ' hours';
     }
 }
