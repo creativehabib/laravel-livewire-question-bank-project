@@ -8,7 +8,6 @@ use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -21,14 +20,14 @@ class ChatPopupTest extends TestCase
         $admin = User::factory()->create(['role' => Role::ADMIN]);
         $teacher = User::factory()->create(['role' => Role::TEACHER]);
 
+        Chat::create(['user_id' => $teacher->id, 'assigned_admin_id' => $admin->id]);
+
         $this->actingAs($teacher);
 
         Livewire::test(ChatPopup::class)
             ->set('message', 'Hello Admin')
             ->call('send')
             ->assertSet('message', '');
-
-        Artisan::call('chat:flush');
 
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $teacher->id,
@@ -46,8 +45,6 @@ class ChatPopupTest extends TestCase
 
         $component = Livewire::test(ChatPopup::class);
         $component->set('message', 'Hi')->call('send');
-
-        Artisan::call('chat:flush');
 
         Chat::where('user_id', $student->id)->update(['assigned_admin_id' => $admin->id]);
         ChatMessage::where('user_id', $student->id)->update(['recipient_id' => $admin->id]);
