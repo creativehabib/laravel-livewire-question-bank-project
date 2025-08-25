@@ -19,6 +19,9 @@ use App\Livewire\Admin\Users\Index as UserIndex;
 use App\Livewire\Admin\Jobs\Index as JobIndex;
 use App\Livewire\Admin\Jobs\Create as JobCreate;
 use App\Livewire\Admin\Jobs\Edit as JobEdit;
+use App\Livewire\Admin\JobCategories\Index as JobCategoryIndex;
+use App\Livewire\Admin\JobCategories\Create as JobCategoryCreate;
+use App\Livewire\Admin\JobCategories\Edit as JobCategoryEdit;
 use App\Livewire\Admin\Media\Index as MediaIndex;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
@@ -55,6 +58,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');
     Route::get('/admin/jobs/create', JobCreate::class)->name('admin.jobs.create');
     Route::get('/admin/jobs/{job}/edit', JobEdit::class)->name('admin.jobs.edit');
+    // Job Categories
+    Route::get('/admin/job-categories', JobCategoryIndex::class)->name('admin.job-categories.index');
+    Route::get('/admin/job-categories/create', JobCategoryCreate::class)->name('admin.job-categories.create');
+    Route::get('/admin/job-categories/{category}/edit', JobCategoryEdit::class)->name('admin.job-categories.edit');
     // Media
     Route::get('/admin/media', MediaIndex::class)->name('admin.media.index');
     Route::post('/admin/media/upload', [MediaController::class, 'store'])->name('admin.media.upload');
