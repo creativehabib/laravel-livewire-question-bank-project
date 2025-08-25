@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Jobs;
 
 use Livewire\Component;
 use App\Models\JobPost;
+use App\Models\JobCategory;
 use App\Enums\JobStatus;
 use Illuminate\Support\Str;
 
@@ -34,7 +35,7 @@ class Create extends Component
         $this->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:job_posts,slug',
-            'category_id' => 'nullable|integer',
+            'category_id' => 'nullable|exists:job_categories,id',
             'company_name' => 'nullable|string|max:255',
             'summary' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -71,7 +72,8 @@ class Create extends Component
 
     public function render()
     {
-        return view('livewire.admin.jobs.create')
-            ->layout('layouts.admin', ['title' => 'Create Job']);
+        return view('livewire.admin.jobs.create', [
+            'categories' => JobCategory::orderBy('name')->get(),
+        ])->layout('layouts.admin', ['title' => 'Create Job']);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Jobs;
 
 use Livewire\Component;
 use App\Models\JobPost;
+use App\Models\JobCategory;
 use App\Enums\JobStatus;
 use Illuminate\Support\Str;
 
@@ -54,7 +55,7 @@ class Edit extends Component
         $this->validate([
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:job_posts,slug,' . $this->job->id,
-            'category_id' => 'nullable|integer',
+            'category_id' => 'nullable|exists:job_categories,id',
             'company_name' => 'nullable|string|max:255',
             'summary' => 'nullable|string|max:255',
             'description' => 'nullable|string',
@@ -91,7 +92,8 @@ class Edit extends Component
 
     public function render()
     {
-        return view('livewire.admin.jobs.edit')
-            ->layout('layouts.admin', ['title' => 'Edit Job']);
+        return view('livewire.admin.jobs.edit', [
+            'categories' => JobCategory::orderBy('name')->get(),
+        ])->layout('layouts.admin', ['title' => 'Edit Job']);
     }
 }

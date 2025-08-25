@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Enums\JobStatus;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class JobPost extends Model
 {
@@ -33,4 +34,9 @@ class JobPost extends Model
         'featured' => 'boolean',
         'status' => JobStatus::class,
     ];
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(JobCategory::class, 'category_id');
+    }
 }

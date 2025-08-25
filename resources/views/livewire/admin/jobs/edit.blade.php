@@ -9,8 +9,13 @@
             <input type="text" wire:model="slug" class="w-full px-3 py-2 border rounded" />
         </div>
         <div>
-            <label class="block mb-1 text-sm font-medium">Category ID</label>
-            <input type="number" wire:model="category_id" class="w-full px-3 py-2 border rounded" />
+            <label class="block mb-1 text-sm font-medium">Category</label>
+            <select wire:model="category_id" class="w-full px-3 py-2 border rounded">
+                <option value="">Select category</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                @endforeach
+            </select>
         </div>
         <div>
             <label class="block mb-1 text-sm font-medium">Company Name</label>
