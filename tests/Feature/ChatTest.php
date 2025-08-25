@@ -95,7 +95,7 @@ class ChatTest extends TestCase
             ->set('recipient_id', $recipient->id)
             ->set('message', 'second')
             ->call('send')
-            ->assertHasErrors(['message' => 'limit']);
+            ->assertHasErrors(['message']);
     }
 
     public function test_unassigned_messages_show_notification_and_assign_on_reply(): void

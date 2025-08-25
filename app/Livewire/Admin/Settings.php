@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Models\Setting;
 use Livewire\Component;
+use DateTimeZone;
 
 class Settings extends Component
 {
@@ -12,6 +13,7 @@ class Settings extends Component
     public $chat_message_max_length;
     public $chat_daily_message_limit;
     public $timezone;
+    public array $timezones = [];
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
@@ -35,6 +37,7 @@ class Settings extends Component
         $this->chat_message_max_length = Setting::get('chat_message_max_length', config('chat.message_max_length'));
         $this->chat_daily_message_limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
         $this->timezone = Setting::get('timezone', config('app.timezone'));
+        $this->timezones = DateTimeZone::listIdentifiers();
     }
 
     public function save(): void

@@ -79,7 +79,7 @@ class ChatPopupTest extends TestCase
         Livewire::test(ChatPopup::class)
             ->set('message', 'Second')
             ->call('send')
-            ->assertHasErrors(['message' => 'limit']);
+            ->assertHasErrors(['message']);
     }
 }
 

@@ -83,7 +83,7 @@ class ChatPopup extends Component
             ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
             ->count();
         if ($count >= $limit) {
-            $this->addError('message', 'limit');
+            $this->addError('message', "You can send {$limit} messages per day. Your limit has been reached.");
             return;
         }
 

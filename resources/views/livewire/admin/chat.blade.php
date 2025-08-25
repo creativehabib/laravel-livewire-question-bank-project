@@ -75,6 +75,9 @@
                     <input type="text" wire:model="message" class="flex-1 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2" placeholder="Type a message...">
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-r-lg">Send</button>
                 </form>
+                @error('message')
+                    <div class="text-xs text-red-600 mt-2">{{ $message }}</div>
+                @enderror
             @endif
         </div>
     </div>

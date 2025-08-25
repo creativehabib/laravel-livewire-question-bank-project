@@ -36,7 +36,11 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Timezone</label>
-            <input type="text" wire:model="timezone" class="w-full border rounded p-2">
+            <select wire:model="timezone" class="w-full border rounded p-2">
+                @foreach($timezones as $tz)
+                    <option value="{{ $tz }}">{{ $tz }}</option>
+                @endforeach
+            </select>
             @error('timezone')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
