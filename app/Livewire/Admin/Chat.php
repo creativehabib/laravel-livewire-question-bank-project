@@ -67,7 +67,7 @@ class Chat extends Component
     {
         $this->validate();
 
-        SendChatMessage::dispatch([
+        SendChatMessage::dispatchSync([
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,
             'message' => $this->message,

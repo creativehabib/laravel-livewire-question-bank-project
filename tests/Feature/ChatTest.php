@@ -102,4 +102,22 @@ class ChatTest extends TestCase
             'recipient_id' => $admin->id,
         ]);
     }
+
+    public function test_chat_clean_command_removes_old_messages(): void
+    {
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $message = ChatMessage::create([
+            'user_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'message' => 'old',
+        ]);
+        $message->created_at = now()->subDays(40);
+        $message->save();
+
+        $this->artisan('chat:clean')->assertExitCode(0);
+
+        $this->assertDatabaseMissing('chat_messages', ['id' => $message->id]);
+    }
 }
