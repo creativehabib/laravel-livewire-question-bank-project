@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Models\ChatMessage;
 use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -28,14 +27,6 @@ class ChatTest extends TestCase
             ->set('message', 'Hello there')
             ->call('send')
             ->assertSet('message', '');
-
-        $this->assertDatabaseMissing('chat_messages', [
-            'user_id' => $sender->id,
-            'recipient_id' => $recipient->id,
-            'message' => 'Hello there',
-        ]);
-
-        Artisan::call('chat:flush');
 
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $sender->id,
@@ -94,8 +85,6 @@ class ChatTest extends TestCase
         Livewire::test(ChatPopup::class)
             ->set('message', 'Help me')
             ->call('send');
-
-        Artisan::call('chat:flush');
 
         $this->actingAs($admin);
 

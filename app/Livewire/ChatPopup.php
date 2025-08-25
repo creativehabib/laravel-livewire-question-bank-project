@@ -2,13 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Events\MessageSent;
 use App\Events\UserTyping;
+use App\Jobs\SendChatMessage;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class ChatPopup extends Component
@@ -32,7 +31,7 @@ class ChatPopup extends Component
         $userId = Auth::id();
         return [
             "echo-private:chat-assigned.{$userId},ChatAssigned" => 'setAdmin',
-            "echo-private:chat.{$userId},MessageSent" => '$refresh',
+            "echo-private:chat.{$userId},ChatMessageSent" => '$refresh',
             "echo-private:chat.{$userId},UserTyping" => 'showTyping',
         ];
     }
@@ -78,18 +77,12 @@ class ChatPopup extends Component
     {
         $this->validate();
 
-        $messages = Cache::get('chat.pending', []);
-        $payload = [
+        SendChatMessage::dispatch([
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
             'created_at' => now(),
-        ];
-
-        $messages[] = $payload;
-        Cache::put('chat.pending', $messages, now()->addMinutes(1));
-
-        broadcast(new MessageSent($payload))->toOthers();
+        ]);
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
@@ -106,15 +99,6 @@ class ChatPopup extends Component
             ->where('recipient_id', Auth::id())
             ->whereNull('delivered_at')
             ->update(['delivered_at' => now()]);
-
-        $pending = Cache::get('chat.pending', []);
-        foreach ($pending as &$msg) {
-            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id() && empty($msg['delivered_at'])) {
-                $msg['delivered_at'] = now();
-            }
-        }
-        unset($msg);
-        Cache::put('chat.pending', $pending, now()->addMinutes(1));
     }
 
     protected function markAsSeen(): void
@@ -128,23 +112,13 @@ class ChatPopup extends Component
             ->where('recipient_id', Auth::id())
             ->whereNull('seen_at')
             ->update(['delivered_at' => now(), 'seen_at' => now()]);
-
-        $pending = Cache::get('chat.pending', []);
-        foreach ($pending as &$msg) {
-            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id()) {
-                $msg['delivered_at'] = $msg['delivered_at'] ?? now();
-                $msg['seen_at'] = now();
-            }
-        }
-        unset($msg);
-        Cache::put('chat.pending', $pending, now()->addMinutes(1));
     }
 
     public function getMessagesProperty()
     {
         $adminId = $this->getAdminId();
 
-        $messages = ChatMessage::with('user')
+        return ChatMessage::with('user')
             ->where(function ($query) use ($adminId) {
                 $query->where('user_id', Auth::id())
                     ->where('recipient_id', $adminId);
@@ -157,40 +131,16 @@ class ChatPopup extends Component
             ->take(20)
             ->get()
             ->reverse();
-
-        $cached = collect(Cache::get('chat.pending', []))
-            ->filter(function ($msg) use ($adminId) {
-                return ($msg['user_id'] === Auth::id() && $msg['recipient_id'] == $adminId)
-                    || ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id());
-            })
-            ->map(function ($msg) {
-                $msg['user'] = User::find($msg['user_id']);
-                $msg['created_at'] = \Illuminate\Support\Carbon::parse($msg['created_at']);
-                $msg['delivered_at'] = isset($msg['delivered_at']) ? \Illuminate\Support\Carbon::parse($msg['delivered_at']) : null;
-                $msg['seen_at'] = isset($msg['seen_at']) ? \Illuminate\Support\Carbon::parse($msg['seen_at']) : null;
-                return (object) $msg;
-            });
-
-        return $messages->toBase()->merge($cached)->sortBy('created_at')->values();
     }
 
     public function getUnreadCountProperty(): int
     {
         $adminId = $this->getAdminId();
 
-        $dbCount = ChatMessage::where('user_id', $adminId)
+        return ChatMessage::where('user_id', $adminId)
             ->where('recipient_id', Auth::id())
             ->whereNull('seen_at')
             ->count();
-
-        $cachedCount = 0;
-        foreach (Cache::get('chat.pending', []) as $msg) {
-            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id() && empty($msg['seen_at'])) {
-                $cachedCount++;
-            }
-        }
-
-        return $dbCount + $cachedCount;
     }
 
     public function render()
