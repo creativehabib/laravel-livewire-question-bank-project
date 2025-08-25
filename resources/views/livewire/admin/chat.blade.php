@@ -1,6 +1,6 @@
 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mt-6">
     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Chat</h3>
-    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Messages are kept for {{ $retentionDays }} days and removed automatically.</p>
+    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Messages are kept for {{ $retention }} and removed automatically.</p>
 
     <div class="flex h-72">
         <div class="w-1/3 pr-4 border-r border-gray-200 dark:border-gray-700 overflow-y-auto h-full">

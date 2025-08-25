@@ -8,5 +8,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('chat:clean')->daily();
+// Run cleanup hourly to respect retention periods configured in hours
+Schedule::command('chat:clean')->hourly();
 Schedule::command('chat:flush')->everyMinute();
