@@ -66,7 +66,7 @@ class ChatTest extends TestCase
                 return ($counts[$sender->id] ?? 0) === 0;
             });
 
-        $this->assertNotNull(ChatMessage::first()->fresh()->read_at);
+        $this->assertNotNull(ChatMessage::first()->fresh()->seen_at);
     }
 
     public function test_message_respects_max_length_setting(): void

@@ -13,11 +13,13 @@ class ChatMessage extends Model
         'user_id',
         'recipient_id',
         'message',
-        'read_at',
+        'delivered_at',
+        'seen_at',
     ];
 
     protected $casts = [
-        'read_at' => 'datetime',
+        'delivered_at' => 'datetime',
+        'seen_at' => 'datetime',
     ];
 
     public function user()

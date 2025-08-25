@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin;
 
 use App\Events\ChatAssigned;
+use App\Events\MessageSent;
+use App\Events\UserTyping;
 use App\Models\Chat as ChatModel;
 use App\Models\ChatMessage;
 use App\Models\User;
@@ -17,6 +19,16 @@ class Chat extends Component
     public $message = '';
     public $recipient_id = '';
     public $lastMessageKey;
+    public $typing;
+
+    public function getListeners(): array
+    {
+        $userId = Auth::id();
+        return [
+            "echo-private:chat.{$userId},MessageSent" => '$refresh',
+            "echo-private:chat.{$userId},UserTyping" => 'showTyping',
+        ];
+    }
 
     protected function rules(): array
     {
@@ -54,22 +66,75 @@ class Chat extends Component
         $this->lastMessageKey = null;
     }
 
+    public function updatedMessage(): void
+    {
+        if ($this->recipient_id) {
+            broadcast(new UserTyping(Auth::id(), $this->recipient_id))->toOthers();
+        }
+    }
+
     public function send()
     {
         $this->validate();
 
         $messages = Cache::get('chat.pending', []);
-        $messages[] = [
+        $payload = [
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,
             'message' => $this->message,
             'created_at' => now(),
         ];
 
+        $messages[] = $payload;
         Cache::put('chat.pending', $messages, now()->addMinutes(1));
+
+        broadcast(new MessageSent($payload))->toOthers();
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
+    }
+
+    protected function markAsDelivered(): void
+    {
+        if (!$this->recipient_id) {
+            return;
+        }
+
+        ChatMessage::where('user_id', $this->recipient_id)
+            ->where('recipient_id', Auth::id())
+            ->whereNull('delivered_at')
+            ->update(['delivered_at' => now()]);
+
+        $pending = Cache::get('chat.pending', []);
+        foreach ($pending as &$msg) {
+            if ($msg['user_id'] == $this->recipient_id && $msg['recipient_id'] == Auth::id() && empty($msg['delivered_at'])) {
+                $msg['delivered_at'] = now();
+            }
+        }
+        unset($msg);
+        Cache::put('chat.pending', $pending, now()->addMinutes(1));
+    }
+
+    protected function markAsSeen(): void
+    {
+        if (!$this->recipient_id) {
+            return;
+        }
+
+        ChatMessage::where('user_id', $this->recipient_id)
+            ->where('recipient_id', Auth::id())
+            ->whereNull('seen_at')
+            ->update(['delivered_at' => now(), 'seen_at' => now()]);
+
+        $pending = Cache::get('chat.pending', []);
+        foreach ($pending as &$msg) {
+            if ($msg['user_id'] == $this->recipient_id && $msg['recipient_id'] == Auth::id()) {
+                $msg['delivered_at'] = $msg['delivered_at'] ?? now();
+                $msg['seen_at'] = now();
+            }
+        }
+        unset($msg);
+        Cache::put('chat.pending', $pending, now()->addMinutes(1));
     }
 
     public function render()
@@ -78,19 +143,8 @@ class Chat extends Component
         $messageCounts = [];
 
         if ($this->recipient_id) {
-            ChatMessage::where('user_id', $this->recipient_id)
-                ->where('recipient_id', Auth::id())
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
-
-            $pending = Cache::get('chat.pending', []);
-            foreach ($pending as &$msg) {
-                if ($msg['user_id'] == $this->recipient_id && $msg['recipient_id'] == Auth::id()) {
-                    $msg['read_at'] = now();
-                }
-            }
-            unset($msg);
-            Cache::put('chat.pending', $pending, now()->addMinutes(1));
+            $this->markAsDelivered();
+            $this->markAsSeen();
 
             $messages = ChatMessage::with('user')
                 ->where(function ($query) {
@@ -114,6 +168,8 @@ class Chat extends Component
                 ->map(function ($msg) {
                     $msg['user'] = User::find($msg['user_id']);
                     $msg['created_at'] = \Illuminate\Support\Carbon::parse($msg['created_at']);
+                    $msg['delivered_at'] = isset($msg['delivered_at']) ? \Illuminate\Support\Carbon::parse($msg['delivered_at']) : null;
+                    $msg['seen_at'] = isset($msg['seen_at']) ? \Illuminate\Support\Carbon::parse($msg['seen_at']) : null;
                     return (object) $msg;
                 });
 
@@ -128,14 +184,14 @@ class Chat extends Component
         }
 
         $dbCountsAssigned = ChatMessage::where('recipient_id', Auth::id())
-            ->whereNull('read_at')
+            ->whereNull('seen_at')
             ->select('user_id', DB::raw('count(*) as count'))
             ->groupBy('user_id')
             ->pluck('count', 'user_id')
             ->toArray();
 
         $dbCountsUnassigned = ChatMessage::whereNull('recipient_id')
-            ->whereNull('read_at')
+            ->whereNull('seen_at')
             ->select('user_id', DB::raw('count(*) as count'))
             ->groupBy('user_id')
             ->pluck('count', 'user_id')
@@ -148,7 +204,7 @@ class Chat extends Component
 
         $cachedCounts = [];
         foreach (Cache::get('chat.pending', []) as $msg) {
-            if ((empty($msg['recipient_id']) || $msg['recipient_id'] == Auth::id()) && empty($msg['read_at'])) {
+            if ((empty($msg['recipient_id']) || $msg['recipient_id'] == Auth::id()) && empty($msg['seen_at'])) {
                 $cachedCounts[$msg['user_id']] = ($cachedCounts[$msg['user_id']] ?? 0) + 1;
             }
         }
@@ -164,5 +220,15 @@ class Chat extends Component
             'messageCounts' => $messageCounts,
             'retentionDays' => Setting::get('chat_retention_days', config('chat.retention_days')),
         ]);
+    }
+
+    public function showTyping(): void
+    {
+        $this->typing = now();
+    }
+
+    public function getIsTypingProperty(): bool
+    {
+        return $this->typing && now()->diffInSeconds($this->typing) < 5;
     }
 }
