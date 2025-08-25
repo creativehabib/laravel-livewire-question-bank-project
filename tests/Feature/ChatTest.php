@@ -7,6 +7,7 @@ use App\Livewire\ChatPopup;
 use App\Models\User;
 use App\Models\ChatMessage;
 use App\Models\Setting;
+use App\Enums\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -96,6 +97,28 @@ class ChatTest extends TestCase
             ->set('message', 'second')
             ->call('send')
             ->assertHasErrors(['message']);
+    }
+
+    public function test_admin_can_send_unlimited_messages(): void
+    {
+        $admin = User::factory()->create(['role' => Role::ADMIN]);
+        $recipient = User::factory()->create();
+
+        Setting::set('chat_daily_message_limit', 1);
+
+        $this->actingAs($admin);
+
+        Livewire::test(Chat::class)
+            ->set('recipient_id', $recipient->id)
+            ->set('message', 'first')
+            ->call('send')
+            ->assertSet('message', '');
+
+        Livewire::test(Chat::class)
+            ->set('recipient_id', $recipient->id)
+            ->set('message', 'second')
+            ->call('send')
+            ->assertSet('message', '');
     }
 
     public function test_unassigned_messages_show_notification_and_assign_on_reply(): void
