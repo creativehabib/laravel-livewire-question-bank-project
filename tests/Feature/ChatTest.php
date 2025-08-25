@@ -76,6 +76,28 @@ class ChatTest extends TestCase
             ->assertHasErrors(['message' => 'max']);
     }
 
+    public function test_daily_message_limit_is_enforced(): void
+    {
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        Setting::set('chat_daily_message_limit', 1);
+
+        $this->actingAs($sender);
+
+        Livewire::test(Chat::class)
+            ->set('recipient_id', $recipient->id)
+            ->set('message', 'first')
+            ->call('send')
+            ->assertSet('message', '');
+
+        Livewire::test(Chat::class)
+            ->set('recipient_id', $recipient->id)
+            ->set('message', 'second')
+            ->call('send')
+            ->assertHasErrors(['message' => 'limit']);
+    }
+
     public function test_unassigned_messages_show_notification_and_assign_on_reply(): void
     {
         $admin = User::factory()->create();

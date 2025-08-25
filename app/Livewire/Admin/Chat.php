@@ -67,6 +67,15 @@ class Chat extends Component
     {
         $this->validate();
 
+        $limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
+        $count = ChatMessage::where('user_id', Auth::id())
+            ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+            ->count();
+        if ($count >= $limit) {
+            $this->addError('message', 'limit');
+            return;
+        }
+
         SendChatMessage::dispatchSync([
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,

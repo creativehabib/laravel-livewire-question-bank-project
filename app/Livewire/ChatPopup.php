@@ -6,6 +6,7 @@ use App\Events\UserTyping;
 use App\Jobs\SendChatMessage;
 use App\Models\Chat;
 use App\Models\ChatMessage;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -76,6 +77,15 @@ class ChatPopup extends Component
     public function send(): void
     {
         $this->validate();
+
+        $limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
+        $count = ChatMessage::where('user_id', Auth::id())
+            ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+            ->count();
+        if ($count >= $limit) {
+            $this->addError('message', 'limit');
+            return;
+        }
 
         SendChatMessage::dispatchSync([
             'user_id' => Auth::id(),

@@ -10,11 +10,15 @@ class Settings extends Component
     public $chat_retention_value;
     public $chat_retention_unit = 'days';
     public $chat_message_max_length;
+    public $chat_daily_message_limit;
+    public $timezone;
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
         'chat_retention_unit' => 'required|in:hours,days',
         'chat_message_max_length' => 'required|integer|min:1',
+        'chat_daily_message_limit' => 'required|integer|min:1',
+        'timezone' => 'required|timezone',
     ];
 
     public function mount(): void
@@ -29,6 +33,8 @@ class Settings extends Component
         }
 
         $this->chat_message_max_length = Setting::get('chat_message_max_length', config('chat.message_max_length'));
+        $this->chat_daily_message_limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
+        $this->timezone = Setting::get('timezone', config('app.timezone'));
     }
 
     public function save(): void
@@ -37,6 +43,10 @@ class Settings extends Component
         $hours = $this->chat_retention_value * ($this->chat_retention_unit === 'days' ? 24 : 1);
         Setting::set('chat_retention_hours', $hours);
         Setting::set('chat_message_max_length', $this->chat_message_max_length);
+        Setting::set('chat_daily_message_limit', $this->chat_daily_message_limit);
+        Setting::set('timezone', $this->timezone);
+        config(['app.timezone' => $this->timezone]);
+        date_default_timezone_set($this->timezone);
         session()->flash('status', 'Settings updated');
     }
 
