@@ -91,16 +91,36 @@
                 <x-heroicon-o-user-group class="w-5 h-5"/>
                 <span class="sidebar-text">Users</span>
             </a>
-            <a wire:navigate href="{{ route('admin.job-categories.index') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/job-categories*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-                <x-heroicon-o-rectangle-stack class="w-5 h-5"/>
-                <span class="sidebar-text">Job Categories</span>
-            </a>
-            <a wire:navigate href="{{ route('admin.jobs.index') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/jobs*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
-                <x-heroicon-o-briefcase class="w-5 h-5"/>
-                <span class="sidebar-text">Jobs</span>
-            </a>
+
+            @php
+                $jobsActive = request()->is('admin/jobs*') || request()->is('admin/job-categories*') || request()->is('admin/job-companies*');
+            @endphp
+            <div x-data="{ open: {{ $jobsActive ? 'true' : 'false' }} }" class="space-y-1">
+                <button @click="open = !open"
+                        class="nav-link flex items-center justify-between w-full px-4 py-2.5 rounded-lg {{ $jobsActive ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                    <span class="flex items-center gap-3">
+                        <x-heroicon-o-briefcase class="w-5 h-5"/>
+                        <span class="sidebar-text">Jobs</span>
+                    </span>
+                    <x-heroicon-o-chevron-down class="w-4 h-4 transition-transform" x-bind:class="{ 'rotate-180': open }"/>
+                </button>
+
+                <div x-show="open" class="space-y-1 pl-8 mt-1" x-cloak>
+                    <a wire:navigate href="{{ route('admin.jobs.index') }}"
+                       class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/jobs*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                        <span class="sidebar-text">Job Posts</span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin.job-categories.index') }}"
+                       class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/job-categories*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                        <span class="sidebar-text">Categories</span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin.job-companies.index') }}"
+                       class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/job-companies*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                        <span class="sidebar-text">Companies</span>
+                    </a>
+                </div>
+            </div>
+
             <a wire:navigate href="{{ route('admin.media.index') }}"
                class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('admin/media*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
                 <x-heroicon-o-photo class="w-5 h-5"/>
