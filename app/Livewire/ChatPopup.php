@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Events\MessageSent;
+use App\Events\UserTyping;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\User;
@@ -15,6 +17,7 @@ class ChatPopup extends Component
     public $open = false;
     public $assignedAdminId;
     public $lastMessageKey;
+    public $typing;
 
     public function mount(): void
     {
@@ -29,6 +32,8 @@ class ChatPopup extends Component
         $userId = Auth::id();
         return [
             "echo-private:chat-assigned.{$userId},ChatAssigned" => 'setAdmin',
+            "echo-private:chat.{$userId},MessageSent" => '$refresh',
+            "echo-private:chat.{$userId},UserTyping" => 'showTyping',
         ];
     }
 
@@ -58,7 +63,14 @@ class ChatPopup extends Component
     public function updatedOpen($value): void
     {
         if ($value) {
-            $this->markAsRead();
+            $this->markAsSeen();
+        }
+    }
+
+    public function updatedMessage(): void
+    {
+        if ($recipient = $this->getAdminId()) {
+            broadcast(new UserTyping(Auth::id(), $recipient))->toOthers();
         }
     }
 
@@ -67,32 +79,61 @@ class ChatPopup extends Component
         $this->validate();
 
         $messages = Cache::get('chat.pending', []);
-        $messages[] = [
+        $payload = [
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
             'created_at' => now(),
         ];
 
+        $messages[] = $payload;
         Cache::put('chat.pending', $messages, now()->addMinutes(1));
+
+        broadcast(new MessageSent($payload))->toOthers();
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
     }
-
-    protected function markAsRead(): void
+    
+    protected function markAsDelivered(): void
     {
         $adminId = $this->getAdminId();
+        if (!$adminId) {
+            return;
+        }
 
         ChatMessage::where('user_id', $adminId)
             ->where('recipient_id', Auth::id())
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
+            ->whereNull('delivered_at')
+            ->update(['delivered_at' => now()]);
+
+        $pending = Cache::get('chat.pending', []);
+        foreach ($pending as &$msg) {
+            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id() && empty($msg['delivered_at'])) {
+                $msg['delivered_at'] = now();
+            }
+        }
+        unset($msg);
+        Cache::put('chat.pending', $pending, now()->addMinutes(1));
+    }
+
+    protected function markAsSeen(): void
+    {
+        $adminId = $this->getAdminId();
+        if (!$adminId) {
+            return;
+        }
+
+        ChatMessage::where('user_id', $adminId)
+            ->where('recipient_id', Auth::id())
+            ->whereNull('seen_at')
+            ->update(['delivered_at' => now(), 'seen_at' => now()]);
 
         $pending = Cache::get('chat.pending', []);
         foreach ($pending as &$msg) {
             if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id()) {
-                $msg['read_at'] = now();
+                $msg['delivered_at'] = $msg['delivered_at'] ?? now();
+                $msg['seen_at'] = now();
             }
         }
         unset($msg);
@@ -125,6 +166,8 @@ class ChatPopup extends Component
             ->map(function ($msg) {
                 $msg['user'] = User::find($msg['user_id']);
                 $msg['created_at'] = \Illuminate\Support\Carbon::parse($msg['created_at']);
+                $msg['delivered_at'] = isset($msg['delivered_at']) ? \Illuminate\Support\Carbon::parse($msg['delivered_at']) : null;
+                $msg['seen_at'] = isset($msg['seen_at']) ? \Illuminate\Support\Carbon::parse($msg['seen_at']) : null;
                 return (object) $msg;
             });
 
@@ -137,12 +180,12 @@ class ChatPopup extends Component
 
         $dbCount = ChatMessage::where('user_id', $adminId)
             ->where('recipient_id', Auth::id())
-            ->whereNull('read_at')
+            ->whereNull('seen_at')
             ->count();
 
         $cachedCount = 0;
         foreach (Cache::get('chat.pending', []) as $msg) {
-            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id() && empty($msg['read_at'])) {
+            if ($msg['user_id'] == $adminId && $msg['recipient_id'] == Auth::id() && empty($msg['seen_at'])) {
                 $cachedCount++;
             }
         }
@@ -152,8 +195,11 @@ class ChatPopup extends Component
 
     public function render()
     {
-        if ($this->open) {
-            $this->markAsRead();
+        if ($this->assignedAdminId) {
+            $this->markAsDelivered();
+            if ($this->open) {
+                $this->markAsSeen();
+            }
         }
 
         $messages = $this->messages;
@@ -173,6 +219,16 @@ class ChatPopup extends Component
             'unreadCount' => $this->unreadCount,
             'chatTitle' => $chatTitle,
         ]);
+    }
+
+    public function showTyping(): void
+    {
+        $this->typing = now();
+    }
+
+    public function getIsTypingProperty(): bool
+    {
+        return $this->typing && now()->diffInSeconds($this->typing) < 5;
     }
 }
 

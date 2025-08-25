@@ -9,14 +9,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->timestamp('read_at')->nullable()->after('message');
+            $table->timestamp('delivered_at')->nullable()->after('message');
+            $table->timestamp('seen_at')->nullable()->after('delivered_at');
         });
     }
 
     public function down(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->dropColumn('read_at');
+            $table->dropColumn(['delivered_at', 'seen_at']);
         });
     }
 };
