@@ -59,5 +59,27 @@ class ChatPopupTest extends TestCase
             ->assertSee('Hi')
             ->assertSee('Hello');
     }
+
+    public function test_daily_message_limit_in_chat_popup(): void
+    {
+        $admin = User::factory()->create(['role' => Role::ADMIN]);
+        $student = User::factory()->create(['role' => Role::TEACHER]);
+
+        Chat::create(['user_id' => $student->id, 'assigned_admin_id' => $admin->id]);
+
+        \App\Models\Setting::set('chat_daily_message_limit', 1);
+
+        $this->actingAs($student);
+
+        Livewire::test(ChatPopup::class)
+            ->set('message', 'First')
+            ->call('send')
+            ->assertSet('message', '');
+
+        Livewire::test(ChatPopup::class)
+            ->set('message', 'Second')
+            ->call('send')
+            ->assertHasErrors(['message' => 'limit']);
+    }
 }
 
