@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Prunable;
+use Illuminate\Database\Eloquent\MassPrunable;
 
 class ChatMessage extends Model
 {
-    use HasFactory, Prunable;
+    use HasFactory, MassPrunable;
 
     protected $fillable = [
         'user_id',
@@ -25,7 +25,7 @@ class ChatMessage extends Model
 
     public function prunable()
     {
-        $hours = Setting::get('chat_retention_hours', config('chat.retention_hours'));
+        $hours = (int) Setting::get('chat_retention_hours', config('chat.retention_hours'));
         return static::where('created_at', '<', now()->subHours($hours));
     }
 
