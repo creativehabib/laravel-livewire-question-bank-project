@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ChatMessage;
+use App\Models\Setting;
 use Illuminate\Console\Command;
 
 class CleanOldChatMessages extends Command
@@ -13,8 +14,12 @@ class CleanOldChatMessages extends Command
 
     public function handle(): int
     {
-        $deleted = ChatMessage::pruneAll();
+        $hours = (int) Setting::get('chat_retention_hours', config('chat.retention_hours'));
+
+        $deleted = ChatMessage::where('created_at', '<', now()->subHours($hours))->delete();
+
         $this->info("Deleted {$deleted} old chat messages.");
+
         return Command::SUCCESS;
     }
 }

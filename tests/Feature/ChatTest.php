@@ -165,4 +165,31 @@ class ChatTest extends TestCase
 
         $this->assertDatabaseMissing('chat_messages', ['id' => $message->id]);
     }
+
+    public function test_chat_clean_command_respects_custom_retention_setting(): void
+    {
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        Setting::set('chat_retention_hours', 1);
+
+        $recent = ChatMessage::create([
+            'user_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'message' => 'recent',
+            'created_at' => now()->subMinutes(30),
+        ]);
+
+        $old = ChatMessage::create([
+            'user_id' => $sender->id,
+            'recipient_id' => $recipient->id,
+            'message' => 'old',
+            'created_at' => now()->subHours(2),
+        ]);
+
+        $this->artisan('chat:clean')->assertExitCode(0);
+
+        $this->assertDatabaseHas('chat_messages', ['id' => $recent->id]);
+        $this->assertDatabaseMissing('chat_messages', ['id' => $old->id]);
+    }
 }
