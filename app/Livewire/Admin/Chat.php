@@ -173,9 +173,11 @@ class Chat extends Component
         ]);
     }
 
-    public function showTyping(): void
+    public function showTyping($event): void
     {
-        $this->typing = now();
+        if (($event['user_id'] ?? null) === $this->recipient_id) {
+            $this->typing = now();
+        }
     }
 
     public function getIsTypingProperty(): bool

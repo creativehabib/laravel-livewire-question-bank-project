@@ -183,9 +183,11 @@ class ChatPopup extends Component
         ]);
     }
 
-    public function showTyping(): void
+    public function showTyping($event): void
     {
-        $this->typing = now();
+        if (($event['user_id'] ?? null) === $this->getAdminId()) {
+            $this->typing = now();
+        }
     }
 
     public function getIsTypingProperty(): bool
