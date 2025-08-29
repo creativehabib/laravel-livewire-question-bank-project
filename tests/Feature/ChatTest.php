@@ -36,6 +36,24 @@ class ChatTest extends TestCase
         ]);
     }
 
+    public function test_conversation_list_shows_latest_message(): void
+    {
+        $admin = User::factory()->create();
+        $student = User::factory()->create();
+
+        ChatMessage::create([
+            'user_id' => $student->id,
+            'recipient_id' => $admin->id,
+            'message' => 'Need help',
+            'created_at' => now(),
+        ]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(Chat::class)
+            ->assertSee('Need help');
+    }
+
     public function test_unread_count_clears_after_viewing_messages(): void
     {
         $sender = User::factory()->create();

@@ -165,10 +165,30 @@ class Chat extends Component
 
         $messageCounts = $dbCounts;
 
+        $authId = Auth::id();
+        $lastMessages = ChatMessage::where(function ($query) use ($authId) {
+                $query->where('user_id', $authId)
+                      ->orWhere('recipient_id', $authId);
+            })
+            ->latest()
+            ->get()
+            ->groupBy(function ($msg) use ($authId) {
+                return $msg->user_id === $authId ? $msg->recipient_id : $msg->user_id;
+            })
+            ->map->first();
+
+        $users = User::where('id', '!=', $authId)
+            ->get()
+            ->sortByDesc(function ($user) use ($lastMessages) {
+                return optional($lastMessages[$user->id] ?? null)->created_at;
+            })
+            ->values();
+
         return view('livewire.admin.chat', [
-            'users' => User::where('id', '!=', Auth::id())->get(),
+            'users' => $users,
             'messages' => $messages,
             'messageCounts' => $messageCounts,
+            'lastMessages' => $lastMessages,
             'retention' => $this->retentionPeriod(),
         ]);
     }
