@@ -6,22 +6,33 @@
         <div class="w-1/3 pr-4 border-r border-gray-200 dark:border-gray-700 overflow-y-auto h-full">
             <ul class="space-y-1">
                 @foreach($users as $user)
+                    @php $last = $lastMessages[$user->id] ?? null; @endphp
                     <li
                         wire:click="$set('recipient_id', {{ $user->id }})"
-                        class="flex items-center justify-between p-2 rounded-lg cursor-pointer {{ $recipient_id == $user->id ? 'bg-indigo-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+                        class="p-2 rounded-lg cursor-pointer {{ $recipient_id == $user->id ? 'bg-indigo-50 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700' }}">
                         <div class="flex items-center space-x-2">
                             @if ($user->avatar_url)
-                                <img src="{{ $user->avatar_url }}" class="w-6 h-6 rounded-full">
+                                <img src="{{ $user->avatar_url }}" class="w-8 h-8 rounded-full">
                             @else
-                                <span class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">{{ $user->initials }}</span>
+                                <span class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700">{{ $user->initials }}</span>
                             @endif
-                            <span class="text-sm text-gray-800 dark:text-gray-100">{{ $user->name }}</span>
-                        </div>
-                        <div class="flex items-center space-x-1">
-                            @if(isset($messageCounts[$user->id]) && $messageCounts[$user->id] > 0)
-                                <span class="text-xs bg-indigo-600 text-white rounded-full px-2">{{ $messageCounts[$user->id] }}</span>
-                            @endif
-                            <span class="text-xs {{ $user->isOnline() ? 'text-green-500' : 'text-gray-400' }}">●</span>
+                            <div class="flex-1 overflow-hidden">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-800 dark:text-gray-100">{{ $user->name }}</span>
+                                    @if($last)
+                                        <span class="text-xs text-gray-500">{{ $last->created_at->format('H:i') }}</span>
+                                    @endif
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 truncate">{{ \Illuminate\Support\Str::limit($last->message ?? '', 30) }}</span>
+                                    <div class="flex items-center space-x-1 flex-shrink-0 ml-2">
+                                        @if(isset($messageCounts[$user->id]) && $messageCounts[$user->id] > 0)
+                                            <span class="text-xs bg-indigo-600 text-white rounded-full px-2">{{ $messageCounts[$user->id] }}</span>
+                                        @endif
+                                        <span class="text-xs {{ $user->isOnline() ? 'text-green-500' : 'text-gray-400' }}">●</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </li>
                 @endforeach
