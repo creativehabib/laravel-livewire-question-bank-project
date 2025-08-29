@@ -8,19 +8,6 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
-    // এই অংশটুকু যোগ করুন
-    safelist: [
-        'justify-end',
-        'justify-start',
-        'bg-indigo-600',
-        'text-white',
-        'bg-gray-200',
-        'dark:bg-gray-700',
-        'text-gray-800',
-        'dark:text-gray-100',
-        'ml-2',
-        'mr-2'
-    ],
     darkMode: 'class', // ⬅️ এটা অবশ্যই থাকতে হবে
     theme: {
         extend: {
