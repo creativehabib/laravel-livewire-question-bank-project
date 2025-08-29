@@ -1,6 +1,6 @@
 @props(['msg', 'showAvatar' => false, 'maxWidth' => 'max-w-xs'])
 <div class="flex items-end {{ $msg->user_id == auth()->id() ? 'justify-end' : 'justify-start' }}">
-    @if($showAvatar && $msg->user_id !== auth()->id())
+    @if($showAvatar && $msg->user_id != auth()->id())
         @if ($msg->user->avatar_url)
             <img src="{{ $msg->user->avatar_url }}" class="w-6 h-6 rounded-full mr-2">
         @else
