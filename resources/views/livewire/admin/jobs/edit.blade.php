@@ -101,41 +101,48 @@
 
         function initializeQuill() {
             const editorEl = document.getElementById('description-editor');
-            if (editorEl && !editorEl.__quill) {
-                const toolbarOptions = [
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'header': 1 }, { 'header': 2 }],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link', 'image', 'video'],
-                    ['clean'],
-                ];
+            if (!editorEl) return;
 
-                quillInstance = new Quill(editorEl, {
-                    theme: 'snow',
-                    modules: { toolbar: toolbarOptions }
-                });
-
+            if (editorEl.__quill) {
+                quillInstance = editorEl.__quill;
                 quillInstance.root.innerHTML = @js($description ?? '');
-
-                quillInstance.on('text-change', () => {
-                    @this.set('description', quillInstance.root.innerHTML, false);
-                });
-
-                quillInstance.getModule('toolbar').addHandler('image', () => {
-                    imageToReplace = null;
-                    window.dispatchEvent(new CustomEvent('open-media-modal'));
-                });
-
-                quillInstance.root.addEventListener('click', (e) => {
-                    if (e.target && e.target.tagName === 'IMG') {
-                        imageToReplace = e.target;
-                        window.dispatchEvent(new CustomEvent('open-media-modal'));
-                    }
-                });
-
-                editorEl.__quill = quillInstance;
+                @this.set('description', quillInstance.root.innerHTML, false);
+                return;
             }
+
+            const toolbarOptions = [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link', 'image', 'video'],
+                ['clean'],
+            ];
+
+            quillInstance = new Quill(editorEl, {
+                theme: 'snow',
+                modules: { toolbar: toolbarOptions }
+            });
+
+            quillInstance.root.innerHTML = @js($description ?? '');
+
+            quillInstance.on('text-change', () => {
+                @this.set('description', quillInstance.root.innerHTML, false);
+            });
+
+            quillInstance.getModule('toolbar').addHandler('image', () => {
+                imageToReplace = null;
+                window.dispatchEvent(new CustomEvent('open-media-modal'));
+            });
+
+            quillInstance.root.addEventListener('click', (e) => {
+                if (e.target && e.target.tagName === 'IMG') {
+                    imageToReplace = e.target;
+                    window.dispatchEvent(new CustomEvent('open-media-modal'));
+                }
+            });
+
+            editorEl.__quill = quillInstance;
         }
 
         function insertOrReplaceImage(url) {
