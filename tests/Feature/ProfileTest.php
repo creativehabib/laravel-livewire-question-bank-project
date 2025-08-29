@@ -4,6 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -97,5 +100,27 @@ class ProfileTest extends TestCase
             ->assertNoRedirect();
 
         $this->assertNotNull($user->fresh());
+    }
+
+    public function test_profile_photo_can_be_updated(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        $component = Volt::test('profile.update-profile-information-form')
+            ->set('photo', UploadedFile::fake()->image('avatar.jpg'))
+            ->call('updateProfileInformation');
+
+        $component
+            ->assertHasNoErrors()
+            ->assertNoRedirect();
+
+        $user->refresh();
+
+        $this->assertNotNull($user->avatar_url);
+        Storage::disk('public')->assertExists(Str::after($user->avatar_url, '/storage/'));
     }
 }

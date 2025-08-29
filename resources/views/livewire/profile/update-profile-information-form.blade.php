@@ -3,13 +3,18 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 new class extends Component
 {
+    use WithFileUploads;
+
     public string $name = '';
     public string $email = '';
+    public $photo = null;
 
     /**
      * Mount the component.
@@ -30,9 +35,15 @@ new class extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'photo' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $user->fill($validated);
+        $user->fill(collect($validated)->except('photo')->toArray());
+
+        if ($this->photo) {
+            $path = $this->photo->store('avatars', 'public');
+            $user->avatar_url = Storage::url($path);
+        }
 
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
@@ -74,6 +85,18 @@ new class extends Component
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
+        <div>
+            <x-input-label for="photo" :value="__('Photo')" />
+            <input wire:model="photo" id="photo" name="photo" type="file" class="mt-1 block w-full" />
+            <x-input-error class="mt-2" :messages="$errors->get('photo')" />
+
+            @if ($photo)
+                <img src="{{ $photo->temporaryUrl() }}" class="h-20 w-20 rounded-full mt-2">
+            @elseif (auth()->user()->avatar_url)
+                <img src="{{ auth()->user()->avatar_url }}" class="h-20 w-20 rounded-full mt-2">
+            @endif
+        </div>
+
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
