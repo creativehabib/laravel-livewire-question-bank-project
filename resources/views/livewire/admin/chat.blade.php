@@ -20,7 +20,7 @@
                                 <div class="flex justify-between">
                                     <span class="text-sm text-gray-800 dark:text-gray-100">{{ $user->name }}</span>
                                     @if($last)
-                                        <span class="text-xs text-gray-500">{{ $last->created_at->format('H:i') }}</span>
+                                        <span class="text-xs text-gray-500">{{ $last->created_at->format('g.ia') }}</span>
                                     @endif
                                 </div>
                                 <div class="flex justify-between items-center">
@@ -41,7 +41,14 @@
 
         <div class="flex-1 pl-4 flex flex-col h-full">
             <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-2" wire:poll.5s>
+                @php $lastDate = null; @endphp
                 @forelse($messages as $msg)
+                    @if ($lastDate !== $msg->created_at->toDateString())
+                        <div class="text-center text-xs text-gray-500 my-2">
+                            {{ $msg->created_at->isToday() ? 'Today' : ($msg->created_at->isYesterday() ? 'Yesterday' : $msg->created_at->format('F j, Y')) }}
+                        </div>
+                        @php $lastDate = $msg->created_at->toDateString(); @endphp
+                    @endif
                     <x-chat-message :msg="$msg" :show-avatar="true" />
                 @empty
                     <div class="text-sm text-gray-500">No messages</div>

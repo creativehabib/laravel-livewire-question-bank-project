@@ -10,7 +10,7 @@
     <div class="{{ $maxWidth }} px-3 py-2 rounded-lg text-sm {{ $msg->user_id === auth()->id() ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100' }}">
         <div>{{ $msg->message }}</div>
         <div class="text-[10px] text-right mt-1 opacity-70">
-            {{ $msg->created_at->format('H:i') }}
+            {{ $msg->created_at->format('g.ia') }}
             @if($msg->user_id === auth()->id())
                 @if($msg->seen_at)
                     <span>- Read</span>
