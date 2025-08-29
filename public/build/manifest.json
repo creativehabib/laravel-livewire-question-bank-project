@@ -240,7 +240,7 @@
     "src": "node_modules/katex/dist/fonts/KaTeX_Typewriter-Regular.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-adn1oCoE.css",
+    "file": "assets/app-BCeK80s8.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -260,7 +260,7 @@
     "src": "resources/css/fonts/roboto-regular-webfont.woff"
   },
   "resources/js/app.js": {
-    "file": "assets/app-BTzt7nSM.js",
+    "file": "assets/app-coK-CYGI.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

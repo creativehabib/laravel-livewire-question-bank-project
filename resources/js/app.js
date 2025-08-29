@@ -7,6 +7,16 @@ import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import { openMathPopup, attachFormulaClickHandler } from './math-popup';
 
+// Import the quill-better-table module
+import QuillBetterTable from 'quill-better-table';
+
+// Register the module with Quill
+Quill.register({
+    'modules/better-table': QuillBetterTable
+}, true);
+
+// Make it available globally
+window.QuillBetterTable = QuillBetterTable;
 // global expose (যাতে Blade থেকে সরাসরি ব্যবহার করা যায়)
 window.Swal = Swal;
 window.katex = katex;

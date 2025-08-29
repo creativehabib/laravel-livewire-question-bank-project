@@ -8,12 +8,18 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
+    // এই অংশটুকু যোগ করুন
     safelist: [
-        'sent',
-        'received',
         'justify-end',
         'justify-start',
-        // অন্য কোনো ডাইনামিক ক্লাস থাকলে সেগুলোও যোগ করুন
+        'bg-indigo-600',
+        'text-white',
+        'bg-gray-200',
+        'dark:bg-gray-700',
+        'text-gray-800',
+        'dark:text-gray-100',
+        'ml-2',
+        'mr-2'
     ],
     darkMode: 'class', // ⬅️ এটা অবশ্যই থাকতে হবে
     theme: {

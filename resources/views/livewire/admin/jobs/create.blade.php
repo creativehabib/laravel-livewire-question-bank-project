@@ -107,10 +107,10 @@
                         ['blockquote', 'code-block'],
                         [{ 'header': 1 }, { 'header': 2 }],
                         [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['table'],
                         ['link', 'image', 'video'],
                         ['clean'],
                     ];
-
                     quillInstance = new Quill(editorEl, {
                         theme: 'snow',
                         modules: { toolbar: toolbarOptions }
