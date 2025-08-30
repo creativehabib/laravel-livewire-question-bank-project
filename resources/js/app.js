@@ -6,6 +6,7 @@ import Quill from 'quill';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import { openMathPopup, attachFormulaClickHandler } from './math-popup';
+import Alpine from 'alpinejs';
 
 // global expose (যাতে Blade থেকে সরাসরি ব্যবহার করা যায়)
 window.Swal = Swal;
@@ -14,6 +15,7 @@ window.Quill = Quill;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.openMathPopup = openMathPopup;
+window.Alpine = Alpine;
 
 // simple toast helper so other scripts can call it globally
 window.showToast = function (message, type = 'success') {
@@ -98,6 +100,8 @@ document.addEventListener('alpine:init', () => {
         },
     }));
 });
+
+Alpine.start();
 
 // delete confirmation handled globally
 window.addEventListener('confirm-delete', (event) => {
