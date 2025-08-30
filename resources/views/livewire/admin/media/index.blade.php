@@ -1,4 +1,4 @@
-<div x-data="mediaManager()">
+<div x-data="mediaManager">
     <x-slot name="title">Media Library</x-slot>
 
     <div class="flex items-center justify-between">
