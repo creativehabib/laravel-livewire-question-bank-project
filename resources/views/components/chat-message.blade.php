@@ -2,7 +2,7 @@
 <div class="flex items-end {{ $msg->user_id == auth()->id() ? 'justify-end' : 'justify-start' }}">
     @if($showAvatar && $msg->user_id != auth()->id())
         @if ($msg->user->avatar_url)
-            <img src="{{ $msg->user->avatar_url }}" class="w-6 h-6 rounded-full mr-2">
+            <img src="{{ $msg->user->avatar_url }}" class="w-6 h-6 rounded-full mr-2" alt="{{$msg->user->name}}">
         @else
             <span class="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center text-xs font-semibold text-gray-700 mr-2">{{ $msg->user->initials }}</span>
         @endif

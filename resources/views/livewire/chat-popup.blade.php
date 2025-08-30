@@ -16,7 +16,7 @@
         <div id="chatMessages" class="p-2 overflow-y-auto space-y-2 h-64">
             @php $lastDate = null; @endphp
             @forelse($messages as $msg)
-                @if ($lastDate !== $msg->created_at->toDateString())
+                @if ($lastDate != $msg->created_at->toDateString())
                     <div class="text-center text-xs text-gray-500 my-2">
                         {{ $msg->created_at->isToday() ? 'Today' : ($msg->created_at->isYesterday() ? 'Yesterday' : $msg->created_at->format('F j, Y')) }}
                     </div>
