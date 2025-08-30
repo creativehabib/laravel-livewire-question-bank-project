@@ -110,7 +110,9 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        function renderAdminCharts() {
+            if (!document.querySelector('#usageChart')) return;
+
             const messageCounts = @json($messageCounts);
 
             const usageOptions = {
@@ -133,6 +135,14 @@
                 xaxis: { categories: @json($viewChartData->pluck('title')) }
             };
             new ApexCharts(document.querySelector('#viewChart'), viewOptions).render();
-        });
+        }
+
+        document.addEventListener('livewire:navigated', renderAdminCharts);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderAdminCharts);
+        } else {
+            renderAdminCharts();
+        }
     </script>
 @endpush
