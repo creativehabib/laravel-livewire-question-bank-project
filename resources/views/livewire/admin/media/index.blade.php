@@ -32,7 +32,7 @@
 
     <div
         x-show="isDetailsDrawerOpen"
-        @open-details-drawer.window="isDetailsDrawerOpen = true"
+        @open-details-drawer.window="isDetailsDrawerOpen = true; isUploaderOpen = false"
         x-transition:enter="transition ease-in-out duration-300"
         x-transition:enter-start="translate-x-full"
         x-transition:enter-end="translate-x-0"
@@ -199,6 +199,7 @@
                 },
                 init() {
                     Livewire.on('open-details-drawer', () => {
+                        this.isUploaderOpen = false;
                         this.isDetailsDrawerOpen = true;
                     });
 
