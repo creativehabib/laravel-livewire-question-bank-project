@@ -6,7 +6,6 @@ import Quill from 'quill';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import { openMathPopup, attachFormulaClickHandler } from './math-popup';
-import * as Alpine from "autoprefixer";
 
 // global expose (যাতে Blade থেকে সরাসরি ব্যবহার করা যায়)
 window.Swal = Swal;
