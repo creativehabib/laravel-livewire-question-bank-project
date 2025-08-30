@@ -110,6 +110,10 @@
 
 @push('scripts')
     <script>
+        let usageChart;
+        let subjectChart;
+        let viewChart;
+
         function renderAdminCharts() {
             if (!document.querySelector('#usageChart')) return;
 
@@ -120,21 +124,27 @@
                 series: [{ name: 'Messages', data: Object.values(messageCounts) }],
                 xaxis: { categories: Object.keys(messageCounts) }
             };
-            new ApexCharts(document.querySelector('#usageChart'), usageOptions).render();
+            if (usageChart) usageChart.destroy();
+            usageChart = new ApexCharts(document.querySelector('#usageChart'), usageOptions);
+            usageChart.render();
 
             const subjectOptions = {
                 chart: { type: 'bar', height: 320 },
                 series: [{ name: 'Questions', data: @json($subjectChartData->pluck('questions_count')) }],
                 xaxis: { categories: @json($subjectChartData->pluck('name')) }
             };
-            new ApexCharts(document.querySelector('#subjectChart'), subjectOptions).render();
+            if (subjectChart) subjectChart.destroy();
+            subjectChart = new ApexCharts(document.querySelector('#subjectChart'), subjectOptions);
+            subjectChart.render();
 
             const viewOptions = {
                 chart: { type: 'bar', height: 320 },
                 series: [{ name: 'Views', data: @json($viewChartData->pluck('views')) }],
                 xaxis: { categories: @json($viewChartData->pluck('title')) }
             };
-            new ApexCharts(document.querySelector('#viewChart'), viewOptions).render();
+            if (viewChart) viewChart.destroy();
+            viewChart = new ApexCharts(document.querySelector('#viewChart'), viewOptions);
+            viewChart.render();
         }
 
         document.addEventListener('livewire:navigated', renderAdminCharts);
