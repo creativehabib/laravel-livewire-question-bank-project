@@ -170,7 +170,9 @@ class Index extends Component
     public function render()
     {
         $mediaItems = Media::latest()->paginate(18);
-        return view('livewire.admin.media.index', compact('mediaItems'));
+
+        return view('livewire.admin.media.index', compact('mediaItems'))
+            ->layout('layouts.admin', ['title' => 'Media Library']);
     }
 
     #[On('deleteMediaConfirmed')]
