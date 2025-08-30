@@ -41,23 +41,15 @@ document.addEventListener('alpine:init', () => {
             this.isUploaderOpen = true;
         },
         init() {
-            const registerListeners = () => {
-                Livewire.on('open-details-drawer', () => {
-                    this.isUploaderOpen = false;
-                    this.isDetailsDrawerOpen = true;
-                });
+            window.addEventListener('open-details-drawer', () => {
+                this.isUploaderOpen = false;
+                this.isDetailsDrawerOpen = true;
+            });
 
-                Livewire.on('mediaDeleted', (e) => {
-                    showToast(e.message);
-                    this.isDetailsDrawerOpen = false;
-                });
-            };
-
-            if (window.Livewire) {
-                registerListeners();
-            } else {
-                window.addEventListener('livewire:load', registerListeners);
-            }
+            window.addEventListener('mediaDeleted', (event) => {
+                showToast(event.detail.message);
+                this.isDetailsDrawerOpen = false;
+            });
         },
 
         // copy URL to clipboard with graceful fallback
@@ -129,11 +121,9 @@ window.addEventListener('confirm-delete', (event) => {
 });
 
 // show toast when media record is updated
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.Livewire) {
-        Livewire.on('mediaUpdated', (e) => showToast(e.message, e.type || 'success'));
-    }
-});
+window.addEventListener('mediaUpdated', (event) =>
+    showToast(event.detail.message, event.detail.type || 'success')
+);
 
 // --- User Menu Dropdown ---
 const userMenuButton = document.getElementById('userMenuButton');
