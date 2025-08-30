@@ -41,15 +41,23 @@ document.addEventListener('alpine:init', () => {
             this.isUploaderOpen = true;
         },
         init() {
-            Livewire.on('open-details-drawer', () => {
-                this.isUploaderOpen = false;
-                this.isDetailsDrawerOpen = true;
-            });
+            const registerListeners = () => {
+                Livewire.on('open-details-drawer', () => {
+                    this.isUploaderOpen = false;
+                    this.isDetailsDrawerOpen = true;
+                });
 
-            Livewire.on('mediaDeleted', (e) => {
-                showToast(e.message);
-                this.isDetailsDrawerOpen = false;
-            });
+                Livewire.on('mediaDeleted', (e) => {
+                    showToast(e.message);
+                    this.isDetailsDrawerOpen = false;
+                });
+            };
+
+            if (window.Livewire) {
+                registerListeners();
+            } else {
+                window.addEventListener('livewire:load', registerListeners);
+            }
         },
 
         // copy URL to clipboard with graceful fallback
