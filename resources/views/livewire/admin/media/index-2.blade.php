@@ -1,9 +1,9 @@
-<div x-data="mediaManager()">
+<div id="mediaManager">
     <x-slot name="title">Media Library</x-slot>
 
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Media Library</h1>
-        <button @click="isUploaderOpen = true" type="button" class="flex items-center">
+        <button data-action="open-uploader" type="button" class="flex items-center">
             <x-heroicon-o-arrow-up-tray class="w-5 h-5 mr-2"/>
             Add Media
         </button>
@@ -31,23 +31,15 @@
     @endif
 
     <div
-        x-show="isDetailsDrawerOpen"
-        @open-details-drawer.window="isDetailsDrawerOpen = true"
-        x-transition:enter="transition ease-in-out duration-300"
-        x-transition:enter-start="translate-x-full"
-        x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in-out duration-300"
-        x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="translate-x-full"
-        class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-lg z-50"
-        x-cloak>
+        id="detailsDrawer"
+        class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-lg z-50 hidden">
 
         <div class="flex flex-col h-full">
             @if($selectedMedia)
                 <div class="p-4 border-b dark:border-gray-700">
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-gray-800 dark:text-white">File Details</h3>
-                        <button @click="isDetailsDrawerOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <button data-action="close-details" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                             <x-heroicon-o-x-mark class="w-6 h-6"/>
                         </button>
                     </div>
@@ -58,17 +50,13 @@
                         <img src="{{ $selectedMedia->url }}" alt="{{ $selectedMedia->name }}" class="w-full h-auto object-contain rounded-md max-h-60">
                     </div>
 
-                    <div x-data="{ isUploading: false, progress: 0 }"
-                         x-on:livewire-upload-start="isUploading = true"
-                         x-on:livewire-upload-finish="isUploading = false"
-                         x-on:livewire-upload-error="isUploading = false"
-                         x-on:livewire-upload-progress="progress = $event.detail.progress">
+                    <div id="replace-upload-wrapper">
                         <label for="replace-file" class="flex items-center w-full text-center cursor-pointer">
                             <x-heroicon-o-arrow-path class="w-5 h-5 mr-2"/> <span>Replace Image</span>
                         </label>
                         <input id="replace-file" wire:model="newFile" type="file" class="sr-only">
-                        <div x-show="isUploading" class="w-full bg-gray-200 rounded-full mt-2">
-                            <div class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" :style="`width: ${progress}%`" x-text="`${progress}%`"></div>
+                        <div id="replace-progress" class="w-full bg-gray-200 rounded-full mt-2 hidden">
+                            <div id="replace-progress-bar" class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"></div>
                         </div>
                     </div>
 
@@ -81,7 +69,7 @@
                             <label class="label">URL</label>
                             <div class="flex">
                                 <input type="text" readonly value="{{ $selectedMedia->url }}" id="media-url-display" class="input-form flex-1 rounded-r-none bg-gray-100 dark:bg-gray-900">
-                                <button @click="copyToClipboard($el)" data-url="{{ $selectedMedia->url }}" class="btn btn-secondary rounded-l-none w-24">Copy</button>
+                                <button data-action="copy-url" data-url="{{ $selectedMedia->url }}" class="btn btn-secondary rounded-l-none w-24">Copy</button>
                             </div>
                         </div>
                         <dl class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -95,7 +83,8 @@
 
                 <div class="p-4 border-t dark:border-gray-700 flex justify-between items-center">
                     <button
-                        @click="$dispatch('confirm-delete', { id: {{ $selectedMedia->id }} })"
+                        data-action="confirm-delete"
+                        data-id="{{ $selectedMedia->id }}"
                         class="btn btn-danger">
                         Delete Permanently
                     </button>
@@ -108,43 +97,34 @@
         </div>
     </div>
 
-    <div x-show="isDetailsDrawerOpen" @click="isDetailsDrawerOpen = false" class="fixed inset-0 bg-black bg-opacity-50 z-40" x-cloak></div>
+    <div id="detailsOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" data-action="close-details"></div>
 
     <div
-        x-show="isUploaderOpen"
-        x-transition
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-        x-cloak>
+        id="uploader"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div
-            @click.outside="isUploaderOpen = false"
-            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl"
-            x-data="{ activeTab: 'upload' }">
+            id="uploaderContent"
+            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-2xl">
 
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">Media Uploader</h3>
-                <button @click="isUploaderOpen = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                <button data-action="close-uploader" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
                     <x-heroicon-o-x-mark class="w-6 h-6"/>
                 </button>
             </div>
 
             <div class="border-b border-gray-200 dark:border-gray-700 mb-4">
                 <nav class="flex space-x-4" aria-label="Tabs">
-                    <button @click="activeTab = 'upload'" :class="{ 'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'upload', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'upload' }" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                    <button data-action="set-tab" data-tab="upload" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                         Upload Media
                     </button>
-                    <button @click="activeTab = 'url'" :class="{ 'border-indigo-500 text-indigo-600 dark:text-indigo-400': activeTab === 'url', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'url' }" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
+                    <button data-action="set-tab" data-tab="url" class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm">
                         Upload From URL
                     </button>
                 </nav>
             </div>
-
-            <div x-show="activeTab === 'upload'">
-                <div x-data="{ isUploading: false, progress: 0 }"
-                     x-on:livewire-upload-start="isUploading = true"
-                     x-on:livewire-upload-finish="isUploading = false; isUploaderOpen = false;"
-                     x-on:livewire-upload-error="isUploading = false"
-                     x-on:livewire-upload-progress="progress = $event.detail.progress">
-
+            <div id="tab-upload">
+                <div id="upload-wrapper">
                     <label for="file-upload" class="relative cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-10 text-center block hover:bg-gray-50 dark:hover:bg-gray-700">
                         <div class="text-center">
                             <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">Drop files to upload</p>
@@ -154,13 +134,13 @@
                         <input id="file-upload" wire:model="file" type="file" class="sr-only">
                     </label>
 
-                    <div x-show="isUploading" class="w-full bg-gray-200 rounded-full mt-4">
-                        <div class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" :style="`width: ${progress}%`" x-text="`${progress}%`"></div>
+                    <div id="upload-progress" class="w-full bg-gray-200 rounded-full mt-4 hidden">
+                        <div id="upload-progress-bar" class="bg-indigo-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"></div>
                     </div>
                 </div>
             </div>
 
-            <div x-show="activeTab === 'url'">
+            <div id="tab-url" class="hidden">
                 <div class="flex">
                     <input type="text" wire:model.defer="url" id="media-url-input" placeholder="https://example.com/image.jpg" class="flex-1 input-form" />
                     <button wire:click.prevent="uploadFromUrl" wire:loading.attr="disabled" class="btn btn-primary rounded-l-none">
@@ -199,6 +179,7 @@
                 },
                 init() {
                     Livewire.on('open-details-drawer', () => {
+                        this.isUploaderOpen = false;
                         this.isDetailsDrawerOpen = true;
                     });
 
