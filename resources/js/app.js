@@ -6,7 +6,6 @@ import Quill from 'quill';
 import TomSelect from 'tom-select';
 import ApexCharts from 'apexcharts';
 import { openMathPopup, attachFormulaClickHandler } from './math-popup';
-import Alpine from 'alpinejs';
 
 // global expose (যাতে Blade থেকে সরাসরি ব্যবহার করা যায়)
 window.Swal = Swal;
@@ -15,7 +14,6 @@ window.Quill = Quill;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.openMathPopup = openMathPopup;
-window.Alpine = Alpine;
 
 // simple toast helper so other scripts can call it globally
 window.showToast = function (message, type = 'success') {
@@ -32,76 +30,179 @@ window.showToast = function (message, type = 'success') {
     }
 };
 
-// register an Alpine component for the media manager before Alpine starts
-document.addEventListener('alpine:init', () => {
-    Alpine.data('mediaManager', () => ({
+// ---- Media Manager without Alpine.js ----
+document.addEventListener('DOMContentLoaded', () => {
+    const state = {
         isUploaderOpen: false,
         isDetailsDrawerOpen: false,
-        openUploader() {
-            this.isUploaderOpen = true;
-        },
-        init() {
-            window.addEventListener('open-details-drawer', () => {
-                this.isUploaderOpen = false;
-                this.isDetailsDrawerOpen = true;
-            });
+    };
 
-            window.addEventListener('mediaDeleted', (event) => {
-                showToast(event.detail.message);
-                this.isDetailsDrawerOpen = false;
-            });
-        },
+    const uploader = document.getElementById('uploader');
+    const uploaderContent = document.getElementById('uploaderContent');
+    const detailsDrawer = document.getElementById('detailsDrawer');
+    const detailsOverlay = document.getElementById('detailsOverlay');
 
-        // copy URL to clipboard with graceful fallback
-        copyToClipboard(buttonEl) {
-            const urlToCopy = buttonEl.dataset.url;
+    function updateUI() {
+        if (uploader) uploader.classList.toggle('hidden', !state.isUploaderOpen);
+        if (detailsDrawer) detailsDrawer.classList.toggle('hidden', !state.isDetailsDrawerOpen);
+        if (detailsOverlay) detailsOverlay.classList.toggle('hidden', !state.isDetailsDrawerOpen);
+    }
 
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard
-                    .writeText(urlToCopy)
-                    .then(() => {
-                        const originalText = buttonEl.innerText;
-                        buttonEl.innerText = 'Copied!';
-                        showToast('URL Copied!');
-                        setTimeout(() => {
-                            buttonEl.innerText = originalText;
-                        }, 2000);
-                    })
-                    .catch((err) => {
-                        console.error('Modern copy failed: ', err);
-                        this.fallbackCopyToClipboard(urlToCopy, buttonEl);
-                    });
-            } else {
-                this.fallbackCopyToClipboard(urlToCopy, buttonEl);
+    function openUploader() {
+        state.isUploaderOpen = true;
+        updateUI();
+    }
+
+    function closeUploader() {
+        state.isUploaderOpen = false;
+        updateUI();
+    }
+
+    function openDetailsDrawer() {
+        state.isUploaderOpen = false;
+        state.isDetailsDrawerOpen = true;
+        updateUI();
+    }
+
+    function closeDetailsDrawer() {
+        state.isDetailsDrawerOpen = false;
+        updateUI();
+    }
+
+    // wire up buttons
+    document.querySelectorAll('[data-action="open-uploader"]').forEach(btn =>
+        btn.addEventListener('click', openUploader)
+    );
+    document.querySelectorAll('[data-action="close-uploader"]').forEach(btn =>
+        btn.addEventListener('click', closeUploader)
+    );
+    document.querySelectorAll('[data-action="close-details"]').forEach(btn =>
+        btn.addEventListener('click', closeDetailsDrawer)
+    );
+    document.querySelectorAll('[data-action="confirm-delete"]').forEach(btn =>
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const event = new CustomEvent('confirm-delete', { detail: { id } });
+            window.dispatchEvent(event);
+        })
+    );
+    document.querySelectorAll('[data-action="copy-url"]').forEach(btn =>
+        btn.addEventListener('click', () => copyToClipboard(btn))
+    );
+
+    // tab handling in uploader
+    const tabButtons = document.querySelectorAll('[data-action="set-tab"]');
+    const tabContents = {
+        upload: document.getElementById('tab-upload'),
+        url: document.getElementById('tab-url'),
+    };
+    function setActiveTab(name) {
+        tabButtons.forEach(btn => {
+            const isActive = btn.dataset.tab === name;
+            btn.classList.toggle('border-indigo-500', isActive);
+            btn.classList.toggle('text-indigo-600', isActive);
+            btn.classList.toggle('dark:text-indigo-400', isActive);
+            btn.classList.toggle('border-transparent', !isActive);
+            btn.classList.toggle('text-gray-500', !isActive);
+            btn.classList.toggle('hover:text-gray-700', !isActive);
+        });
+        Object.keys(tabContents).forEach(key => {
+            if (tabContents[key]) {
+                tabContents[key].classList.toggle('hidden', key !== name);
             }
-        },
+        });
+    }
+    tabButtons.forEach(btn =>
+        btn.addEventListener('click', () => setActiveTab(btn.dataset.tab))
+    );
+    setActiveTab('upload');
 
-        fallbackCopyToClipboard(text, buttonEl) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-9999px';
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                const originalText = buttonEl.innerText;
-                buttonEl.innerText = 'Copied!';
-                showToast('URL Copied!');
-                setTimeout(() => {
-                    buttonEl.innerText = originalText;
-                }, 2000);
-            } catch (err) {
-                console.error('Fallback copy failed: ', err);
-                showToast('Failed to copy URL!', 'error');
-            }
-            document.body.removeChild(textArea);
-        },
-    }));
+    // close uploader when clicking outside
+    if (uploader) {
+        uploader.addEventListener('click', (e) => {
+            if (e.target === uploader) closeUploader();
+        });
+    }
+    if (detailsOverlay) {
+        detailsOverlay.addEventListener('click', closeDetailsDrawer);
+    }
+
+    // Livewire events
+    window.addEventListener('open-details-drawer', openDetailsDrawer);
+    window.addEventListener('mediaDeleted', (event) => {
+        showToast(event.detail.message);
+        closeDetailsDrawer();
+    });
+
+    // upload progress handlers
+    function setupUploadProgress(inputId, progressId, barId, closeOnFinish = false) {
+        const input = document.getElementById(inputId);
+        const progress = document.getElementById(progressId);
+        const bar = document.getElementById(barId);
+        if (!input || !progress || !bar) return;
+        progress.classList.add('hidden');
+
+        input.addEventListener('livewire-upload-start', () => {
+            progress.classList.remove('hidden');
+        });
+        input.addEventListener('livewire-upload-finish', () => {
+            progress.classList.add('hidden');
+            if (closeOnFinish) closeUploader();
+        });
+        input.addEventListener('livewire-upload-error', () => {
+            progress.classList.add('hidden');
+        });
+        input.addEventListener('livewire-upload-progress', (e) => {
+            bar.style.width = `${e.detail.progress}%`;
+            bar.textContent = `${e.detail.progress}%`;
+        });
+    }
+    setupUploadProgress('replace-file', 'replace-progress', 'replace-progress-bar');
+    setupUploadProgress('file-upload', 'upload-progress', 'upload-progress-bar', true);
+
+    updateUI();
 });
 
-Alpine.start();
+// copy URL to clipboard helpers
+function copyToClipboard(buttonEl) {
+    const urlToCopy = buttonEl.dataset.url;
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard
+            .writeText(urlToCopy)
+            .then(() => handleCopySuccess(buttonEl))
+            .catch(() => fallbackCopyToClipboard(urlToCopy, buttonEl));
+    } else {
+        fallbackCopyToClipboard(urlToCopy, buttonEl);
+    }
+}
+
+function fallbackCopyToClipboard(text, buttonEl) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        handleCopySuccess(buttonEl);
+    } catch (err) {
+        console.error('Fallback copy failed: ', err);
+        showToast('Failed to copy URL!', 'error');
+    }
+    document.body.removeChild(textArea);
+}
+
+function handleCopySuccess(buttonEl) {
+    const originalText = buttonEl.innerText;
+    buttonEl.innerText = 'Copied!';
+    showToast('URL Copied!');
+    setTimeout(() => {
+        buttonEl.innerText = originalText;
+    }, 2000);
+}
 
 // delete confirmation handled globally
 window.addEventListener('confirm-delete', (event) => {
