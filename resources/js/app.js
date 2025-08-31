@@ -15,7 +15,117 @@ window.Quill = Quill;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.openMathPopup = openMathPopup;
+window.Alpine = Alpine;
 
+// simple toast helper so other scripts can call it globally
+window.showToast = function (message, type = 'success') {
+    if (window.Swal) {
+        Swal.fire({
+            toast: true,
+            icon: type,
+            title: message,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+        });
+    }
+};
+
+// register an Alpine component for the media manager before Alpine starts
+document.addEventListener('alpine:init', () => {
+    Alpine.data('mediaManager', () => ({
+        isUploaderOpen: false,
+        isDetailsDrawerOpen: false,
+        openUploader() {
+            this.isUploaderOpen = true;
+        },
+        init() {
+            Livewire.on('open-details-drawer', () => {
+                this.isUploaderOpen = false;
+                this.isDetailsDrawerOpen = true;
+            });
+
+            Livewire.on('mediaDeleted', (e) => {
+                showToast(e.message);
+                this.isDetailsDrawerOpen = false;
+            });
+        },
+
+        // copy URL to clipboard with graceful fallback
+        copyToClipboard(buttonEl) {
+            const urlToCopy = buttonEl.dataset.url;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard
+                    .writeText(urlToCopy)
+                    .then(() => {
+                        const originalText = buttonEl.innerText;
+                        buttonEl.innerText = 'Copied!';
+                        showToast('URL Copied!');
+                        setTimeout(() => {
+                            buttonEl.innerText = originalText;
+                        }, 2000);
+                    })
+                    .catch((err) => {
+                        console.error('Modern copy failed: ', err);
+                        this.fallbackCopyToClipboard(urlToCopy, buttonEl);
+                    });
+            } else {
+                this.fallbackCopyToClipboard(urlToCopy, buttonEl);
+            }
+        },
+
+        fallbackCopyToClipboard(text, buttonEl) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                const originalText = buttonEl.innerText;
+                buttonEl.innerText = 'Copied!';
+                showToast('URL Copied!');
+                setTimeout(() => {
+                    buttonEl.innerText = originalText;
+                }, 2000);
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                showToast('Failed to copy URL!', 'error');
+            }
+            document.body.removeChild(textArea);
+        },
+    }));
+});
+
+Alpine.start();
+
+// delete confirmation handled globally
+window.addEventListener('confirm-delete', (event) => {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'This action cannot be undone!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Livewire.dispatch('deleteMediaConfirmed', { id: event.detail.id });
+        }
+    });
+});
+
+// show toast when media record is updated
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.Livewire) {
+        Livewire.on('mediaUpdated', (e) => showToast(e.message, e.type || 'success'));
+    }
+});
 
 // --- User Menu Dropdown ---
 const userMenuButton = document.getElementById('userMenuButton');
