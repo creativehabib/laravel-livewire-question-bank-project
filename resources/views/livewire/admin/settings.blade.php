@@ -39,19 +39,32 @@
             <label for="chat_ai_enabled" class="text-sm font-medium">Enable AI responses when admins are offline</label>
         </div>
         <div>
-            <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
-            <input type="text" wire:model="openai_api_key" class="w-full border rounded p-2">
-            @error('openai_api_key')
+            <label class="block text-sm font-medium mb-1">AI Provider</label>
+            <select wire:model="chat_ai_provider" class="w-full border rounded p-2">
+                <option value="openai">OpenAI</option>
+                <option value="gemini">Gemini</option>
+            </select>
+            @error('chat_ai_provider')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
-        <div>
-            <label class="block text-sm font-medium mb-1">Gemini API Key</label>
-            <input type="text" wire:model="gemini_api_key" class="w-full border rounded p-2">
-            @error('gemini_api_key')
-                <div class="text-red-600 text-sm">{{ $message }}</div>
-            @enderror
-        </div>
+        @if ($chat_ai_provider === 'openai')
+            <div>
+                <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
+                <input type="text" wire:model="openai_api_key" class="w-full border rounded p-2">
+                @error('openai_api_key')
+                    <div class="text-red-600 text-sm">{{ $message }}</div>
+                @enderror
+            </div>
+        @else
+            <div>
+                <label class="block text-sm font-medium mb-1">Gemini API Key</label>
+                <input type="text" wire:model="gemini_api_key" class="w-full border rounded p-2">
+                @error('gemini_api_key')
+                    <div class="text-red-600 text-sm">{{ $message }}</div>
+                @enderror
+            </div>
+        @endif
         <div>
             <label class="block text-sm font-medium mb-1">Timezone</label>
             <select wire:model="timezone" class="w-full border rounded p-2">
