@@ -38,7 +38,7 @@ class SendChatMessage implements ShouldQueue
 
             if (!$recipientOnline) {
                 $enabled = Setting::get('chat_ai_enabled', false);
-                $apiKey = Setting::get('openai_api_key');
+                $apiKey = Setting::get('openai_api_key') ?: config('services.openai.key');
 
                 if ($enabled && $apiKey) {
                     try {

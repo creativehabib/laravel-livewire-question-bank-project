@@ -43,7 +43,7 @@ class Settings extends Component
         $this->timezone = Setting::get('timezone', config('app.timezone'));
         $this->timezones = DateTimeZone::listIdentifiers();
         $this->chat_ai_enabled = (bool) Setting::get('chat_ai_enabled', false);
-        $this->openai_api_key = Setting::get('openai_api_key', '');
+        $this->openai_api_key = Setting::get('openai_api_key', config('services.openai.key'));
     }
 
     public function save(): void
