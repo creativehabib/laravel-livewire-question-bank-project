@@ -34,6 +34,17 @@
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="chat_ai_enabled" id="chat_ai_enabled">
+            <label for="chat_ai_enabled" class="text-sm font-medium">Enable AI responses when admins are offline</label>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
+            <input type="text" wire:model="openai_api_key" class="w-full border rounded p-2">
+            @error('openai_api_key')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
         <div>
             <label class="block text-sm font-medium mb-1">Timezone</label>
             <select wire:model="timezone" class="w-full border rounded p-2">

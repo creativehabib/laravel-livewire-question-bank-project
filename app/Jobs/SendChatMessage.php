@@ -4,6 +4,10 @@ namespace App\Jobs;
 
 use App\Events\ChatMessageSent;
 use App\Models\ChatMessage;
+use App\Models\Setting;
+use App\Models\User;
+use App\Services\AIResponseService;
+use App\Enums\Role;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -26,5 +30,38 @@ class SendChatMessage implements ShouldQueue
     {
         $message = ChatMessage::create($this->payload);
         broadcast(new ChatMessageSent($message));
+
+        $sender = User::find($message->user_id);
+        if ($sender && !$sender->isAdmin()) {
+            $recipient = $message->recipient_id ? User::find($message->recipient_id) : null;
+            $recipientOnline = $recipient ? $recipient->isOnline() : false;
+
+            if (!$recipientOnline) {
+                $enabled = Setting::get('chat_ai_enabled', false);
+                $apiKey = Setting::get('openai_api_key');
+
+                if ($enabled && $apiKey) {
+                    try {
+                        $service = app(AIResponseService::class);
+                        $reply = $service->generate($message->message, $apiKey);
+                    } catch (\Throwable $e) {
+                        $reply = null;
+                    }
+
+                    if ($reply) {
+                        $botUser = $recipient ?? User::where('role', Role::ADMIN)->first();
+                        if ($botUser) {
+                            $aiMessage = ChatMessage::create([
+                                'user_id' => $botUser->id,
+                                'recipient_id' => $message->user_id,
+                                'message' => $reply,
+                                'created_at' => now(),
+                            ]);
+                            broadcast(new ChatMessageSent($aiMessage));
+                        }
+                    }
+                }
+            }
+        }
     }
 }
