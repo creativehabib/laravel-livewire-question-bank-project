@@ -46,6 +46,13 @@
             @enderror
         </div>
         <div>
+            <label class="block text-sm font-medium mb-1">Gemini API Key</label>
+            <input type="text" wire:model="gemini_api_key" class="w-full border rounded p-2">
+            @error('gemini_api_key')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
+        <div>
             <label class="block text-sm font-medium mb-1">Timezone</label>
             <select wire:model="timezone" class="w-full border rounded p-2">
                 @foreach($timezones as $tz)

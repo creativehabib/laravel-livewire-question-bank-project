@@ -9,6 +9,7 @@ use App\Models\ChatMessage;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\AIResponseService;
+use App\Services\GeminiResponseService;
 use App\Enums\Role;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,12 +41,18 @@ class SendChatMessage implements ShouldQueue
 
             if (!$recipientOnline) {
                 $enabled = Setting::get('chat_ai_enabled', false);
-                $apiKey = Setting::get('openai_api_key') ?: config('services.openai.key');
+                $openaiKey = Setting::get('openai_api_key') ?: config('services.openai.key');
+                $geminiKey = Setting::get('gemini_api_key') ?: config('services.gemini.key');
 
-                if ($enabled && $apiKey) {
+                if ($enabled && ($openaiKey || $geminiKey)) {
                     try {
-                        $service = app(AIResponseService::class);
-                        $reply = $service->generate($message->message, $apiKey);
+                        if ($openaiKey) {
+                            $service = app(AIResponseService::class);
+                            $reply = $service->generate($message->message, $openaiKey);
+                        } else {
+                            $service = app(GeminiResponseService::class);
+                            $reply = $service->generate($message->message, $geminiKey);
+                        }
                     } catch (\Throwable $e) {
                         $reply = null;
                     }
