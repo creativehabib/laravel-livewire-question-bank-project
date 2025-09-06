@@ -16,6 +16,7 @@ class Settings extends Component
     public array $timezones = [];
     public $chat_ai_enabled = false;
     public $openai_api_key = '';
+    public $gemini_api_key = '';
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
@@ -25,6 +26,7 @@ class Settings extends Component
         'timezone' => 'required|timezone',
         'chat_ai_enabled' => 'boolean',
         'openai_api_key' => 'nullable|string',
+        'gemini_api_key' => 'nullable|string',
     ];
 
     public function mount(): void
@@ -44,6 +46,7 @@ class Settings extends Component
         $this->timezones = DateTimeZone::listIdentifiers();
         $this->chat_ai_enabled = (bool) Setting::get('chat_ai_enabled', false);
         $this->openai_api_key = Setting::get('openai_api_key', config('services.openai.key'));
+        $this->gemini_api_key = Setting::get('gemini_api_key', config('services.gemini.key'));
     }
 
     public function save(): void
@@ -56,6 +59,7 @@ class Settings extends Component
         Setting::set('timezone', $this->timezone);
         Setting::set('chat_ai_enabled', $this->chat_ai_enabled ? 1 : 0);
         Setting::set('openai_api_key', $this->openai_api_key);
+        Setting::set('gemini_api_key', $this->gemini_api_key);
         config(['app.timezone' => $this->timezone]);
         date_default_timezone_set($this->timezone);
         session()->flash('status', 'Settings updated');
