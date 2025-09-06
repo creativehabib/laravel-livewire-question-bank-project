@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Events\ChatMessageSent;
+use App\Events\ChatAssigned;
+use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\Setting;
 use App\Models\User;
@@ -51,6 +53,13 @@ class SendChatMessage implements ShouldQueue
                     if ($reply) {
                         $botUser = $recipient ?? User::where('role', Role::ADMIN)->first();
                         if ($botUser) {
+                            $chat = Chat::firstOrCreate(['user_id' => $message->user_id]);
+                            if (!$chat->assigned_admin_id) {
+                                $chat->assigned_admin_id = $botUser->id;
+                                $chat->save();
+                                broadcast(new ChatAssigned($chat));
+                            }
+
                             $aiMessage = ChatMessage::create([
                                 'user_id' => $botUser->id,
                                 'recipient_id' => $message->user_id,
