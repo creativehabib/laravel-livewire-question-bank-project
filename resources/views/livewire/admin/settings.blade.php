@@ -49,7 +49,7 @@
             @enderror
         </div>
         @if ($chat_ai_provider === 'openai')
-            <div>
+            <div wire:key="openai-key-input">
                 <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
                 <input type="text" wire:model="openai_api_key" class="w-full border rounded p-2">
                 @error('openai_api_key')
@@ -57,7 +57,7 @@
                 @enderror
             </div>
         @elseif ($chat_ai_provider === 'gemini')
-            <div>
+            <div wire:key="gemini-key-input">
                 <label class="block text-sm font-medium mb-1">Gemini API Key</label>
                 <input type="text" wire:model="gemini_api_key" class="w-full border rounded p-2">
                 @error('gemini_api_key')
