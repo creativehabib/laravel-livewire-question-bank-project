@@ -41,15 +41,17 @@ class SendChatMessage implements ShouldQueue
 
             if (!$recipientOnline) {
                 $enabled = Setting::get('chat_ai_enabled', false);
+                $provider = Setting::get('chat_ai_provider', 'openai');
                 $openaiKey = Setting::get('openai_api_key') ?: config('services.openai.key');
                 $geminiKey = Setting::get('gemini_api_key') ?: config('services.gemini.key');
 
-                if ($enabled && ($openaiKey || $geminiKey)) {
+                if ($enabled) {
+                    $reply = null;
                     try {
-                        if ($openaiKey) {
+                        if ($provider === 'openai' && $openaiKey) {
                             $service = app(AIResponseService::class);
                             $reply = $service->generate($message->message, $openaiKey);
-                        } else {
+                        } elseif ($provider === 'gemini' && $geminiKey) {
                             $service = app(GeminiResponseService::class);
                             $reply = $service->generate($message->message, $geminiKey);
                         }

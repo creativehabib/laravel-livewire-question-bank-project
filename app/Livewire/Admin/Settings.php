@@ -15,6 +15,7 @@ class Settings extends Component
     public $timezone;
     public array $timezones = [];
     public $chat_ai_enabled = false;
+    public $chat_ai_provider = 'openai';
     public $openai_api_key = '';
     public $gemini_api_key = '';
 
@@ -25,6 +26,7 @@ class Settings extends Component
         'chat_daily_message_limit' => 'required|integer|min:1',
         'timezone' => 'required|timezone',
         'chat_ai_enabled' => 'boolean',
+        'chat_ai_provider' => 'required|in:openai,gemini',
         'openai_api_key' => 'nullable|string',
         'gemini_api_key' => 'nullable|string',
     ];
@@ -45,6 +47,7 @@ class Settings extends Component
         $this->timezone = Setting::get('timezone', config('app.timezone'));
         $this->timezones = DateTimeZone::listIdentifiers();
         $this->chat_ai_enabled = (bool) Setting::get('chat_ai_enabled', false);
+        $this->chat_ai_provider = Setting::get('chat_ai_provider', 'openai');
         $this->openai_api_key = Setting::get('openai_api_key', config('services.openai.key'));
         $this->gemini_api_key = Setting::get('gemini_api_key', config('services.gemini.key'));
     }
@@ -58,6 +61,7 @@ class Settings extends Component
         Setting::set('chat_daily_message_limit', $this->chat_daily_message_limit);
         Setting::set('timezone', $this->timezone);
         Setting::set('chat_ai_enabled', $this->chat_ai_enabled ? 1 : 0);
+        Setting::set('chat_ai_provider', $this->chat_ai_provider);
         Setting::set('openai_api_key', $this->openai_api_key);
         Setting::set('gemini_api_key', $this->gemini_api_key);
         config(['app.timezone' => $this->timezone]);
