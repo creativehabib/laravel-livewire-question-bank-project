@@ -15,6 +15,8 @@ window.Quill = Quill;
 window.TomSelect = TomSelect;
 window.ApexCharts = ApexCharts;
 window.openMathPopup = openMathPopup;
+window.Alpine = Alpine;
+Alpine.start();
 
 // --- User Menu Dropdown ---
 const userMenuButton = document.getElementById('userMenuButton');

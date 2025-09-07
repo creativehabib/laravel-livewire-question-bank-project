@@ -198,35 +198,43 @@
     styleActiveParentMenu();
 
     // --- Example Charts ---
-    new Chart(document.getElementById('subjectChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: ['Math','Physics','Chemistry','Biology'],
-            datasets: [{
-                label: 'Questions',
-                data: [1200, 800, 950, 600],
-                backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444'],
-                borderRadius: 8
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
+    if (window.Chart) {
+        const subjectEl = document.getElementById('subjectChart');
+        if (subjectEl) {
+            new Chart(subjectEl.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Math','Physics','Chemistry','Biology'],
+                    datasets: [{
+                        label: 'Questions',
+                        data: [1200, 800, 950, 600],
+                        backgroundColor: ['#3b82f6','#10b981','#f59e0b','#ef4444'],
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
 
-    new Chart(document.getElementById('usageChart').getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-            datasets: [{
-                label: 'Daily Attempts',
-                data: [120,150,200,180,250,300,280],
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99,102,241,0.2)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-    });
+        const usageEl = document.getElementById('usageChart');
+        if (usageEl) {
+            new Chart(usageEl.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+                    datasets: [{
+                        label: 'Daily Attempts',
+                        data: [120,150,200,180,250,300,280],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99,102,241,0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        }
+    }
 </script>
 
 {{-- ✅ Livewire Scripts --}}
