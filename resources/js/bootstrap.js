@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Echo from 'laravel-echo';
+import Echo from 'laravel-echo/dist/echo.esm.js';
 
 window.axios = axios;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
