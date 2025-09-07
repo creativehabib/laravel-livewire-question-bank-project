@@ -76,6 +76,42 @@
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="google_login_enabled" id="google_login_enabled">
+            <label for="google_login_enabled" class="text-sm font-medium">Enable Google Login</label>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Google Client ID</label>
+            <input type="text" wire:model="google_client_id" class="w-full border rounded p-2">
+            @error('google_client_id')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Google Client Secret</label>
+            <input type="text" wire:model="google_client_secret" class="w-full border rounded p-2">
+            @error('google_client_secret')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="facebook_login_enabled" id="facebook_login_enabled">
+            <label for="facebook_login_enabled" class="text-sm font-medium">Enable Facebook Login</label>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Facebook Client ID</label>
+            <input type="text" wire:model="facebook_client_id" class="w-full border rounded p-2">
+            @error('facebook_client_id')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Facebook Client Secret</label>
+            <input type="text" wire:model="facebook_client_secret" class="w-full border rounded p-2">
+            @error('facebook_client_secret')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
         <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
     </form>
 </div>
