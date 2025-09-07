@@ -18,6 +18,12 @@ class Settings extends Component
     public $chat_ai_provider = 'openai';
     public $openai_api_key = '';
     public $gemini_api_key = '';
+    public $google_login_enabled = false;
+    public $facebook_login_enabled = false;
+    public $google_client_id = '';
+    public $google_client_secret = '';
+    public $facebook_client_id = '';
+    public $facebook_client_secret = '';
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
@@ -29,6 +35,12 @@ class Settings extends Component
         'chat_ai_provider' => 'required|in:openai,gemini',
         'openai_api_key' => 'nullable|string',
         'gemini_api_key' => 'nullable|string',
+        'google_login_enabled' => 'boolean',
+        'facebook_login_enabled' => 'boolean',
+        'google_client_id' => 'nullable|string',
+        'google_client_secret' => 'nullable|string',
+        'facebook_client_id' => 'nullable|string',
+        'facebook_client_secret' => 'nullable|string',
     ];
 
     public function mount(): void
@@ -50,6 +62,12 @@ class Settings extends Component
         $this->chat_ai_provider = Setting::get('chat_ai_provider', 'openai');
         $this->openai_api_key = Setting::get('openai_api_key', config('services.openai.key'));
         $this->gemini_api_key = Setting::get('gemini_api_key', config('services.gemini.key'));
+        $this->google_login_enabled = (bool) Setting::get('google_login_enabled', false);
+        $this->facebook_login_enabled = (bool) Setting::get('facebook_login_enabled', false);
+        $this->google_client_id = Setting::get('google_client_id', config('services.google.client_id'));
+        $this->google_client_secret = Setting::get('google_client_secret', config('services.google.client_secret'));
+        $this->facebook_client_id = Setting::get('facebook_client_id', config('services.facebook.client_id'));
+        $this->facebook_client_secret = Setting::get('facebook_client_secret', config('services.facebook.client_secret'));
     }
 
     public function save(): void
@@ -64,6 +82,12 @@ class Settings extends Component
         Setting::set('chat_ai_provider', $this->chat_ai_provider);
         Setting::set('openai_api_key', $this->openai_api_key);
         Setting::set('gemini_api_key', $this->gemini_api_key);
+        Setting::set('google_login_enabled', $this->google_login_enabled ? 1 : 0);
+        Setting::set('facebook_login_enabled', $this->facebook_login_enabled ? 1 : 0);
+        Setting::set('google_client_id', $this->google_client_id);
+        Setting::set('google_client_secret', $this->google_client_secret);
+        Setting::set('facebook_client_id', $this->facebook_client_id);
+        Setting::set('facebook_client_secret', $this->facebook_client_secret);
         config(['app.timezone' => $this->timezone]);
         date_default_timezone_set($this->timezone);
         session()->flash('status', 'Settings updated');

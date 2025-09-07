@@ -2,12 +2,21 @@
 
 use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
+use App\Models\Setting;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
     public LoginForm $form;
+    public bool $googleLogin = false;
+    public bool $facebookLogin = false;
+
+    public function mount(): void
+    {
+        $this->googleLogin = (bool) Setting::get('google_login_enabled', false);
+        $this->facebookLogin = (bool) Setting::get('facebook_login_enabled', false);
+    }
 
     /**
      * Handle an incoming authentication request.
@@ -27,6 +36,17 @@ new #[Layout('layouts.guest')] class extends Component
 <div>
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    @if ($googleLogin || $facebookLogin)
+        <div class="mb-4 space-y-2">
+            @if ($googleLogin)
+                <a href="{{ route('social.redirect', 'google') }}" class="w-full flex justify-center px-4 py-2 border rounded">{{ __('Log in with Google') }}</a>
+            @endif
+            @if ($facebookLogin)
+                <a href="{{ route('social.redirect', 'facebook') }}" class="w-full flex justify-center px-4 py-2 border rounded">{{ __('Log in with Facebook') }}</a>
+            @endif
+        </div>
+    @endif
 
     <form wire:submit="login">
         <!-- Email Address -->
