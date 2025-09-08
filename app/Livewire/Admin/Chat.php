@@ -49,12 +49,16 @@ class Chat extends Component
             $chat->assigned_admin_id = Auth::id();
             $chat->save();
 
-        ChatMessage::where('user_id', $value)
-            ->whereNull('recipient_id')
-            ->update(['recipient_id' => Auth::id()]);
+            ChatMessage::where('user_id', $value)
+                ->whereNull('recipient_id')
+                ->update(['recipient_id' => Auth::id()]);
 
             event(new ChatAssigned($chat));
         }
+
+        Cache::forget("chat:countsAssigned:" . Auth::id());
+        Cache::forget('chat:countsUnassigned');
+        Cache::forget("chat:lastMessages:" . Auth::id());
 
         $this->lastMessageKey = null;
     }
@@ -114,6 +118,9 @@ class Chat extends Component
             ->where('recipient_id', Auth::id())
             ->whereNull('seen_at')
             ->update(['delivered_at' => now(), 'seen_at' => now()]);
+
+        Cache::forget("chat:countsAssigned:" . Auth::id());
+        Cache::forget("chat:lastMessages:" . Auth::id());
     }
 
     public function render()

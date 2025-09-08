@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 
 class SendChatMessage implements ShouldQueue
 {
@@ -33,6 +34,7 @@ class SendChatMessage implements ShouldQueue
     {
         $message = ChatMessage::create($this->payload);
         broadcast(new ChatMessageSent($message));
+        $this->forgetCache($message);
 
         $sender = User::find($message->user_id);
         if ($sender && !$sender->isAdmin()) {
@@ -76,10 +78,24 @@ class SendChatMessage implements ShouldQueue
                                 'created_at' => now(),
                             ]);
                             broadcast(new ChatMessageSent($aiMessage));
+                            $this->forgetCache($aiMessage);
                         }
                     }
                 }
             }
+        }
+    }
+
+    protected function forgetCache(ChatMessage $message): void
+    {
+        Cache::forget("chat:lastMessages:{$message->user_id}");
+        Cache::forget("chat:countsAssigned:{$message->user_id}");
+
+        if ($message->recipient_id) {
+            Cache::forget("chat:lastMessages:{$message->recipient_id}");
+            Cache::forget("chat:countsAssigned:{$message->recipient_id}");
+        } else {
+            Cache::forget('chat:countsUnassigned');
         }
     }
 }
