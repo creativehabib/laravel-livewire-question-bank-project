@@ -93,7 +93,11 @@ class Chat extends Component
             'updated_at' => now(),
         ];
 
-        SendChatMessage::dispatch($payload);
+        // Run the job immediately so the message is persisted even if no
+        // queue worker is running. Previously, messages would be queued and
+        // never stored when the worker was down, causing chat messages to
+        // appear "unsent". dispatchSync ensures the job executes right away.
+        SendChatMessage::dispatchSync($payload);
 
         $this->message = '';
         $this->dispatch('chat-message-sent');

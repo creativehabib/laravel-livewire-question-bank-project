@@ -100,7 +100,10 @@ class ChatPopup extends Component
             'updated_at' => now(),
         ];
 
-        SendChatMessage::dispatch($payload);
+        // Ensure the chat message is stored immediately so users don't lose
+        // messages when the queue worker is not running. Using dispatchSync
+        // executes the job right away instead of waiting for the queue.
+        SendChatMessage::dispatchSync($payload);
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
