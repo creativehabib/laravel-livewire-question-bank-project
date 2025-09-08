@@ -33,6 +33,15 @@ class SendChatMessage implements ShouldQueue
     public function handle(): void
     {
         $message = ChatMessage::create($this->payload);
+
+        Cache::forget("chat:lastMessages:{$message->user_id}");
+        if ($message->recipient_id) {
+            Cache::forget("chat:countsAssigned:{$message->recipient_id}");
+            Cache::forget("chat:lastMessages:{$message->recipient_id}");
+        } else {
+            Cache::forget('chat:countsUnassigned');
+        }
+
         broadcast(new ChatMessageSent($message));
         $this->forgetCache($message);
 
@@ -77,6 +86,9 @@ class SendChatMessage implements ShouldQueue
                                 'message' => $reply,
                                 'created_at' => now(),
                             ]);
+                            Cache::forget("chat:lastMessages:{$aiMessage->user_id}");
+                            Cache::forget("chat:lastMessages:{$aiMessage->recipient_id}");
+                            Cache::forget("chat:countsAssigned:{$aiMessage->recipient_id}");
                             broadcast(new ChatMessageSent($aiMessage));
                             $this->forgetCache($aiMessage);
                         }

@@ -29,6 +29,8 @@ class Chat extends Component
         $userId = Auth::id();
         return [
             "echo-private:chat.{$userId},UserTyping" => 'showTyping',
+            "echo-private:chat.{$userId},ChatMessageSent" => '$refresh',
+            'echo-private:chat-admins,ChatMessageSent' => '$refresh',
         ];
     }
 
