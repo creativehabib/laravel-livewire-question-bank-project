@@ -15,7 +15,9 @@
                     <a href="{{ route('dashboard') }}" class="text-sm text-gray-700 hover:text-gray-900">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
-                    <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
+                    @endif
                 @endauth
             </nav>
         </div>

@@ -7,7 +7,9 @@
     @auth
         <a href="{{ route('dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
     @else
-        <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Get Started</a>
+        @if (Route::has('register'))
+            <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Get Started</a>
+        @endif
     @endauth
 </section>
 
@@ -33,7 +35,9 @@
     @auth
         <a href="{{ route('dashboard') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Go to Dashboard</a>
     @else
-        <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Create an Account</a>
+        @if (Route::has('register'))
+            <a href="{{ route('register') }}" class="px-6 py-3 bg-indigo-600 text-white rounded-md">Create an Account</a>
+        @endif
     @endauth
 </section>
 @endsection
