@@ -102,7 +102,7 @@ new #[Layout('layouts.guest')] class extends Component
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
-        @if ($registrationEnabled)
+        @if ($registrationEnabled && Route::has('register'))
             <div class="mt-4 text-center">
                 <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}" wire:navigate>{{ __('Register') }}</a>
             </div>
