@@ -91,7 +91,7 @@ class ChatPopup extends Component
             }
         }
 
-        SendChatMessage::dispatch([
+        SendChatMessage::dispatchSync([
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
