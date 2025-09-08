@@ -24,6 +24,7 @@ class Settings extends Component
     public $google_client_secret = '';
     public $facebook_client_id = '';
     public $facebook_client_secret = '';
+    public $registration_enabled = true;
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
@@ -41,6 +42,7 @@ class Settings extends Component
         'google_client_secret' => 'nullable|string',
         'facebook_client_id' => 'nullable|string',
         'facebook_client_secret' => 'nullable|string',
+        'registration_enabled' => 'boolean',
     ];
 
     public function mount(): void
@@ -68,6 +70,7 @@ class Settings extends Component
         $this->google_client_secret = Setting::get('google_client_secret', config('services.google.client_secret'));
         $this->facebook_client_id = Setting::get('facebook_client_id', config('services.facebook.client_id'));
         $this->facebook_client_secret = Setting::get('facebook_client_secret', config('services.facebook.client_secret'));
+        $this->registration_enabled = (bool) Setting::get('registration_enabled', true);
     }
 
     public function save(): void
@@ -88,6 +91,7 @@ class Settings extends Component
         Setting::set('google_client_secret', $this->google_client_secret);
         Setting::set('facebook_client_id', $this->facebook_client_id);
         Setting::set('facebook_client_secret', $this->facebook_client_secret);
+        Setting::set('registration_enabled', $this->registration_enabled ? 1 : 0);
         config(['app.timezone' => $this->timezone]);
         date_default_timezone_set($this->timezone);
         session()->flash('status', 'Settings updated');

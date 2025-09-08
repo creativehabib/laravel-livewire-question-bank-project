@@ -44,16 +44,23 @@ class SocialiteController
             return redirect()->route('login')->with('status', ucfirst($provider).' login failed.');
         }
 
-        $user = User::firstOrCreate(
-            ['email' => $socialUser->getEmail()],
-            [
+        $user = User::where('email', $socialUser->getEmail())->first();
+
+        if (! $user) {
+            $registrationEnabled = (bool) Setting::get('registration_enabled', true);
+            if (! $registrationEnabled) {
+                return redirect()->route('login')->with('status', 'Registration is disabled.');
+            }
+
+            $user = User::create([
                 'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: $socialUser->getEmail(),
+                'email' => $socialUser->getEmail(),
                 'password' => Hash::make(Str::random(16)),
                 'role' => Role::STUDENT,
                 'email_verified_at' => now(),
                 'avatar_url' => $socialUser->getAvatar(),
-            ]
-        );
+            ]);
+        }
 
         Auth::login($user, true);
 

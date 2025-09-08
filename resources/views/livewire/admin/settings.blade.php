@@ -77,6 +77,10 @@
             @enderror
         </div>
         <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="registration_enabled" id="registration_enabled">
+            <label for="registration_enabled" class="text-sm font-medium">Allow new user registration</label>
+        </div>
+        <div class="flex items-center space-x-2">
             <input type="checkbox" wire:model="google_login_enabled" id="google_login_enabled">
             <label for="google_login_enabled" class="text-sm font-medium">Enable Google Login</label>
         </div>
