@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Events\UserTyping;
-use App\Jobs\SendChatMessage;
+use App\Events\ChatMessageSent;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\Setting;
@@ -92,12 +92,13 @@ class ChatPopup extends Component
             }
         }
 
-        SendChatMessage::dispatch([
+        $message = ChatMessage::create([
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
-            'created_at' => now(),
         ]);
+
+        broadcast(new ChatMessageSent($message));
 
         $this->message = '';
         $this->dispatch('chat-message-sent');

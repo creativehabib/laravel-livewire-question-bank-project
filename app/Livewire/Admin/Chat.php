@@ -4,7 +4,7 @@ namespace App\Livewire\Admin;
 
 use App\Events\ChatAssigned;
 use App\Events\UserTyping;
-use App\Jobs\SendChatMessage;
+use App\Events\ChatMessageSent;
 use App\Models\Chat as ChatModel;
 use App\Models\ChatMessage;
 use App\Models\User;
@@ -85,12 +85,13 @@ class Chat extends Component
             }
         }
 
-        SendChatMessage::dispatch([
+        $message = ChatMessage::create([
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,
             'message' => $this->message,
-            'created_at' => now(),
         ]);
+
+        broadcast(new ChatMessageSent($message));
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
