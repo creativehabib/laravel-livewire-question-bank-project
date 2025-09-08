@@ -29,8 +29,6 @@ class Chat extends Component
         $userId = Auth::id();
         return [
             "echo-private:chat.{$userId},UserTyping" => 'showTyping',
-            "echo-private:chat.{$userId},ChatMessageSent" => '$refresh',
-            'echo-private:chat-admins,ChatMessageSent' => '$refresh',
         ];
     }
 
@@ -87,7 +85,7 @@ class Chat extends Component
             }
         }
 
-        SendChatMessage::dispatchSync([
+        SendChatMessage::dispatch([
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,
             'message' => $this->message,
@@ -197,7 +195,7 @@ class Chat extends Component
         });
 
         $users = User::where('id', '!=', $authId)
-            ->paginate(50);
+            ->paginate(15);
 
         $users->setCollection(
             $users->getCollection()
