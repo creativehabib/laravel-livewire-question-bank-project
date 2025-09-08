@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mt-6">
+<div wire:poll.5s class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mt-6">
     <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Chat</h3>
     <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">Messages are kept for {{ $retention }} and removed automatically.</p>
 
