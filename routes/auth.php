@@ -3,12 +3,15 @@
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Livewire\Actions\Logout;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest')->group(function () {
-    Volt::route('register', 'pages.auth.register')
-        ->name('register');
+    if (Setting::get('registration_enabled', true)) {
+        Volt::route('register', 'pages.auth.register')
+            ->name('register');
+    }
 
     Volt::route('login', 'pages.auth.login')
         ->name('login');
