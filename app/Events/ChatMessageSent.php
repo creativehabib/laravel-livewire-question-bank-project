@@ -22,10 +22,17 @@ class ChatMessageSent implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        return [
-            new PrivateChannel('chat.' . $this->message->recipient_id),
+        $channels = [
             new PrivateChannel('chat.' . $this->message->user_id),
         ];
+
+        if ($this->message->recipient_id) {
+            $channels[] = new PrivateChannel('chat.' . $this->message->recipient_id);
+        } else {
+            $channels[] = new PrivateChannel('chat-admins');
+        }
+
+        return $channels;
     }
 
     public function broadcastWith(): array

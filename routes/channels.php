@@ -10,3 +10,7 @@ Broadcast::channel('chat.{userId}', function ($user, $userId) {
     return (int) $user->id === (int) $userId;
 });
 
+Broadcast::channel('chat-admins', function ($user) {
+    return $user->isAdmin();
+});
+
