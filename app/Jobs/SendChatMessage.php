@@ -9,7 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 
 class SendChatMessage implements ShouldQueue
 {
@@ -24,11 +23,10 @@ class SendChatMessage implements ShouldQueue
 
     public function handle(): void
     {
-        $messages = Cache::get('chat.pending', []);
-        $messages[] = $this->payload;
-        Cache::put('chat.pending', $messages, 3600);
+        // Persist the message immediately so both sender and recipient can
+        // retrieve it without waiting for the flush command to run.
+        $message = ChatMessage::create($this->payload);
 
-        $message = new ChatMessage($this->payload);
         broadcast(new ChatMessageSent($message));
     }
 }

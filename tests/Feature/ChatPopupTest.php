@@ -29,7 +29,6 @@ class ChatPopupTest extends TestCase
             ->set('message', 'Hello Admin')
             ->call('send')
             ->assertSet('message', '');
-        $this->artisan('chat:flush');
 
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $teacher->id,
@@ -48,7 +47,6 @@ class ChatPopupTest extends TestCase
 
         $component = Livewire::test(ChatPopup::class);
         $component->set('message', 'Hi')->call('send');
-        $this->artisan('chat:flush');
 
         Chat::where('user_id', $student->id)->update(['assigned_admin_id' => $admin->id]);
         ChatMessage::where('user_id', $student->id)->update(['recipient_id' => $admin->id]);
@@ -80,7 +78,6 @@ class ChatPopupTest extends TestCase
             ->set('message', 'First')
             ->call('send')
             ->assertSet('message', '');
-        $this->artisan('chat:flush');
 
         Livewire::test(ChatPopup::class)
             ->set('message', 'Second')

@@ -29,7 +29,6 @@ class ChatTest extends TestCase
             ->set('message', 'Hello there')
             ->call('send')
             ->assertSet('message', '');
-        $this->artisan('chat:flush');
 
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $sender->id,
@@ -138,14 +137,12 @@ class ChatTest extends TestCase
             ->set('message', 'first')
             ->call('send')
             ->assertSet('message', '');
-        $this->artisan('chat:flush');
 
         Livewire::test(Chat::class)
             ->set('recipient_id', $recipient->id)
             ->set('message', 'second')
             ->call('send')
             ->assertSet('message', '');
-        $this->artisan('chat:flush');
     }
 
     public function test_unassigned_messages_show_notification_and_assign_on_reply(): void
@@ -158,7 +155,6 @@ class ChatTest extends TestCase
         Livewire::test(ChatPopup::class)
             ->set('message', 'Help me')
             ->call('send');
-        $this->artisan('chat:flush');
 
         $this->actingAs($admin);
 
