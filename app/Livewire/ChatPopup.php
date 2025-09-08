@@ -9,6 +9,7 @@ use App\Models\ChatMessage;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class ChatPopup extends Component
@@ -126,6 +127,9 @@ class ChatPopup extends Component
             ->where('recipient_id', Auth::id())
             ->whereNull('seen_at')
             ->update(['delivered_at' => now(), 'seen_at' => now()]);
+
+        Cache::forget("chat:countsAssigned:{$adminId}");
+        Cache::forget("chat:lastMessages:{$adminId}");
     }
 
     public function getMessagesProperty()
