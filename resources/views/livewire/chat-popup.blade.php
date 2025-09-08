@@ -34,7 +34,7 @@
             <div class="px-2 text-xs text-red-600">{{ $message }}</div>
         @enderror
         <form wire:submit.prevent="send" class="flex border-t border-gray-200 dark:border-gray-700">
-            <input type="text" wire:model="message" class="flex-1 p-2 rounded-bl-lg focus:outline-none dark:bg-gray-800" placeholder="Type a message...">
+            <input type="text" wire:model.debounce.1000ms="message" class="flex-1 p-2 rounded-bl-lg focus:outline-none dark:bg-gray-800" placeholder="Type a message...">
             <button type="submit" class="px-4 bg-indigo-600 text-white rounded-br-lg">Send</button>
         </form>
     </div>
@@ -51,6 +51,22 @@
         };
 
         scroll();
+        const userId = @json(Auth::id());
+
+        window.Echo.private(`chat.${userId}`)
+            .listen('ChatMessageSent', (e) => {
+                const el = document.getElementById('chatMessages');
+                if (el) {
+                    const align = e.message.user_id === userId ? 'justify-end' : 'justify-start';
+                    const bubble = e.message.user_id === userId ? 'bg-indigo-600 text-white' : 'bg-gray-200';
+                    const wrapper = document.createElement('div');
+                    wrapper.className = `flex ${align}`;
+                    wrapper.innerHTML = `<div class="${bubble} rounded-lg p-2 text-sm">${e.message.message}</div>`;
+                    el.appendChild(wrapper);
+                    scroll();
+                }
+            });
+
         Livewire.on('chat-message-sent', () => {
             scroll();
         });

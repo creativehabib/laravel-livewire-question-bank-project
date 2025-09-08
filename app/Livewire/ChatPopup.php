@@ -18,6 +18,7 @@ class ChatPopup extends Component
     public $assignedAdminId;
     public $lastMessageKey;
     public $typing;
+    protected $lastTypingBroadcast;
 
     public function mount(): void
     {
@@ -32,7 +33,6 @@ class ChatPopup extends Component
         $userId = Auth::id();
         return [
             "echo-private:chat-assigned.{$userId},ChatAssigned" => 'setAdmin',
-            "echo-private:chat.{$userId},ChatMessageSent" => '$refresh',
             "echo-private:chat.{$userId},UserTyping" => 'showTyping',
         ];
     }
@@ -70,7 +70,9 @@ class ChatPopup extends Component
     public function updatedMessage(): void
     {
         if ($recipient = $this->getAdminId()) {
-            broadcast(new UserTyping(Auth::id(), $recipient))->toOthers();
+            if ($this->shouldBroadcastTyping()) {
+                broadcast(new UserTyping(Auth::id(), $recipient))->toOthers();
+            }
         }
     }
 
@@ -89,7 +91,7 @@ class ChatPopup extends Component
             }
         }
 
-        SendChatMessage::dispatchSync([
+        SendChatMessage::dispatch([
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
@@ -193,6 +195,16 @@ class ChatPopup extends Component
     public function getIsTypingProperty(): bool
     {
         return $this->typing && now()->diffInSeconds($this->typing) < 5;
+    }
+
+    protected function shouldBroadcastTyping(): bool
+    {
+        $now = now();
+        if (!$this->lastTypingBroadcast || $now->diffInSeconds($this->lastTypingBroadcast) > 1) {
+            $this->lastTypingBroadcast = $now;
+            return true;
+        }
+        return false;
     }
 }
 
