@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Cache;
 
 class SendChatMessage implements ShouldQueue
 {
@@ -24,7 +24,9 @@ class SendChatMessage implements ShouldQueue
 
     public function handle(): void
     {
-        Redis::rpush('pending_chat_messages', json_encode($this->payload));
+        $messages = Cache::get('chat.pending', []);
+        $messages[] = $this->payload;
+        Cache::put('chat.pending', $messages, 3600);
 
         $message = new ChatMessage($this->payload);
         broadcast(new ChatMessageSent($message));

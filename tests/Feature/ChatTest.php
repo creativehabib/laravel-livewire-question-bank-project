@@ -18,6 +18,7 @@ class ChatTest extends TestCase
 
     public function test_users_can_send_messages(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $sender = User::factory()->create();
         $recipient = User::factory()->create();
 
@@ -28,6 +29,7 @@ class ChatTest extends TestCase
             ->set('message', 'Hello there')
             ->call('send')
             ->assertSet('message', '');
+        $this->artisan('chat:flush');
 
         $this->assertDatabaseHas('chat_messages', [
             'user_id' => $sender->id,
@@ -38,6 +40,7 @@ class ChatTest extends TestCase
 
     public function test_conversation_list_shows_latest_message(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $admin = User::factory()->create();
         $student = User::factory()->create();
 
@@ -56,6 +59,7 @@ class ChatTest extends TestCase
 
     public function test_unread_count_clears_after_viewing_messages(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $sender = User::factory()->create();
         $recipient = User::factory()->create();
 
@@ -81,6 +85,7 @@ class ChatTest extends TestCase
 
     public function test_message_respects_max_length_setting(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $sender = User::factory()->create();
         $recipient = User::factory()->create();
 
@@ -97,6 +102,7 @@ class ChatTest extends TestCase
 
     public function test_daily_message_limit_is_enforced(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $sender = User::factory()->create();
         $recipient = User::factory()->create();
 
@@ -119,6 +125,7 @@ class ChatTest extends TestCase
 
     public function test_admin_can_send_unlimited_messages(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $admin = User::factory()->create(['role' => Role::ADMIN]);
         $recipient = User::factory()->create();
 
@@ -131,16 +138,19 @@ class ChatTest extends TestCase
             ->set('message', 'first')
             ->call('send')
             ->assertSet('message', '');
+        $this->artisan('chat:flush');
 
         Livewire::test(Chat::class)
             ->set('recipient_id', $recipient->id)
             ->set('message', 'second')
             ->call('send')
             ->assertSet('message', '');
+        $this->artisan('chat:flush');
     }
 
     public function test_unassigned_messages_show_notification_and_assign_on_reply(): void
     {
+        \Illuminate\Support\Facades\Cache::flush();
         $admin = User::factory()->create();
         $student = User::factory()->create();
 
@@ -148,6 +158,7 @@ class ChatTest extends TestCase
         Livewire::test(ChatPopup::class)
             ->set('message', 'Help me')
             ->call('send');
+        $this->artisan('chat:flush');
 
         $this->actingAs($admin);
 
