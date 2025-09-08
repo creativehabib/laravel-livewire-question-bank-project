@@ -3,6 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Console\Commands\CleanOldChatMessages;
+use App\Console\Commands\FlushChatCache;
+use App\Console\Commands\ProcessCachedMessages;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         \App\Providers\AppServiceProvider::class,
         \App\Providers\AuthServiceProvider::class,
         \App\Providers\VoltServiceProvider::class,
+    ])
+    ->withCommands([
+        CleanOldChatMessages::class,
+        FlushChatCache::class,
+        ProcessCachedMessages::class,
     ])
     ->withExceptions(function (Exceptions $exceptions): void {
         //

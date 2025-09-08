@@ -34,7 +34,7 @@
             <div class="px-2 text-xs text-red-600">{{ $message }}</div>
         @enderror
         <form wire:submit.prevent="send" class="flex border-t border-gray-200 dark:border-gray-700">
-            <input type="text" wire:model.live="message" class="flex-1 p-2 rounded-bl-lg focus:outline-none dark:bg-gray-800" placeholder="Type a message...">
+            <input type="text" wire:model.live.debounce.500ms="message" class="flex-1 p-2 rounded-bl-lg focus:outline-none dark:bg-gray-800" placeholder="Type a message...">
             <button type="submit" class="px-4 bg-indigo-600 text-white rounded-br-lg">Send</button>
         </form>
     </div>

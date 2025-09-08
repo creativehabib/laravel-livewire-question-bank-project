@@ -63,7 +63,7 @@
 
             @if($recipient_id)
                 <form wire:submit.prevent="send" class="flex flex-shrink-0">
-                    <input type="text" wire:model.live="message" class="flex-1 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2" placeholder="Type a message...">
+                    <input type="text" wire:model.live.debounce.500ms="message" class="flex-1 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2" placeholder="Type a message...">
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-r-lg">Send</button>
                 </form>
                 @error('message')
