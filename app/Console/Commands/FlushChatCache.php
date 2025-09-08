@@ -15,8 +15,8 @@ class FlushChatCache extends Command
     public function handle(): int
     {
         $messages = Cache::pull('chat.pending', []);
-        foreach ($messages as $message) {
-            ChatMessage::create($message);
+        if ($messages) {
+            ChatMessage::insert($messages);
         }
         $this->info('Stored '.count($messages).' cached chat messages.');
         return Command::SUCCESS;

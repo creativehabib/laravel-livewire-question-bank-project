@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Events\UserTyping;
-use App\Events\ChatMessageSent;
+use App\Jobs\SendChatMessage;
 use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\Setting;
@@ -85,23 +85,36 @@ class ChatPopup extends Component
             $limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
             $count = ChatMessage::where('user_id', Auth::id())
                 ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
-                ->count();
+                ->count() + $this->pendingCount();
             if ($count >= $limit) {
                 $this->addError('message', "You can send {$limit} messages per day. Your limit has been reached.");
                 return;
             }
         }
 
-        $message = ChatMessage::create([
+        $payload = [
             'user_id' => Auth::id(),
             'recipient_id' => $this->getAdminId(),
             'message' => $this->message,
-        ]);
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
 
-        broadcast(new ChatMessageSent($message));
+        SendChatMessage::dispatch($payload);
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
+    }
+
+    protected function pendingCount(): int
+    {
+        $pending = Cache::get('chat.pending', []);
+        $start = now()->startOfDay();
+        $end = now()->endOfDay();
+        return collect($pending)
+            ->where('user_id', Auth::id())
+            ->filter(fn($m) => $m['created_at'] >= $start && $m['created_at'] <= $end)
+            ->count();
     }
     
     protected function markAsDelivered(): void
