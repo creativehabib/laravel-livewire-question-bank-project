@@ -37,10 +37,13 @@
                     </li>
                 @endforeach
             </ul>
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
         </div>
 
         <div class="flex-1 pl-4 flex flex-col h-full">
-            <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-2" wire:poll.5s>
+            <div id="chatMessages" class="flex-1 overflow-y-auto mb-4 space-y-2">
                 @php $lastDate = null; @endphp
                 @forelse($messages as $msg)
                     @if ($lastDate !== $msg->created_at->toDateString())
@@ -60,7 +63,7 @@
 
             @if($recipient_id)
                 <form wire:submit.prevent="send" class="flex flex-shrink-0">
-                    <input type="text" wire:model="message" class="flex-1 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2" placeholder="Type a message...">
+                    <input type="text" wire:model.debounce.1000ms="message" class="flex-1 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2" placeholder="Type a message...">
                     <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-r-lg">Send</button>
                 </form>
                 @error('message')
@@ -82,6 +85,22 @@
             };
 
             scroll();
+
+            const userId = @json(Auth::id());
+
+            window.Echo.private(`chat.${userId}`)
+                .listen('ChatMessageSent', (e) => {
+                    const el = document.getElementById('chatMessages');
+                    if (el) {
+                        const align = e.message.user_id === userId ? 'justify-end' : 'justify-start';
+                        const bubble = e.message.user_id === userId ? 'bg-indigo-600 text-white' : 'bg-gray-200';
+                        const wrapper = document.createElement('div');
+                        wrapper.className = `flex ${align}`;
+                        wrapper.innerHTML = `<div class="${bubble} rounded-lg p-2 text-sm">${e.message.message}</div>`;
+                        el.appendChild(wrapper);
+                        scroll();
+                    }
+                });
 
             Livewire.on('chat-message-sent', () => {
                 scroll();

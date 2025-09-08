@@ -11,20 +11,23 @@ use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Chat extends Component
 {
+    use WithPagination;
     public $message = '';
     public $recipient_id = '';
     public $lastMessageKey;
     public $typing;
+    protected $lastTypingBroadcast;
 
     public function getListeners(): array
     {
         $userId = Auth::id();
         return [
-            "echo-private:chat.{$userId},ChatMessageSent" => '$refresh',
             "echo-private:chat.{$userId},UserTyping" => 'showTyping',
         ];
     }
@@ -58,7 +61,7 @@ class Chat extends Component
 
     public function updatedMessage(): void
     {
-        if ($this->recipient_id) {
+        if ($this->recipient_id && $this->shouldBroadcastTyping()) {
             broadcast(new UserTyping(Auth::id(), $this->recipient_id))->toOthers();
         }
     }
@@ -78,7 +81,7 @@ class Chat extends Component
             }
         }
 
-        SendChatMessage::dispatchSync([
+        SendChatMessage::dispatch([
             'user_id' => Auth::id(),
             'recipient_id' => $this->recipient_id,
             'message' => $this->message,
@@ -118,6 +121,8 @@ class Chat extends Component
         $messages = collect();
         $messageCounts = [];
 
+        $authId = Auth::id();
+
         if ($this->recipient_id) {
             $this->markAsDelivered();
             $this->markAsSeen();
@@ -144,19 +149,23 @@ class Chat extends Component
             $this->lastMessageKey = $key;
         }
 
-        $dbCountsAssigned = ChatMessage::where('recipient_id', Auth::id())
-            ->whereNull('seen_at')
-            ->select('user_id', DB::raw('count(*) as count'))
-            ->groupBy('user_id')
-            ->pluck('count', 'user_id')
-            ->toArray();
+        $dbCountsAssigned = Cache::remember("chat:countsAssigned:{$authId}", 300, function () use ($authId) {
+            return ChatMessage::where('recipient_id', $authId)
+                ->whereNull('seen_at')
+                ->select('user_id', DB::raw('count(*) as count'))
+                ->groupBy('user_id')
+                ->pluck('count', 'user_id')
+                ->toArray();
+        });
 
-        $dbCountsUnassigned = ChatMessage::whereNull('recipient_id')
-            ->whereNull('seen_at')
-            ->select('user_id', DB::raw('count(*) as count'))
-            ->groupBy('user_id')
-            ->pluck('count', 'user_id')
-            ->toArray();
+        $dbCountsUnassigned = Cache::remember('chat:countsUnassigned', 300, function () {
+            return ChatMessage::whereNull('recipient_id')
+                ->whereNull('seen_at')
+                ->select('user_id', DB::raw('count(*) as count'))
+                ->groupBy('user_id')
+                ->pluck('count', 'user_id')
+                ->toArray();
+        });
 
         $dbCounts = $dbCountsAssigned;
         foreach ($dbCountsUnassigned as $userId => $count) {
@@ -165,24 +174,29 @@ class Chat extends Component
 
         $messageCounts = $dbCounts;
 
-        $authId = Auth::id();
-        $lastMessages = ChatMessage::where(function ($query) use ($authId) {
-                $query->where('user_id', $authId)
-                      ->orWhere('recipient_id', $authId);
-            })
-            ->latest()
-            ->get()
-            ->groupBy(function ($msg) use ($authId) {
-                return $msg->user_id === $authId ? $msg->recipient_id : $msg->user_id;
-            })
-            ->map->first();
+        $lastMessages = Cache::remember("chat:lastMessages:{$authId}", 300, function () use ($authId) {
+            return ChatMessage::where(function ($query) use ($authId) {
+                    $query->where('user_id', $authId)
+                        ->orWhere('recipient_id', $authId);
+                })
+                ->latest()
+                ->get()
+                ->groupBy(function ($msg) use ($authId) {
+                    return $msg->user_id === $authId ? $msg->recipient_id : $msg->user_id;
+                })
+                ->map->first();
+        });
 
         $users = User::where('id', '!=', $authId)
-            ->get()
-            ->sortByDesc(function ($user) use ($lastMessages) {
-                return optional($lastMessages[$user->id] ?? null)->created_at;
-            })
-            ->values();
+            ->paginate(50);
+
+        $users->setCollection(
+            $users->getCollection()
+                ->sortByDesc(function ($user) use ($lastMessages) {
+                    return optional($lastMessages[$user->id] ?? null)->created_at;
+                })
+                ->values()
+        );
 
         return view('livewire.admin.chat', [
             'users' => $users,
@@ -203,6 +217,16 @@ class Chat extends Component
     public function getIsTypingProperty(): bool
     {
         return $this->typing && now()->diffInSeconds($this->typing) < 5;
+    }
+
+    protected function shouldBroadcastTyping(): bool
+    {
+        $now = now();
+        if (!$this->lastTypingBroadcast || $now->diffInSeconds($this->lastTypingBroadcast) > 1) {
+            $this->lastTypingBroadcast = $now;
+            return true;
+        }
+        return false;
     }
 
     protected function retentionPeriod(): string
