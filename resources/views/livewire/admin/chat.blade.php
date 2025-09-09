@@ -87,6 +87,8 @@
             scroll();
 
             const userId = @json(Auth::id());
+            const toneEnabled = @json($toneEnabled);
+            const toneUrl = @json($toneUrl);
 
             window.Echo.private(`chat.${userId}`)
                 .listen('ChatMessageSent', (e) => {
@@ -118,15 +120,21 @@
 
             Livewire.on('chat-message-received', () => {
                 scroll();
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = ctx.createOscillator();
-                const gain = ctx.createGain();
-                oscillator.type = 'sine';
-                oscillator.frequency.value = 1000;
-                oscillator.connect(gain);
-                gain.connect(ctx.destination);
-                oscillator.start();
-                oscillator.stop(ctx.currentTime + 0.2);
+                if (toneEnabled) {
+                    if (toneUrl) {
+                        new Audio(toneUrl).play();
+                    } else {
+                        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        oscillator.type = 'sine';
+                        oscillator.frequency.value = 1000;
+                        oscillator.connect(gain);
+                        gain.connect(ctx.destination);
+                        oscillator.start();
+                        oscillator.stop(ctx.currentTime + 0.2);
+                    }
+                }
             });
         });
     </script>
