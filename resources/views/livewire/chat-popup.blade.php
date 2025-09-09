@@ -42,7 +42,7 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('livewire:load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         const scroll = () => {
             const el = document.getElementById('chatMessages');
             if (el) {
