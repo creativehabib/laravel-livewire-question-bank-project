@@ -3,15 +3,21 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Setting;
-use Livewire\Component;
 use DateTimeZone;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class Settings extends Component
 {
+    use WithFileUploads;
     public $chat_retention_value;
     public $chat_retention_unit = 'days';
     public $chat_message_max_length;
     public $chat_daily_message_limit;
+    public $chat_tone_enabled = true;
+    public $chat_tone;
+    public $chat_tone_url;
     public $timezone;
     public array $timezones = [];
     public $chat_ai_enabled = false;
@@ -31,6 +37,8 @@ class Settings extends Component
         'chat_retention_unit' => 'required|in:hours,days',
         'chat_message_max_length' => 'required|integer|min:1',
         'chat_daily_message_limit' => 'required|integer|min:1',
+        'chat_tone_enabled' => 'boolean',
+        'chat_tone' => 'nullable|file|mimes:mp3,wav,ogg',
         'timezone' => 'required|timezone',
         'chat_ai_enabled' => 'boolean',
         'chat_ai_provider' => 'required|in:openai,gemini',
@@ -58,6 +66,9 @@ class Settings extends Component
 
         $this->chat_message_max_length = Setting::get('chat_message_max_length', config('chat.message_max_length'));
         $this->chat_daily_message_limit = Setting::get('chat_daily_message_limit', config('chat.daily_message_limit'));
+        $this->chat_tone_enabled = (bool) Setting::get('chat_tone_enabled', config('chat.tone_enabled'));
+        $path = Setting::get('chat_message_tone', config('chat.message_tone'));
+        $this->chat_tone_url = $path ? Storage::url($path) : null;
         $this->timezone = Setting::get('timezone', config('app.timezone'));
         $this->timezones = DateTimeZone::listIdentifiers();
         $this->chat_ai_enabled = (bool) Setting::get('chat_ai_enabled', false);
@@ -80,6 +91,12 @@ class Settings extends Component
         Setting::set('chat_retention_hours', $hours);
         Setting::set('chat_message_max_length', $this->chat_message_max_length);
         Setting::set('chat_daily_message_limit', $this->chat_daily_message_limit);
+        Setting::set('chat_tone_enabled', $this->chat_tone_enabled ? 1 : 0);
+        if ($this->chat_tone) {
+            $path = $this->chat_tone->store('chat-tones', 'public');
+            Setting::set('chat_message_tone', $path);
+            $this->chat_tone_url = Storage::url($path);
+        }
         Setting::set('timezone', $this->timezone);
         Setting::set('chat_ai_enabled', $this->chat_ai_enabled ? 1 : 0);
         Setting::set('chat_ai_provider', $this->chat_ai_provider);

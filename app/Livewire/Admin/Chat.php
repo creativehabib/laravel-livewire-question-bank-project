@@ -12,6 +12,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -229,6 +230,8 @@ class Chat extends Component
             'messageCounts' => $messageCounts,
             'lastMessages' => $lastMessages,
             'retention' => $this->retentionPeriod(),
+            'toneEnabled' => (bool) Setting::get('chat_tone_enabled', config('chat.tone_enabled')),
+            'toneUrl' => ($path = Setting::get('chat_message_tone', config('chat.message_tone'))) ? Storage::url($path) : null,
         ]);
     }
 
