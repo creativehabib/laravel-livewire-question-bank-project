@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class ChatPopup extends Component
@@ -203,6 +204,8 @@ class ChatPopup extends Component
             'messages' => $messages,
             'unreadCount' => $this->unreadCount,
             'chatTitle' => $chatTitle,
+            'toneEnabled' => (bool) Setting::get('chat_tone_enabled', config('chat.tone_enabled')),
+            'toneUrl' => ($path = Setting::get('chat_message_tone', config('chat.message_tone'))) ? Storage::url($path) : null,
         ]);
     }
 

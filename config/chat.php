@@ -9,5 +9,11 @@ return [
 
     // Maximum number of chat messages a user can send per day
     'daily_message_limit' => env('CHAT_DAILY_MESSAGE_LIMIT', 100),
+
+    // Whether chat message tones are enabled by default
+    'tone_enabled' => env('CHAT_TONE_ENABLED', true),
+
+    // Default path for the chat message tone. If null, a basic beep is used.
+    'message_tone' => env('CHAT_MESSAGE_TONE'),
 ];
 
