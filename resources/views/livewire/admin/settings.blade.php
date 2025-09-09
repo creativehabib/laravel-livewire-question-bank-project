@@ -35,6 +35,20 @@
             @enderror
         </div>
         <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="chat_tone_enabled" id="chat_tone_enabled">
+            <label for="chat_tone_enabled" class="text-sm font-medium">Enable chat message tone</label>
+        </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Upload chat message tone</label>
+            <input type="file" wire:model="chat_tone" accept="audio/*" class="w-full border rounded p-2">
+            @if ($chat_tone_url)
+                <audio controls class="mt-2" src="{{ $chat_tone_url }}"></audio>
+            @endif
+            @error('chat_tone')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
+        <div class="flex items-center space-x-2">
             <input type="checkbox" wire:model="chat_ai_enabled" id="chat_ai_enabled">
             <label for="chat_ai_enabled" class="text-sm font-medium">Enable AI responses when admins are offline</label>
         </div>
