@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Events\ChatMessageSent;
 use App\Models\ChatMessage;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendChatMessage implements ShouldQueue
 {
@@ -27,6 +29,13 @@ class SendChatMessage implements ShouldQueue
         // retrieve it without waiting for the flush command to run.
         $message = ChatMessage::create($this->payload);
 
-        broadcast(new ChatMessageSent($message));
+        try {
+            broadcast(new ChatMessageSent($message));
+        } catch (BroadcastException $e) {
+            Log::warning('Failed to broadcast chat message.', [
+                'message_id' => $message->id,
+                'exception' => $e->getMessage(),
+            ]);
+        }
     }
 }
