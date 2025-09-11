@@ -8,6 +8,8 @@ use App\Models\Chat;
 use App\Models\ChatMessage;
 use App\Models\Setting;
 use App\Models\User;
+use App\Enums\Role;
+use App\Services\AIResponseService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -108,6 +110,56 @@ class ChatPopup extends Component
 
         $this->message = '';
         $this->dispatch('chat-message-sent');
+
+        $this->maybeSendAiResponse($payload['message']);
+    }
+
+    protected function maybeSendAiResponse(string $prompt): void
+    {
+        if (!Setting::get('chat_ai_enabled', false)) {
+            return;
+        }
+
+        $adminId = $this->getAdminId();
+        $adminOnline = $adminId ? optional(User::find($adminId))->isOnline() : false;
+        if ($adminOnline) {
+            return;
+        }
+
+        $provider = Setting::get('chat_ai_provider', 'openai');
+        $apiKey = match ($provider) {
+            'openai' => Setting::get('openai_api_key', config('services.openai.key')),
+            'gemini' => Setting::get('gemini_api_key', config('services.gemini.key')),
+            default => null,
+        };
+
+        if (!$apiKey) {
+            return;
+        }
+
+        $reply = app(AIResponseService::class)->generate($prompt, $apiKey, $provider);
+        if (!$reply) {
+            return;
+        }
+
+        if (!$adminId) {
+            $adminId = User::where('role', Role::ADMIN)->value('id');
+            if (!$adminId) {
+                return;
+            }
+            Chat::updateOrCreate(['user_id' => Auth::id()], ['assigned_admin_id' => $adminId]);
+            $this->assignedAdminId = $adminId;
+        }
+
+        SendChatMessage::dispatchSync([
+            'user_id' => $adminId,
+            'recipient_id' => Auth::id(),
+            'message' => $reply,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->dispatch('chat-message-received');
     }
 
     protected function pendingCount(): int
