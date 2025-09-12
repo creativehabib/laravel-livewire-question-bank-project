@@ -1,6 +1,6 @@
 <div x-data class="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow">
     <form wire:submit.prevent="save" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {{-- Subject --}}
             <div wire:ignore>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
