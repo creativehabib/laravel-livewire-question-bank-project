@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Chapter extends Model
+class SubSubject extends Model
 {
-    protected $fillable = ['subject_id', 'sub_subject_id', 'name'];
+    protected $fillable = ['subject_id', 'name'];
 
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
     }
 
-    public function subSubject(): BelongsTo
+    public function chapters(): HasMany
     {
-        return $this->belongsTo(SubSubject::class);
+        return $this->hasMany(Chapter::class);
     }
 
     public function questions(): HasMany

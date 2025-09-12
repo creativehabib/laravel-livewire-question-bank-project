@@ -12,9 +12,20 @@
                 </select>
             </div>
 
-            {{-- Chapter (Optional) --}}
+            {{-- Sub-Subject (Optional) --}}
             <div wire:ignore>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter (Optional)</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sub-Subject (Optional)</label>
+                <select id="sub_subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($subSubjects as $ss)
+                        <option value="{{ $ss->id }}" @selected($ss->id == $sub_subject_id)>{{ $ss->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- Chapter (Required if Sub-Subject) --}}
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
                 <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
                     @foreach($chapters as $c)
@@ -77,7 +88,7 @@
 @push('scripts')
     <script>
         let quillEditors = {};
-        let tsSubject, tsChapter;
+        let tsSubject, tsSubSubject, tsChapter;
 
         function initEditors() {
             const main = document.getElementById('editor');
@@ -154,6 +165,14 @@
             });
             tsSubject.setValue(@json($subject_id), true);
 
+            if (tsSubSubject) tsSubSubject.destroy();
+            tsSubSubject = new TomSelect('#sub_subject', {
+                onChange: (value) => {
+                    @this.set('sub_subject_id', value);
+                }
+            });
+            tsSubSubject.setValue(@json($sub_subject_id), true);
+
             if (tsChapter) tsChapter.destroy();
             tsChapter = new TomSelect('#chapter', {
                 onChange: (value) => {
@@ -173,6 +192,14 @@
             });
             @this.set('tagIds', window.tsTags.items);
         }
+
+        window.addEventListener('subSubjectsUpdated', e => {
+            if (!tsSubSubject) return;
+            tsSubSubject.clearOptions();
+            tsSubSubject.addOptions(e.detail.subSubjects);
+            tsSubSubject.refreshOptions(false);
+            tsSubSubject.setValue('');
+        });
 
         window.addEventListener('chaptersUpdated', e => {
             if (!tsChapter) return;

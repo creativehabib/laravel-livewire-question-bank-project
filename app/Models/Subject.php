@@ -14,6 +14,11 @@ class Subject extends Model
         return $this->hasMany(Chapter::class);
     }
 
+    public function subSubjects(): HasMany
+    {
+        return $this->hasMany(SubSubject::class);
+    }
+
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class);

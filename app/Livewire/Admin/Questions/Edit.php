@@ -4,14 +4,14 @@ namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, Chapter, Question, Tag};
+use App\Models\{Subject, SubSubject, Chapter, Question, Tag};
 
 class Edit extends Component
 {
     use AuthorizesRequests;
 
     public Question $question;
-    public $subject_id, $chapter_id, $title, $difficulty, $tagIds = [], $options = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty, $tagIds = [], $options = [];
 
     public function mount(Question $question)
     {
@@ -19,6 +19,7 @@ class Edit extends Component
 
         $this->question = $question;
         $this->subject_id = $question->subject_id;
+        $this->sub_subject_id = $question->sub_subject_id;
         $this->chapter_id = $question->chapter_id;
         $this->title = $question->title;
         $this->difficulty = $question->difficulty;
@@ -32,7 +33,8 @@ class Edit extends Component
 
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'chapter_id' => 'nullable|exists:chapters,id',
+            'sub_subject_id' => 'nullable|exists:sub_subjects,id',
+            'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
             'options.*.option_text' => 'required|string',
             'tagIds' => 'nullable|array',
@@ -40,6 +42,7 @@ class Edit extends Component
 
         $this->question->update([
             'subject_id' => $this->subject_id,
+            'sub_subject_id' => $this->sub_subject_id ?: null,
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
@@ -64,8 +67,22 @@ class Edit extends Component
 
     public function updatedSubjectId($value)
     {
+        $this->sub_subject_id = null;
         $this->chapter_id = null;
-        $chapters = Chapter::where('subject_id', $value)
+
+        $subSubjects = SubSubject::where('subject_id', $value)
+            ->get()
+            ->map(fn($s) => ['value' => $s->id, 'text' => $s->name])
+            ->all();
+        $this->dispatch('subSubjectsUpdated', subSubjects: $subSubjects);
+
+        $this->dispatch('chaptersUpdated', chapters: []);
+    }
+
+    public function updatedSubSubjectId($value)
+    {
+        $this->chapter_id = null;
+        $chapters = Chapter::where('sub_subject_id', $value)
             ->get()
             ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
             ->all();
@@ -78,7 +95,8 @@ class Edit extends Component
 
         return view('livewire.admin.questions.edit', [
             'subjects' => Subject::all(),
-            'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
+            'subSubjects' => SubSubject::where('subject_id', $this->subject_id)->get(),
+            'chapters' => Chapter::where('sub_subject_id', $this->sub_subject_id)->get(),
             'allTags' => Tag::all(),
         ])->layout($layout, ['title' => 'Edit Question']);
     }

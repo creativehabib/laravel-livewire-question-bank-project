@@ -4,13 +4,13 @@ namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, Chapter, Question, Option, Tag};
+use App\Models\{Subject, SubSubject, Chapter, Question, Option, Tag};
 
 class Create extends Component
 {
     use AuthorizesRequests;
 
-    public $subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
     public $options = [
         ['option_text' => '', 'is_correct' => false],
         ['option_text' => '', 'is_correct' => false],
@@ -20,8 +20,22 @@ class Create extends Component
 
     public function updatedSubjectId($value)
     {
+        $this->sub_subject_id = null;
         $this->chapter_id = null;
-        $chapters = Chapter::where('subject_id', $value)
+
+        $subSubjects = SubSubject::where('subject_id', $value)
+            ->get()
+            ->map(fn($s) => ['value' => $s->id, 'text' => $s->name])
+            ->all();
+        $this->dispatch('subSubjectsUpdated', subSubjects: $subSubjects);
+
+        $this->dispatch('chaptersUpdated', chapters: []);
+    }
+
+    public function updatedSubSubjectId($value)
+    {
+        $this->chapter_id = null;
+        $chapters = Chapter::where('sub_subject_id', $value)
             ->get()
             ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
             ->all();
@@ -34,7 +48,8 @@ class Create extends Component
 
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'chapter_id' => 'nullable|exists:chapters,id',
+            'sub_subject_id' => 'nullable|exists:sub_subjects,id',
+            'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
             'options.*.option_text' => 'required|string',
             'options' => 'array|min:2',
@@ -43,6 +58,7 @@ class Create extends Component
 
         $question = Question::create([
             'subject_id' => $this->subject_id,
+            'sub_subject_id' => $this->sub_subject_id ?: null,
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
@@ -73,7 +89,8 @@ class Create extends Component
 
         return view('livewire.admin.questions.create', [
             'subjects' => Subject::all(),
-            'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
+            'subSubjects' => SubSubject::where('subject_id', $this->subject_id)->get(),
+            'chapters' => Chapter::where('sub_subject_id', $this->sub_subject_id)->get(),
             'allTags' => Tag::all(),
         ])->layout($layout, ['title' => 'Create Question']);
     }
