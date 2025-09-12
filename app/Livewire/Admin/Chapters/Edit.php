@@ -22,9 +22,16 @@ class Edit extends Component
         $this->name = $chapter->name;
     }
 
-    public function updatedSubjectId(): void
+    public function updatedSubjectId($value): void
     {
         $this->sub_subject_id = null;
+
+        $subSubjects = SubSubject::where('subject_id', $value)
+            ->get()
+            ->map(fn($s) => ['value' => $s->id, 'text' => $s->name])
+            ->all();
+
+        $this->dispatch('subSubjectsUpdated', subSubjects: $subSubjects);
     }
 
     public function update()
