@@ -90,10 +90,12 @@ class Edit extends Component
     public function updatedSubSubjectId($value)
     {
         $this->chapter_id = null;
-        $chapters = Chapter::where('sub_subject_id', $value)
-            ->get()
-            ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
-            ->all();
+        $chapters = $value
+            ? Chapter::where('sub_subject_id', $value)
+                ->get()
+                ->map(fn($c) => ['value' => $c->id, 'text' => $c->name])
+                ->all()
+            : [];
         $this->dispatch('chaptersUpdated', chapters: $chapters);
     }
 
