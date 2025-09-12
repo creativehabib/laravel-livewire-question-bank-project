@@ -14,7 +14,7 @@ class Question extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'subject_id', 'chapter_id', 'title', 'difficulty', 'slug', 'views', 'user_id',
+        'subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'slug', 'views', 'user_id',
     ];
 
     protected $casts = [
@@ -35,6 +35,11 @@ class Question extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    public function subSubject(): BelongsTo
+    {
+        return $this->belongsTo(SubSubject::class);
     }
 
     public function chapter(): BelongsTo
