@@ -65,17 +65,19 @@
         {{-- Options --}}
         <div class="space-y-4">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Options</label>
-            @foreach($options as $i => $opt)
-                <div wire:key="opt-{{ $i }}" class="flex items-start gap-2">
-                    <div wire:ignore class="flex-1">
-                        <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600  min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @foreach($options as $i => $opt)
+                    <div wire:key="opt-{{ $i }}" class="flex items-start gap-2">
+                        <div wire:ignore class="flex-1">
+                            <div id="opt_editor_{{ $i }}" class="border border-gray-300 dark:border-gray-600  min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100"></div>
+                        </div>
+                        <label class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+                            <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
+                            <span>Correct</span>
+                        </label>
                     </div>
-                    <label class="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
-                        <input type="checkbox" wire:model="options.{{ $i }}.is_correct" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
-                        <span>Correct</span>
-                    </label>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
 
         <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">

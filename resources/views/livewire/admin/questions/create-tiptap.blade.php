@@ -9,18 +9,20 @@
         {{-- Options --}}
         <div class="space-y-2">
             <label>Options</label>
-            @foreach($options as $i => $opt)
-                <div wire:key="opt-{{ $i }}" class="flex items-center gap-2">
-                    <div wire:ignore class="flex-1">
-                        <div id="opt_editor_{{ $i }}" class="border rounded min-h-[100px] p-2 bg-white">
-                            {!! $opt['option_text'] ?? '' !!}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                @foreach($options as $i => $opt)
+                    <div wire:key="opt-{{ $i }}" class="flex items-center gap-2">
+                        <div wire:ignore class="flex-1">
+                            <div id="opt_editor_{{ $i }}" class="border rounded min-h-[100px] p-2 bg-white">
+                                {!! $opt['option_text'] ?? '' !!}
+                            </div>
                         </div>
+                        <label>
+                            <input type="checkbox" wire:model="options.{{ $i }}.is_correct"> Correct
+                        </label>
                     </div>
-                    <label>
-                        <input type="checkbox" wire:model="options.{{ $i }}.is_correct"> Correct
-                    </label>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
 
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
