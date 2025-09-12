@@ -11,10 +11,21 @@
             </select>
         </div>
 
+        {{-- Sub-Subject (Optional) --}}
+        <div>
+            <label>Sub-Subject (Optional)</label>
+            <select wire:model="sub_subject_id" class="border p-2 rounded w-full">
+                <option value="">-- Select --</option>
+                @foreach($subSubjects as $ss)
+                    <option value="{{ $ss->id }}">{{ $ss->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
         {{-- Chapter (Optional) --}}
         <div>
             <label>Chapter (Optional)</label>
-            <select wire:model="chapter_id" class="border p-2 rounded w-full">
+            <select wire:model="chapter_id" class="border p-2 rounded w-full" {{ $sub_subject_id ? '' : 'disabled' }}>
                 <option value="">-- Select --</option>
                 @foreach($chapters as $c)
                     <option value="{{ $c->id }}">{{ $c->name }}</option>
