@@ -43,7 +43,7 @@
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{!! $q->title !!}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->user->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->subject->name }}</td>
-                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter->name }}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter?->name }}</td>
                     <td class="px-4 py-2 space-x-2">
                         <a wire:navigate href="{{ route(auth()->user()->isAdmin() ? 'admin.questions.edit' : 'teacher.questions.edit', $q) }}"
                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
