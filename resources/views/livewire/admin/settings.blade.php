@@ -62,6 +62,13 @@
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
+        <div>
+            <label class="block text-sm font-medium mb-1">Admin offline minutes before AI responds</label>
+            <input type="number" min="1" wire:model="chat_ai_admin_offline_minutes" class="w-full border rounded p-2">
+            @error('chat_ai_admin_offline_minutes')
+                <div class="text-red-600 text-sm">{{ $message }}</div>
+            @enderror
+        </div>
         @if ($chat_ai_provider === 'openai')
             <div wire:key="openai-key-input">
                 <label class="block text-sm font-medium mb-1">OpenAI API Key</label>

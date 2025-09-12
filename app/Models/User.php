@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Enums\Role;
 use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 use Illuminate\Support\Str;
 
 class User extends Authenticatable
@@ -69,9 +70,10 @@ class User extends Authenticatable
 
     public function isOnline(): bool
     {
+        $minutes = (int) Setting::get('chat_ai_admin_offline_minutes', config('chat.ai_admin_offline_minutes'));
         return DB::table('sessions')
             ->where('user_id', $this->id)
-            ->where('last_activity', '>=', now()->subMinutes(5)->getTimestamp())
+            ->where('last_activity', '>=', now()->subMinutes($minutes)->getTimestamp())
             ->exists();
     }
 

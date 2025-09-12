@@ -24,6 +24,7 @@ class Settings extends Component
     public $chat_ai_provider = 'openai';
     public $openai_api_key = '';
     public $gemini_api_key = '';
+    public $chat_ai_admin_offline_minutes;
     public $google_login_enabled = false;
     public $facebook_login_enabled = false;
     public $google_client_id = '';
@@ -44,6 +45,7 @@ class Settings extends Component
         'chat_ai_provider' => 'required|in:openai,gemini',
         'openai_api_key' => 'nullable|string',
         'gemini_api_key' => 'nullable|string',
+        'chat_ai_admin_offline_minutes' => 'required|integer|min:1',
         'google_login_enabled' => 'boolean',
         'facebook_login_enabled' => 'boolean',
         'google_client_id' => 'nullable|string',
@@ -75,6 +77,7 @@ class Settings extends Component
         $this->chat_ai_provider = Setting::get('chat_ai_provider', 'openai');
         $this->openai_api_key = Setting::get('openai_api_key', config('services.openai.key'));
         $this->gemini_api_key = Setting::get('gemini_api_key', config('services.gemini.key'));
+        $this->chat_ai_admin_offline_minutes = Setting::get('chat_ai_admin_offline_minutes', config('chat.ai_admin_offline_minutes'));
         $this->google_login_enabled = (bool) Setting::get('google_login_enabled', false);
         $this->facebook_login_enabled = (bool) Setting::get('facebook_login_enabled', false);
         $this->google_client_id = Setting::get('google_client_id', config('services.google.client_id'));
@@ -102,6 +105,7 @@ class Settings extends Component
         Setting::set('chat_ai_provider', $this->chat_ai_provider);
         Setting::set('openai_api_key', $this->openai_api_key);
         Setting::set('gemini_api_key', $this->gemini_api_key);
+        Setting::set('chat_ai_admin_offline_minutes', $this->chat_ai_admin_offline_minutes);
         Setting::set('google_login_enabled', $this->google_login_enabled ? 1 : 0);
         Setting::set('facebook_login_enabled', $this->facebook_login_enabled ? 1 : 0);
         Setting::set('google_client_id', $this->google_client_id);
