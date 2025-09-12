@@ -34,6 +34,7 @@
             @php
                 $questionsActive = request()->is('admin/questions*')
                     || request()->is('admin/subjects*')
+                    || request()->is('admin/sub-subjects*')
                     || request()->is('admin/chapters*')
                     || request()->is('admin/tags*');
             @endphp
@@ -58,6 +59,11 @@
                        class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/subjects*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
                         <x-heroicon-o-book-open class="w-4 h-4"/>
                         <span class="sidebar-text">Subjects</span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin.sub-subjects.index') }}"
+                       class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/sub-subjects*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                        <x-heroicon-o-book-open class="w-4 h-4"/>
+                        <span class="sidebar-text">Sub Subjects</span>
                     </a>
                     <a wire:navigate href="{{ route('admin.chapters.index') }}"
                        class="nav-link flex items-center gap-3 pr-4 pl-4 py-2.5 rounded-lg {{ request()->is('admin/chapters*') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">

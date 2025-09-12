@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Livewire\Admin\Chapters;
+namespace App\Livewire\Admin\SubSubjects;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Chapter;
+use App\Models\SubSubject;
 use App\Models\Subject;
 
 class Index extends Component
@@ -15,8 +15,8 @@ class Index extends Component
     public $subjectId = '';
 
     protected $listeners = [
-        'chapterDeleted' => '$refresh',
-        'deleteChapterConfirmed' => 'delete',
+        'subSubjectDeleted' => '$refresh',
+        'deleteSubSubjectConfirmed' => 'delete',
     ];
 
     public function updatingSearch(): void
@@ -31,23 +31,23 @@ class Index extends Component
 
     public function delete($id)
     {
-        Chapter::findOrFail($id)->delete();
+        SubSubject::findOrFail($id)->delete();
 
         $this->resetPage();
-        $this->dispatch('chapterDeleted', message: 'Chapter deleted successfully.');
+        $this->dispatch('subSubjectDeleted', message: 'Sub subject deleted successfully.');
     }
 
     public function render()
     {
-        $chapters = Chapter::with('subject', 'subSubject')
+        $subSubjects = SubSubject::with('subject')
             ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
             ->orderBy('name')
             ->paginate(10);
 
-        return view('livewire.admin.chapters.index', [
-            'chapters' => $chapters,
+        return view('livewire.admin.sub-subjects.index', [
+            'subSubjects' => $subSubjects,
             'subjects' => Subject::orderBy('name')->get(),
-        ])->layout('layouts.admin', ['title' => 'Manage Chapters']);
+        ])->layout('layouts.admin', ['title' => 'Manage Sub Subjects']);
     }
 }
