@@ -32,7 +32,7 @@ class Edit extends Component
 
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'chapter_id' => 'required|exists:chapters,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
             'title' => 'required|string',
             'options.*.option_text' => 'required|string',
             'tagIds' => 'nullable|array',
@@ -40,7 +40,7 @@ class Edit extends Component
 
         $this->question->update([
             'subject_id' => $this->subject_id,
-            'chapter_id' => $this->chapter_id,
+            'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
         ]);

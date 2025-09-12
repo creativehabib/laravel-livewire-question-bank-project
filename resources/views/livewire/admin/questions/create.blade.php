@@ -12,9 +12,9 @@
                 </select>
             </div>
 
-            {{-- Chapter --}}
+            {{-- Chapter (Optional) --}}
             <div wire:ignore>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter (Optional)</label>
                 <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
                     @foreach($chapters as $c)
