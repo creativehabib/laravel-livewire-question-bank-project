@@ -120,6 +120,7 @@
                     @this.set('tagIds', values);
                 }
             });
+            window.tsTags.setValue(@json($tagIds), true);
             @this.set('tagIds', window.tsTags.items);
         }
 
