@@ -24,15 +24,17 @@
             </div>
 
             {{-- Chapter (Required if Sub-Subject) --}}
-            <div wire:ignore wire:key="create-chapter-select">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
-                <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="">-- Select --</option>
-                    @foreach($chapters as $c)
-                        <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
-                    @endforeach
-                </select>
-            </div>
+            @if($sub_subject_id)
+                <div wire:ignore wire:key="create-chapter-select">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+                    <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">-- Select --</option>
+                        @foreach($chapters as $c)
+                            <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @endif
         </div>
 
         {{-- Main Question --}}
@@ -176,13 +178,19 @@
             });
             tsSubSubject.setValue(@json($sub_subject_id), true);
 
-            if (tsChapter) tsChapter.destroy();
-            tsChapter = new TomSelect('#chapter', {
-                onChange: (value) => {
-                    @this.set('chapter_id', value);
-                }
-            });
-            tsChapter.setValue(@json($chapter_id), true);
+            if (tsChapter) {
+                tsChapter.destroy();
+                tsChapter = null;
+            }
+            const chapterEl = document.getElementById('chapter');
+            if (chapterEl) {
+                tsChapter = new TomSelect('#chapter', {
+                    onChange: (value) => {
+                        @this.set('chapter_id', value);
+                    }
+                });
+                tsChapter.setValue(@json($chapter_id), true);
+            }
 
             if (window.tsTags) window.tsTags.destroy();
             window.tsTags = new TomSelect('#tags', {
@@ -206,8 +214,21 @@
         });
 
         window.addEventListener('chaptersUpdated', e => {
-            if (!tsChapter) return;
-            tsChapter.clearOptions();
+            if (tsChapter) {
+                tsChapter.destroy();
+                tsChapter = null;
+            }
+
+            const chapterEl = document.getElementById('chapter');
+            if (!chapterEl) return;
+
+            chapterEl.options.length = 0;
+            chapterEl.append(new Option('-- Select --', ''));
+            tsChapter = new TomSelect('#chapter', {
+                onChange: (value) => {
+                    @this.set('chapter_id', value);
+                }
+            });
             tsChapter.addOptions(e.detail.chapters);
             tsChapter.refreshOptions(false);
             tsChapter.setValue('');
