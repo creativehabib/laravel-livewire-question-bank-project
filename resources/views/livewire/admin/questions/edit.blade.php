@@ -210,6 +210,12 @@
             tsChapter.setValue('');
         });
 
+        window.addEventListener('reset-selects', () => {
+            tsSubject?.clear(true);
+            tsSubSubject?.clear(true);
+            tsChapter?.clear(true);
+        });
+
         document.addEventListener('livewire:load', initEditors);
         document.addEventListener('livewire:navigated', initEditors);
     </script>

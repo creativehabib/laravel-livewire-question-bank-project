@@ -15,6 +15,8 @@ class Edit extends Component
 
     public function mount(Question $question)
     {
+        $this->resetFields();
+
         $this->authorize('update', $question);
 
         $this->question = $question;
@@ -25,6 +27,12 @@ class Edit extends Component
         $this->difficulty = $question->difficulty;
         $this->tagIds = $question->tags()->pluck('tags.id')->toArray();
         $this->options = $question->options->toArray();
+    }
+
+    public function resetFields(): void
+    {
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'tagIds', 'options');
+        $this->dispatch('reset-selects');
     }
 
     public function save()

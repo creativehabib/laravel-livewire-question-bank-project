@@ -18,6 +18,25 @@ class Create extends Component
         ['option_text' => '', 'is_correct' => false],
     ];
 
+    public function mount(): void
+    {
+        $this->resetFields();
+    }
+
+    public function resetFields(): void
+    {
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'tagIds', 'options');
+        $this->difficulty = 'easy';
+        $this->options = [
+            ['option_text' => '', 'is_correct' => false],
+            ['option_text' => '', 'is_correct' => false],
+            ['option_text' => '', 'is_correct' => false],
+            ['option_text' => '', 'is_correct' => false],
+        ];
+
+        $this->dispatch('reset-selects');
+    }
+
     public function updatedSubjectId($value)
     {
         $this->sub_subject_id = null;
