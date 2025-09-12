@@ -46,7 +46,7 @@ class QuestionForm extends Component
     {
         $data = $this->validate([
             'subject_id' => 'required',
-            'chapter_id' => 'required',
+            'chapter_id' => 'nullable|exists:chapters,id',
             'title' => 'required|string',
             'difficulty' => 'required',
             'tagIds' => 'nullable|array',
@@ -64,7 +64,7 @@ class QuestionForm extends Component
             $this->authorize('update', $q);
             $q->update([
                 'subject_id' => $this->subject_id,
-                'chapter_id' => $this->chapter_id,
+                'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
             ]);
@@ -75,7 +75,7 @@ class QuestionForm extends Component
             $this->authorize('create', Question::class);
             $q = Question::create([
                 'subject_id' => $this->subject_id,
-                'chapter_id' => $this->chapter_id,
+                'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
                 'user_id' => auth()->id(),

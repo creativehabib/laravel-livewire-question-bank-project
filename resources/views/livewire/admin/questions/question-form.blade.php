@@ -11,9 +11,9 @@
             </select>
         </div>
 
-        {{-- Chapter --}}
+        {{-- Chapter (Optional) --}}
         <div>
-            <label>Chapter</label>
+            <label>Chapter (Optional)</label>
             <select wire:model="chapter_id" class="border p-2 rounded w-full">
                 <option value="">-- Select --</option>
                 @foreach($chapters as $c)

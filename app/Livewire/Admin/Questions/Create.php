@@ -34,7 +34,7 @@ class Create extends Component
 
         $this->validate([
             'subject_id' => 'required|exists:subjects,id',
-            'chapter_id' => 'required|exists:chapters,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
             'title' => 'required|string',
             'options.*.option_text' => 'required|string',
             'options' => 'array|min:2',
@@ -43,7 +43,7 @@ class Create extends Component
 
         $question = Question::create([
             'subject_id' => $this->subject_id,
-            'chapter_id' => $this->chapter_id,
+            'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
             'user_id' => auth()->id(),
