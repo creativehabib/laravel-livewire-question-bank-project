@@ -213,8 +213,13 @@
 
         window.addEventListener('reset-selects', () => {
             tsSubject?.clear(true);
+            tsSubject?.setValue('', true);
+
             tsSubSubject?.clear(true);
+            tsSubSubject?.setValue('', true);
+
             tsChapter?.clear(true);
+            tsChapter?.setValue('', true);
         });
 
         document.addEventListener('livewire:load', initEditors);
