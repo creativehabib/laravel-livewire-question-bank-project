@@ -92,45 +92,20 @@
 
         function initEditors() {
             const main = document.getElementById('editor');
-            if (!main || main.classList.contains('ql-container')) return;
 
-            quillEditors = {};
-            window.quillEditors = quillEditors;
+            if (main && !main.classList.contains('ql-container')) {
+                quillEditors = {};
+                window.quillEditors = quillEditors;
 
-            const toolbarOptions = [
-                ['bold', 'italic'],
-                [{ 'script': 'sub' }, { 'script': 'super' }],
-                ['customMath'],
-                ['clean']
-            ];
+                const toolbarOptions = [
+                    ['bold', 'italic'],
+                    [{ 'script': 'sub' }, { 'script': 'super' }],
+                    ['customMath'],
+                    ['clean']
+                ];
 
-            // --- Main Editor ---
-            let mainEditor = new Quill('#editor', {
-                theme: 'snow',
-                modules: {
-                    formula: true,
-                    toolbar: {
-                        container: toolbarOptions,
-                        handlers: {
-                            customMath: function () {
-                                openMathPopup('title');
-                            }
-                        }
-                    }
-                },
-                placeholder: 'Compose an epic...',
-            });
-            quillEditors['title'] = mainEditor;
-
-            mainEditor.on('text-change', function () {
-                @this.set('title', mainEditor.root.innerHTML);
-            });
-
-            // --- Options Editors ---
-            document.querySelectorAll('[id^="opt_editor_"]').forEach(el => {
-                if (el.classList.contains('ql-container')) return;
-                let index = el.id.replace('opt_editor_', '');
-                let optEditor = new Quill(`#${el.id}`, {
+                // --- Main Editor ---
+                let mainEditor = new Quill('#editor', {
                     theme: 'snow',
                     modules: {
                         formula: true,
@@ -138,24 +113,50 @@
                             container: toolbarOptions,
                             handlers: {
                                 customMath: function () {
-                                    openMathPopup(`option_${index}`);
+                                    openMathPopup('title');
                                 }
                             }
                         }
                     },
                     placeholder: 'Compose an epic...',
                 });
-                quillEditors[`option_${index}`] = optEditor;
+                quillEditors['title'] = mainEditor;
 
-                optEditor.on('text-change', function () {
-                    @this.set(`options.${index}.option_text`, optEditor.root.innerHTML);
+                mainEditor.on('text-change', function () {
+                    @this.set('title', mainEditor.root.innerHTML);
                 });
-            });
 
-            // Custom button icon
-            document.querySelectorAll('.ql-customMath').forEach(btn => {
-                btn.innerHTML = '∑';
-            });
+                // --- Options Editors ---
+                document.querySelectorAll('[id^="opt_editor_"]').forEach(el => {
+                    if (el.classList.contains('ql-container')) return;
+                    let index = el.id.replace('opt_editor_', '');
+                    let optEditor = new Quill(`#${el.id}`, {
+                        theme: 'snow',
+                        modules: {
+                            formula: true,
+                            toolbar: {
+                                container: toolbarOptions,
+                                handlers: {
+                                    customMath: function () {
+                                        openMathPopup(`option_${index}`);
+                                    }
+                                }
+                            }
+                        },
+                        placeholder: 'Compose an epic...',
+                    });
+                    quillEditors[`option_${index}`] = optEditor;
+
+                    optEditor.on('text-change', function () {
+                        @this.set(`options.${index}.option_text`, optEditor.root.innerHTML);
+                    });
+                });
+
+                // Custom button icon
+                document.querySelectorAll('.ql-customMath').forEach(btn => {
+                    btn.innerHTML = '∑';
+                });
+            }
 
             if (tsSubject) tsSubject.destroy();
             tsSubject = new TomSelect('#subject', {
