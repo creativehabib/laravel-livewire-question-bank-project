@@ -24,17 +24,15 @@
             </div>
 
             {{-- Chapter (Required if Sub-Subject) --}}
-            @if($sub_subject_id)
-                <div wire:ignore wire:key="create-chapter-select">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
-                    <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="">-- Select --</option>
-                        @foreach($chapters as $c)
-                            <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            @endif
+            <div wire:ignore wire:key="create-chapter-select">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
+                <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- Select --</option>
+                    @foreach($chapters as $c)
+                        <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
 
         {{-- Main Question --}}
