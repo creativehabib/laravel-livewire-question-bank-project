@@ -11,6 +11,9 @@ use App\Livewire\Admin\Settings;
 use App\Livewire\Admin\Subjects\Index as SubjectIndex;
 use App\Livewire\Admin\Subjects\Create as SubjectCreate;
 use App\Livewire\Admin\Subjects\Edit as SubjectEdit;
+use App\Livewire\Admin\SubSubjects\Index as SubSubjectIndex;
+use App\Livewire\Admin\SubSubjects\Create as SubSubjectCreate;
+use App\Livewire\Admin\SubSubjects\Edit as SubSubjectEdit;
 use App\Livewire\Admin\Chapters\Index as ChapterIndex;
 use App\Livewire\Admin\Chapters\Create as ChapterCreate;
 use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
@@ -51,6 +54,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/subjects', SubjectIndex::class)->name('admin.subjects.index');
     Route::get('/admin/subjects/create', SubjectCreate::class)->name('admin.subjects.create');
     Route::get('/admin/subjects/{subject}/edit', SubjectEdit::class)->name('admin.subjects.edit');
+
+    // Sub Subjects
+    Route::get('/admin/sub-subjects', SubSubjectIndex::class)->name('admin.sub-subjects.index');
+    Route::get('/admin/sub-subjects/create', SubSubjectCreate::class)->name('admin.sub-subjects.create');
+    Route::get('/admin/sub-subjects/{subSubject}/edit', SubSubjectEdit::class)->name('admin.sub-subjects.edit');
 
     // Chapters
     Route::get('/admin/chapters', ChapterIndex::class)->name('admin.chapters.index');

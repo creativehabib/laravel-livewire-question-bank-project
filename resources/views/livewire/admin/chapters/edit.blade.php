@@ -11,6 +11,16 @@
             @error('subject_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div>
+            <label class="block mb-1">Sub Subject</label>
+            <select wire:model="sub_subject_id" class="border p-2 rounded w-full">
+                <option value="">-- Select --</option>
+                @foreach($subSubjects as $subSubject)
+                    <option value="{{ $subSubject->id }}">{{ $subSubject->name }}</option>
+                @endforeach
+            </select>
+            @error('sub_subject_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+        </div>
+        <div>
             <label class="block mb-1">Name</label>
             <input type="text" wire:model="name" class="border p-2 rounded w-full">
             @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
