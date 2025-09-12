@@ -2,7 +2,7 @@
     <form wire:submit.prevent="save" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             {{-- Subject --}}
-            <div wire:ignore>
+            <div wire:ignore wire:key="subject-select-{{ $question->id }}">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
                 <select id="subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
@@ -13,7 +13,7 @@
             </div>
 
             {{-- Sub-Subject (Optional) --}}
-            <div wire:ignore>
+            <div wire:ignore wire:key="subsubject-select-{{ $question->id }}">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Sub-Subject (Optional)</label>
                 <select id="sub_subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
@@ -24,7 +24,7 @@
             </div>
 
             {{-- Chapter (Required if Sub-Subject) --}}
-            <div wire:ignore>
+            <div wire:ignore wire:key="chapter-select-{{ $question->id }}">
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Chapter</label>
                 <select id="chapter" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="">-- Select --</option>
