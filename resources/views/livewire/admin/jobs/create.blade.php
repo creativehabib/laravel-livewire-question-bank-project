@@ -105,7 +105,8 @@
                     { name: 'links', items: ['Link', 'Unlink'] },
                     { name: 'insert', items: ['ImageManager'] },
                     { name: 'tools', items: ['Source'] }
-                ]
+                ],
+                allowedContent: true
             });
 
             editor.on('change', function () {
