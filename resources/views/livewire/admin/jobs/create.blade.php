@@ -17,9 +17,8 @@
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
                     <div wire:ignore>
-                        <div id="description-editor" class="w-full border rounded-md dark:border-gray-600 min-h-[250px]"></div>
+                        <textarea wire:model="description" id="content" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
                     </div>
-                    <textarea wire:model="description" id="content" class="hidden"></textarea>
                 </div>
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Title</label>
@@ -94,81 +93,64 @@
 
 @push('scripts')
     <script>
-        CKEDITOR.replace('content', {
+        document.addEventListener('livewire:navigated', () => {
+            let imageToReplace = null;
+            window.selectingThumbnail = false;
+
+            const editor = CKEDITOR.replace('content', {
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', 'Blockquote'] },
+                    { name: 'links', items: ['Link', 'Unlink'] },
+                    { name: 'insert', items: ['ImageManager'] },
+                    { name: 'tools', items: ['Source'] }
+                ]
+            });
+
+            editor.on('change', function () {
+                @this.set('description', editor.getData(), false);
+            });
+
+            editor.addCommand('openMediaModal', {
+                exec: function () {
+                    imageToReplace = null;
+                    window.dispatchEvent(new CustomEvent('open-media-modal'));
+                }
+            });
+
+            editor.ui.addButton('ImageManager', {
+                label: 'Image',
+                command: 'openMediaModal',
+                toolbar: 'insert',
+                icon: 'image'
+            });
+
+            editor.on('doubleclick', function (evt) {
+                const element = evt.data.element;
+                if (element && element.is('img')) {
+                    imageToReplace = element;
+                    window.dispatchEvent(new CustomEvent('open-media-modal'));
+                }
+            });
+
+            const imageSelectedHandler = (event) => {
+                if (window.selectingThumbnail) {
+                    @this.set('cover_image', event.detail.url);
+                    window.selectingThumbnail = false;
+                } else {
+                    const url = event.detail.url;
+                    if (imageToReplace) {
+                        imageToReplace.setAttribute('src', url);
+                    } else {
+                        editor.insertHtml('<img src="' + url + '" alt="" />');
+                    }
+                    @this.set('description', editor.getData(), false);
+                    imageToReplace = null;
+                }
+            };
+
+            window.removeEventListener('image-selected', imageSelectedHandler);
+            window.addEventListener('image-selected', imageSelectedHandler);
         });
     </script>
-{{--    <script>--}}
-{{--        document.addEventListener('livewire:navigated', () => {--}}
-{{--            let quillInstance = null;--}}
-{{--            let imageToReplace = null;--}}
-{{--            window.selectingThumbnail = false;--}}
-
-{{--            function initializeQuill() {--}}
-{{--                const editorEl = document.getElementById('description-editor');--}}
-{{--                if (editorEl && !editorEl.__quill) {--}}
-{{--                    const toolbarOptions = [--}}
-{{--                        ['bold', 'italic', 'underline', 'strike'],--}}
-{{--                        ['blockquote', 'code-block'],--}}
-{{--                        [{ 'header': 1 }, { 'header': 2 }],--}}
-{{--                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],--}}
-{{--                        ['table'],--}}
-{{--                        ['link', 'image', 'video'],--}}
-{{--                        ['clean'],--}}
-{{--                    ];--}}
-{{--                    quillInstance = new Quill(editorEl, {--}}
-{{--                        theme: 'snow',--}}
-{{--                        modules: { toolbar: toolbarOptions }--}}
-{{--                    });--}}
-
-{{--                    quillInstance.root.innerHTML = @js($description ?? '');--}}
-
-{{--                    quillInstance.on('text-change', () => {--}}
-{{--                        @this.set('description', quillInstance.root.innerHTML, false);--}}
-{{--                    });--}}
-
-{{--                    quillInstance.getModule('toolbar').addHandler('image', () => {--}}
-{{--                        imageToReplace = null;--}}
-{{--                        window.dispatchEvent(new CustomEvent('open-media-modal'));--}}
-{{--                    });--}}
-
-{{--                    quillInstance.root.addEventListener('click', (e) => {--}}
-{{--                        if (e.target && e.target.tagName === 'IMG') {--}}
-{{--                            imageToReplace = e.target;--}}
-{{--                            window.dispatchEvent(new CustomEvent('open-media-modal'));--}}
-{{--                        }--}}
-{{--                    });--}}
-
-{{--                    editorEl.__quill = quillInstance;--}}
-{{--                }--}}
-{{--            }--}}
-
-{{--            function insertOrReplaceImage(url) {--}}
-{{--                if (!quillInstance) return;--}}
-
-{{--                if (imageToReplace) {--}}
-{{--                    imageToReplace.setAttribute('src', url);--}}
-{{--                } else {--}}
-{{--                    const range = quillInstance.getSelection(true);--}}
-{{--                    quillInstance.insertEmbed(range.index, 'image', url, 'user');--}}
-{{--                }--}}
-
-{{--                @this.set('description', quillInstance.root.innerHTML, false);--}}
-{{--                imageToReplace = null;--}}
-{{--            }--}}
-
-{{--            const imageSelectedHandler = (event) => {--}}
-{{--                if (window.selectingThumbnail) {--}}
-{{--                    @this.set('cover_image', event.detail.url);--}}
-{{--                    window.selectingThumbnail = false;--}}
-{{--                } else {--}}
-{{--                    insertOrReplaceImage(event.detail.url);--}}
-{{--                }--}}
-{{--            };--}}
-
-{{--            initializeQuill();--}}
-
-{{--            window.removeEventListener('image-selected', imageSelectedHandler);--}}
-{{--            window.addEventListener('image-selected', imageSelectedHandler);--}}
-{{--        });--}}
-{{--    </script>--}}
 @endpush
