@@ -120,7 +120,8 @@
                     // reference becomes stale once focus shifts away from the
                     // editor, preventing images from being inserted at the
                     // expected position.
-                    const ranges = editor.getSelection().getRanges();
+                    const selection = editor.getSelection();
+                    const ranges = selection ? selection.getRanges() : [];
                     if (ranges.length) {
                         savedSelection = ranges[0].clone();
                     }
