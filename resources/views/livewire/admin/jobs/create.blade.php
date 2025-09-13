@@ -112,19 +112,20 @@
                 @this.set('description', editor.getData(), false);
             });
 
+            // Preserve the current cursor position so images can be
+            // inserted where the user expects even after the editor
+            // loses focus when the media modal is opened.
+            editor.on('selectionChange', function () {
+                const selection = editor.getSelection();
+                const ranges = selection ? selection.getRanges() : [];
+                if (ranges.length) {
+                    savedSelection = ranges[0].clone();
+                }
+            });
+
             editor.addCommand('openMediaModal', {
                 exec: function () {
                     imageToReplace = null;
-                    // Clone the current selection range so it can be restored
-                    // after the media modal closes. Without cloning, the
-                    // reference becomes stale once focus shifts away from the
-                    // editor, preventing images from being inserted at the
-                    // expected position.
-                    const selection = editor.getSelection();
-                    const ranges = selection ? selection.getRanges() : [];
-                    if (ranges.length) {
-                        savedSelection = ranges[0].clone();
-                    }
                     window.dispatchEvent(new CustomEvent('open-media-modal'));
                 }
             });
