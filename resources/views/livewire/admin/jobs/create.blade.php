@@ -95,6 +95,7 @@
     <script>
         document.addEventListener('livewire:navigated', () => {
             let imageToReplace = null;
+            let savedSelection = null;
             window.selectingThumbnail = false;
 
             const editor = CKEDITOR.replace('content', {
@@ -114,6 +115,7 @@
             editor.addCommand('openMediaModal', {
                 exec: function () {
                     imageToReplace = null;
+                    savedSelection = editor.getSelection().getRanges()[0];
                     window.dispatchEvent(new CustomEvent('open-media-modal'));
                 }
             });
@@ -142,10 +144,15 @@
                     if (imageToReplace) {
                         imageToReplace.setAttribute('src', url);
                     } else {
+                        editor.focus();
+                        if (savedSelection) {
+                            editor.getSelection().selectRanges([savedSelection]);
+                        }
                         editor.insertHtml('<img src="' + url + '" alt="" />');
                     }
                     @this.set('description', editor.getData(), false);
                     imageToReplace = null;
+                    savedSelection = null;
                 }
             };
 
