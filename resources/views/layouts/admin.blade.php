@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'MCQ Bank' }}</title>
+    <script src="/ckeditor/ckeditor.js" type="text/javascript"></script>
     <script>
         // ডার্ক মোডের জন্য এই অংশটুকু এখানে রাখা জরুরি, যাতে পেজ লোডের সময় কোনো ফ্লিকার না হয়।
         if (localStorage.getItem('theme') === 'dark') {
