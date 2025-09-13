@@ -4,32 +4,39 @@
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Title</label>
                 <input type="text" wire:model="title" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                @error('title') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Slug</label>
                 <input type="text" wire:model="slug" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                @error('slug') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Summary</label>
                 <textarea wire:model="summary" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                @error('summary') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
                 <div wire:ignore>
                     <textarea wire:model="description" id="content" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                    @error('description') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Title</label>
                 <input type="text" wire:model="seo_title" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                @error('seo_title') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Description</label>
                 <textarea wire:model="seo_description" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                @error('seo_description') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Keywords</label>
                 <input type="text" wire:model="seo_keywords" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                @error('seo_keywords') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
@@ -41,6 +48,7 @@
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                     @endforeach
                 </select>
+                @error('category_id') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Company Name</label>
