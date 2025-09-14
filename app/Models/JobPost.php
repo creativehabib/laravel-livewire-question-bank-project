@@ -15,7 +15,7 @@ class JobPost extends Model
         'title',
         'slug',
         'category_id',
-        'company_name',
+        'company_id',
         'summary',
         'description',
         'deadline',
@@ -38,5 +38,9 @@ class JobPost extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(JobCategory::class, 'category_id');
+    }
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(JobCompany::class, 'company_id');
     }
 }

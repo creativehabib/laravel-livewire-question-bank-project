@@ -22,7 +22,7 @@
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $job->id }}</td>
                         <td class="px-4 py-2">{{ $job->title }}</td>
-                        <td class="px-4 py-2">{{ $job->company_name }}</td>
+                        <td class="px-4 py-2">{{ $job->company?->name }}</td>
                         <td class="px-4 py-2">{{ ucfirst($job->status->value) }}</td>
                         <td class="px-4 py-2 space-x-2">
                             <a wire:navigate href="{{ route('admin.jobs.edit', $job) }}" class="text-indigo-600 hover:text-indigo-800">Edit</a>
