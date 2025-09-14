@@ -33,7 +33,7 @@ class Index extends Component
     {
         $jobs = JobPost::when($this->search, function ($query) {
                 $query->where('title', 'like', '%'.$this->search.'%')
-                      ->orWhere('company_name', 'like', '%'.$this->search.'%');
+                      ->orWhere('description', 'like', '%'.$this->search.'%');
             })
             ->orderByDesc('created_at')
             ->paginate(10);

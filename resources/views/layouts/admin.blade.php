@@ -61,7 +61,19 @@
             svg: { fontCache: 'global' }
         };
     </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- layout.blade.php এর <head> এ -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+    <script>
+        document.addEventListener('livewire:load', () => {
+            // Livewire কোনো ডম আপডেট শেষে আবার MathJax টাইপসেট করাবে
+            Livewire.hook('message.processed', () => {
+                if (window.MathJax) {
+                    MathJax.typesetPromise();
+                }
+            });
+        });
+    </script>
 
     {{-- নির্দিষ্ট পেজের জন্য কোনো স্ক্রিপ্ট থাকলে এখানে পুশ হবে --}}
     @stack('scripts')
