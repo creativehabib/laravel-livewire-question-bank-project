@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->unsignedBigInteger('category_id')->nullable();
-            $table->string('company_name')->nullable();
+            $table->unsignedBigInteger('company_id')->nullable();
             $table->string('summary')->nullable();
             $table->longText('description')->nullable();
             $table->date('deadline')->nullable();

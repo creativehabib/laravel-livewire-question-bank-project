@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Jobs;
 
+use App\Models\JobCompany;
 use Livewire\Component;
 use App\Models\JobPost;
 use App\Models\JobCategory;
@@ -13,7 +14,7 @@ class Create extends Component
     public $title;
     public $slug;
     public $category_id;
-    public $company_name;
+    public $company_id;
     public $summary;
     public $description;
     public $deadline;
@@ -36,7 +37,7 @@ class Create extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:job_posts,slug',
             'category_id' => 'nullable|exists:job_categories,id',
-            'company_name' => 'nullable|string|max:255',
+            'company_id' => 'nullable|exists:job_companies, id',
             'summary' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'deadline' => 'nullable|date',
@@ -53,7 +54,7 @@ class Create extends Component
             'title' => $this->title,
             'slug' => $this->slug,
             'category_id' => $this->category_id,
-            'company_name' => $this->company_name,
+            'company_id' => $this->company_id,
             'summary' => $this->summary,
             'description' => $this->description,
             'deadline' => $this->deadline,
@@ -73,7 +74,8 @@ class Create extends Component
     public function render()
     {
         return view('livewire.admin.jobs.create', [
-            'categories' => JobCategory::orderBy('name')->get(),
+            'categories' => JobCategory::select('id', 'name')->orderBy('name')->get(),
+            'companies' => JobCompany::select('id', 'name')->orderBy('name')->get(),
         ])->layout('layouts.admin', ['title' => 'Create Job']);
     }
 }

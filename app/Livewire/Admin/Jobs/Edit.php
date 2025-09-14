@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Jobs;
 
+use App\Models\JobCompany;
 use Livewire\Component;
 use App\Models\JobPost;
 use App\Models\JobCategory;
@@ -14,7 +15,7 @@ class Edit extends Component
     public $title;
     public $slug;
     public $category_id;
-    public $company_name;
+    public $company_id;
     public $summary;
     public $description;
     public $deadline;
@@ -25,14 +26,13 @@ class Edit extends Component
     public $seo_title;
     public $seo_description;
     public $seo_keywords;
-
     public function mount(JobPost $job)
     {
         $this->job = $job;
         $this->title = $job->title;
         $this->slug = $job->slug;
         $this->category_id = $job->category_id;
-        $this->company_name = $job->company_name;
+        $this->company_id = $job->company_id;
         $this->summary = $job->summary;
         $this->description = $job->description;
         $this->deadline = optional($job->deadline)->format('Y-m-d');
@@ -56,7 +56,7 @@ class Edit extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:job_posts,slug,' . $this->job->id,
             'category_id' => 'nullable|exists:job_categories,id',
-            'company_name' => 'nullable|string|max:255',
+            'company_id' => 'nullable|exists:job_companies, id',
             'summary' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'deadline' => 'nullable|date',
@@ -73,7 +73,7 @@ class Edit extends Component
             'title' => $this->title,
             'slug' => $this->slug,
             'category_id' => $this->category_id,
-            'company_name' => $this->company_name,
+            'company_id' => $this->company_id,
             'summary' => $this->summary,
             'description' => $this->description,
             'deadline' => $this->deadline,
@@ -93,7 +93,8 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.admin.jobs.edit', [
-            'categories' => JobCategory::orderBy('name')->get(),
+            'categories' => JobCategory::select('id', 'name')->orderBy('name')->get(),
+            'companies' => JobCompany::select('id', 'name')->orderBy('name')->get(),
         ])->layout('layouts.admin', ['title' => 'Edit Job']);
     }
 }

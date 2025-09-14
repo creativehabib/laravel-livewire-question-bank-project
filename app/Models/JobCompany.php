@@ -17,7 +17,7 @@ class JobCompany extends Model
         'details',
     ];
 
-    public function jobPosts(): HasMany
+    public function companies(): HasMany
     {
         return $this->hasMany(JobPost::class, 'company_id');
     }
