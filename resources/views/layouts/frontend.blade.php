@@ -28,5 +28,13 @@
     <footer class="bg-white border-t mt-12 py-6 text-center text-sm text-gray-500">
         &copy; {{ date('Y') }} MCQ Bank. All rights reserved.
     </footer>
+    {{-- MathJax Configuration --}}
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>

@@ -239,17 +239,15 @@
 
 {{-- ✅ Livewire Scripts --}}
 @livewireScripts
+
+{{-- MathJax Configuration --}}
+<script>
+    window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+        svg: { fontCache: 'global' }
+    };
+</script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-{{-- MathJax Configuration (যদি MathJax ব্যবহার করেন) --}}
-@if(isset($usesMath) && $usesMath)
-    <script>
-        window.MathJax = {
-            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
-            svg: { fontCache: 'global' }
-        };
-    </script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
-@endif
 
 {{-- ✅ Extra scripts --}}
 @stack('scripts')
