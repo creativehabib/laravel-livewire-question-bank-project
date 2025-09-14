@@ -83,6 +83,17 @@
                 <x-heroicon-o-question-mark-circle class="w-5 h-5"/>
                 <span class="sidebar-text">Questions</span>
             </a>
+        @elseif(auth()->user()->isStudent())
+            <a wire:navigate href="{{ route('student.exam') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->is('student/exam') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                <x-heroicon-o-clipboard-document-check class="w-5 h-5"/>
+                <span class="sidebar-text">Exam</span>
+            </a>
+            <a wire:navigate href="{{ route('practice') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->routeIs('practice') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+                <x-heroicon-o-pencil-square class="w-5 h-5"/>
+                <span class="sidebar-text">Daily Practice</span>
+            </a>
         @endif
 
         @if(auth()->user()->isAdmin())

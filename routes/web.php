@@ -31,6 +31,7 @@ use App\Livewire\Admin\JobCompanies\Edit as JobCompanyEdit;
 use App\Livewire\Admin\Media\Index as MediaIndex;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
 use App\Livewire\Student\Dashboard as StudentDashboard;
+use App\Livewire\Student\Exam as StudentExam;
 use App\Livewire\Practice;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\MediaController;
@@ -96,6 +97,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('/student/dashboard', StudentDashboard::class)->name('student.dashboard');
+    Route::get('/student/exam', StudentExam::class)->name('student.exam');
 });
 
 Route::middleware(['auth', 'role:teacher,student'])->group(function () {

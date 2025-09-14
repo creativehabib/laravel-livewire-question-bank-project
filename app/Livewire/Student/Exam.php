@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Livewire\Student;
+
+use Livewire\Component;
+use App\Models\{Subject, Chapter, Question, ExamResult};
+
+class Exam extends Component
+{
+    public $subjectId = '';
+    public $chapterId = '';
+    public $totalQuestions = 20;
+    public $duration = 20; // minutes
+
+    public $subjects = [];
+    public $chapters = [];
+
+    public $questions = [];
+    public $currentIndex = 0;
+    public $currentQuestion;
+    public $selectedOption;
+    public $score = 0;
+
+    public $examStarted = false;
+    public $examFinished = false;
+    public $timeLeft = 0; // seconds
+
+    public function mount(): void
+    {
+        $this->subjects = Subject::orderBy('name')->get();
+        $this->loadChapters();
+    }
+
+    protected function loadChapters(): void
+    {
+        $this->chapters = $this->subjectId
+            ? Chapter::where('subject_id', $this->subjectId)->orderBy('name')->get()
+            : Chapter::orderBy('name')->get();
+    }
+
+    public function updatedSubjectId(): void
+    {
+        $this->chapterId = '';
+        $this->loadChapters();
+    }
+
+    public function startExam(): void
+    {
+        $query = Question::with('options');
+
+        if ($this->subjectId) {
+            $query->where('subject_id', $this->subjectId);
+        }
+
+        if ($this->chapterId) {
+            $query->where('chapter_id', $this->chapterId);
+        }
+
+        $this->questions = $query->inRandomOrder()->take($this->totalQuestions)->get();
+        $this->currentIndex = 0;
+        $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
+        $this->score = 0;
+        $this->selectedOption = null;
+        $this->examStarted = true;
+        $this->examFinished = false;
+        $this->timeLeft = $this->duration * 60;
+    }
+
+    public function selectOption(int $id): void
+    {
+        $this->selectedOption = $id;
+    }
+
+    public function next(): void
+    {
+        if (!$this->currentQuestion) {
+            return;
+        }
+
+        $selected = $this->currentQuestion->options->firstWhere('id', $this->selectedOption);
+        if ($selected && $selected->is_correct) {
+            $this->score++;
+        }
+
+        $this->currentIndex++;
+        if ($this->currentIndex < count($this->questions)) {
+            $this->currentQuestion = $this->questions[$this->currentIndex];
+            $this->selectedOption = null;
+        } else {
+            $this->finishExam();
+        }
+    }
+
+    public function tick(): void
+    {
+        if ($this->examStarted && $this->timeLeft > 0) {
+            $this->timeLeft--;
+            if ($this->timeLeft === 0) {
+                $this->finishExam();
+            }
+        }
+    }
+
+    protected function finishExam(): void
+    {
+        $this->examStarted = false;
+        $this->examFinished = true;
+        ExamResult::create([
+            'user_id' => auth()->id(),
+            'score'   => $this->score,
+        ]);
+    }
+
+    public function resetExam(): void
+    {
+        $this->examStarted = false;
+        $this->examFinished = false;
+        $this->questions = [];
+        $this->currentQuestion = null;
+        $this->currentIndex = 0;
+        $this->score = 0;
+        $this->selectedOption = null;
+        $this->timeLeft = 0;
+    }
+
+    public function render()
+    {
+        return view('livewire.student.exam')
+            ->layout('layouts.admin', ['title' => 'Exam']);
+    }
+}
