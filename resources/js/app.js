@@ -171,7 +171,23 @@ function initializeApp() {
     attachFormulaClickHandler();
 }
 
+// --- MathJax re-render helper ---
+function renderMath() {
+    if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+        window.MathJax.typesetPromise();
+    }
+}
+
 // Initial page load
-document.addEventListener('DOMContentLoaded', initializeApp);
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    renderMath();
+});
 // After every Livewire navigation
-document.addEventListener('livewire:navigated', initializeApp);
+document.addEventListener('livewire:navigated', () => {
+    initializeApp();
+    renderMath();
+});
+
+// When Livewire updates existing DOM
+document.addEventListener('livewire:update', renderMath);
