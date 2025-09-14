@@ -21,7 +21,7 @@
                 @forelse($jobs as $job)
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                         <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $job->id }}</td>
-                        <td class="px-4 py-2">{{ $job->title }}</td>
+                        <td class="px-4 py-2">{!! $job->description !!} </td>
                         <td class="px-4 py-2">{{ $job->company?->name }}</td>
                         <td class="px-4 py-2">{{ ucfirst($job->status->value) }}</td>
                         <td class="px-4 py-2 space-x-2">
