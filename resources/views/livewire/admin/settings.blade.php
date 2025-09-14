@@ -7,8 +7,8 @@
         <div>
             <label class="block text-sm font-medium mb-1">Chat retention period</label>
             <div class="flex space-x-2">
-                <input type="number" min="1" wire:model="chat_retention_value" class="w-full border rounded p-2">
-                <select wire:model="chat_retention_unit" class="border rounded p-2">
+                <input type="number" min="1" wire:model="chat_retention_value" class="input-field">
+                <select wire:model="chat_retention_unit" class="input-field">
                     <option value="hours">Hours</option>
                     <option value="days">Days</option>
                 </select>
@@ -22,14 +22,14 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Chat message max length</label>
-            <input type="number" min="1" wire:model="chat_message_max_length" class="w-full border rounded p-2">
+            <input type="number" min="1" wire:model="chat_message_max_length" class="input-field">
             @error('chat_message_max_length')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Chat daily message limit</label>
-            <input type="number" min="1" wire:model="chat_daily_message_limit" class="w-full border rounded p-2">
+            <input type="number" min="1" wire:model="chat_daily_message_limit" class="input-field">
             @error('chat_daily_message_limit')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
@@ -40,7 +40,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Upload chat message tone</label>
-            <input type="file" wire:model="chat_tone" accept="audio/*" class="w-full border rounded p-2">
+            <input type="file" wire:model="chat_tone" accept="audio/*" class="input-field">
             @if ($chat_tone_url)
                 <audio controls class="mt-2" src="{{ $chat_tone_url }}"></audio>
             @endif
@@ -54,7 +54,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">AI Provider</label>
-            <select wire:model.live="chat_ai_provider" class="w-full border rounded p-2">
+            <select wire:model.live="chat_ai_provider" class="input-field">
                 <option value="openai">OpenAI</option>
                 <option value="gemini">Gemini</option>
             </select>
@@ -64,7 +64,7 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Admin offline minutes before AI responds</label>
-            <input type="number" min="1" wire:model="chat_ai_admin_offline_minutes" class="w-full border rounded p-2">
+            <input type="number" min="1" wire:model="chat_ai_admin_offline_minutes" class="input-field">
             @error('chat_ai_admin_offline_minutes')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
@@ -72,7 +72,7 @@
         @if ($chat_ai_provider === 'openai')
             <div wire:key="openai-key-input">
                 <label class="block text-sm font-medium mb-1">OpenAI API Key</label>
-                <input type="text" wire:model="openai_api_key" class="w-full border rounded p-2">
+                <input type="text" wire:model="openai_api_key" class="input-field">
                 @error('openai_api_key')
                     <div class="text-red-600 text-sm">{{ $message }}</div>
                 @enderror
@@ -80,7 +80,7 @@
         @elseif ($chat_ai_provider === 'gemini')
             <div wire:key="gemini-key-input">
                 <label class="block text-sm font-medium mb-1">Gemini API Key</label>
-                <input type="text" wire:model="gemini_api_key" class="w-full border rounded p-2">
+                <input type="text" wire:model="gemini_api_key" class="input-field">
                 @error('gemini_api_key')
                     <div class="text-red-600 text-sm">{{ $message }}</div>
                 @enderror
@@ -88,7 +88,7 @@
         @endif
         <div>
             <label class="block text-sm font-medium mb-1">Timezone</label>
-            <select wire:model="timezone" class="w-full border rounded p-2">
+            <select wire:model="timezone" class="input-field">
                 @foreach($timezones as $tz)
                     <option value="{{ $tz }}">{{ $tz }}</option>
                 @endforeach
@@ -107,14 +107,14 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Google Client ID</label>
-            <input type="text" wire:model="google_client_id" class="w-full border rounded p-2">
+            <input type="text" wire:model="google_client_id" class="input-field">
             @error('google_client_id')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Google Client Secret</label>
-            <input type="text" wire:model="google_client_secret" class="w-full border rounded p-2">
+            <input type="text" wire:model="google_client_secret" class="input-field">
             @error('google_client_secret')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
@@ -125,14 +125,14 @@
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Facebook Client ID</label>
-            <input type="text" wire:model="facebook_client_id" class="w-full border rounded p-2">
+            <input type="text" wire:model="facebook_client_id" class="input-field">
             @error('facebook_client_id')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
         <div>
             <label class="block text-sm font-medium mb-1">Facebook Client Secret</label>
-            <input type="text" wire:model="facebook_client_secret" class="w-full border rounded p-2">
+            <input type="text" wire:model="facebook_client_secret" class="input-field">
             @error('facebook_client_secret')
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror

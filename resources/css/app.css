@@ -46,3 +46,11 @@ body {
 .ts-dropdown .option {
     @apply px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700;
 }
+
+.input-field{
+    @apply w-full px-3 py-2 border rounded text-sm border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200;
+}
+.ts-control{
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}

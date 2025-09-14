@@ -3,46 +3,46 @@
         <div class="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Title</label>
-                <input type="text" wire:model="title" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                <input type="text" wire:model="title" class="input-field" />
                 @error('title') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Slug</label>
-                <input type="text" wire:model="slug" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                <input type="text" wire:model="slug" class="input-field" />
                 @error('slug') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Summary</label>
-                <textarea wire:model="summary" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                <textarea wire:model="summary" class="input-field"></textarea>
                 @error('summary') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Description</label>
                 <div wire:ignore>
-                    <textarea wire:model="description" id="content" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                    <textarea wire:model="description" id="content" class="input-field"></textarea>
                     @error('description') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Title</label>
-                <input type="text" wire:model="seo_title" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                <input type="text" wire:model="seo_title" class="input-field" />
                 @error('seo_title') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Description</label>
-                <textarea wire:model="seo_description" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"></textarea>
+                <textarea wire:model="seo_description" class="input-field"></textarea>
                 @error('seo_description') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">SEO Keywords</label>
-                <input type="text" wire:model="seo_keywords" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                <input type="text" wire:model="seo_keywords" class="input-field" />
                 @error('seo_keywords') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
         </div>
         <div class="col-span-1 bg-white dark:bg-gray-800 p-6 rounded-lg shadow space-y-4">
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Category</label>
-                <select wire:model="category_id" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                <select wire:model="category_id" class="input-field">
                     <option value="">Select category</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -52,22 +52,22 @@
             </div>
             <div>
                 <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Company Name</label>
-                <input type="text" wire:model="company_name" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                <input type="text" wire:model="company_name" class="input-field" />
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Deadline</label>
-                    <input type="date" wire:model="deadline" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                    <input type="date" wire:model="deadline" class="input-field" />
                 </div>
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Posted At</label>
-                    <input type="datetime-local" wire:model="posted_at" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" />
+                    <input type="datetime-local" wire:model="posted_at" class="input-field" />
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">Status</label>
-                    <select wire:model="status" class="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                    <select wire:model="status" class="input-field">
                         @foreach(\App\Enums\JobStatus::cases() as $status)
                             <option value="{{ $status->value }}">{{ ucfirst($status->value) }}</option>
                         @endforeach
@@ -106,7 +106,7 @@
 
             const editor = CKEDITOR.replace('content', {
                 // Add extra plugins for math equations and table resizing
-                extraPlugins: ['mathjax,tableresize'],
+                extraPlugins: ['mathjax,tableresize','wordcount','notification'],
 
                 // Set the path to the MathJax library
                 mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML',

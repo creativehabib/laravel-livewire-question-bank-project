@@ -2,7 +2,7 @@
     <form wire:submit.prevent="update" class="space-y-4 max-w-md">
         <div wire:ignore>
             <label class="block mb-1">Subject</label>
-            <select id="subject" class="border p-2 rounded w-full">
+            <select id="subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">-- Select --</option>
                 @foreach($subjects as $sub)
                     <option value="{{ $sub->id }}" @selected($sub->id == $subject_id)>{{ $sub->name }}</option>
@@ -12,7 +12,7 @@
         </div>
         <div wire:ignore>
             <label class="block mb-1">Sub Subject</label>
-            <select id="sub_subject" class="border p-2 rounded w-full">
+            <select id="sub_subject" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">-- Select --</option>
                 @foreach($subSubjects as $subSubject)
                     <option value="{{ $subSubject->id }}" @selected($subSubject->id == $sub_subject_id)>{{ $subSubject->name }}</option>
@@ -22,7 +22,7 @@
         </div>
         <div>
             <label class="block mb-1">Name</label>
-            <input type="text" wire:model="name" class="border p-2 rounded w-full">
+            <input type="text" wire:model="name" class="input-field">
             @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Update Chapter</button>
