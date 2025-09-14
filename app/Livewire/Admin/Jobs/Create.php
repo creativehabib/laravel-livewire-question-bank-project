@@ -37,7 +37,7 @@ class Create extends Component
             'title' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:job_posts,slug',
             'category_id' => 'nullable|exists:job_categories,id',
-            'company_id' => 'nullable|exists:job_companies, id',
+            'company_id' => 'nullable|exists:job_companies,id',
             'summary' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'deadline' => 'nullable|date',
