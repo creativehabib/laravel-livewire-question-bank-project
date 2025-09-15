@@ -23,17 +23,17 @@
     @elseif($examStarted)
         <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
             <div class="flex justify-between mb-4">
-                <div>প্রশ্ন {{ $currentIndex + 1 }} / {{ $questions->count() }}</div>
+                <div>প্রশ্ন {{ $this->banglaNumber($currentIndex + 1) }} / {{ $this->banglaNumber($questions->count()) }}</div>
                 <div>সময়: {{ gmdate('i:s', $timeLeft) }}</div>
             </div>
 
-            <div class="mb-4 prose max-w-none">{!! $currentQuestion->title !!}</div>
+            <div class="mb-4 prose max-w-none">{{ $this->banglaNumber($currentIndex + 1) }}. {!! $currentQuestion->title !!}</div>
 
             <ul class="space-y-2">
-                @foreach($currentQuestion->options as $opt)
+                @foreach($currentQuestion->options as $index => $opt)
                     <li>
                         <button wire:click="selectOption({{ $opt->id }})" class="border px-3 py-2 rounded w-full text-left @if($selectedOption == $opt->id) bg-indigo-100 @endif">
-                            {!! $opt->option_text !!}
+                            <span class="mr-2">({{ $this->optionLabel($index) }})</span>{!! $opt->option_text !!}
                         </button>
                     </li>
                 @endforeach

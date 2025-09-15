@@ -123,6 +123,18 @@ class Exam extends Component
         $this->timeLeft = 0;
     }
 
+    public function banglaNumber(int $number): string
+    {
+        $banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        return str_replace(range(0, 9), $banglaDigits, (string) $number);
+    }
+
+    public function optionLabel(int $index): string
+    {
+        $labels = ['ক', 'খ', 'গ', 'ঘ'];
+        return $labels[$index] ?? '';
+    }
+
     public function render()
     {
         return view('livewire.student.exam')
