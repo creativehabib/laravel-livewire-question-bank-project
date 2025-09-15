@@ -44,22 +44,6 @@
 
             <div class="text-center">
                 <button wire:click="submitExam" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
-
-            <div class="mb-4 prose max-w-none flex font-bold align-middle space-x-2"><span>{{ $this->banglaNumber($currentIndex + 1) }}.</span> <span>{!! $currentQuestion->title !!}</span></div>
-
-            <ul class="space-y-2">
-                @foreach($currentQuestion->options as $index => $opt)
-                    <li>
-                        <button wire:click="selectOption({{ $opt->id }})" class="border flex px-3 py-2 rounded w-full text-left @if($selectedOption == $opt->id) bg-indigo-100 @endif">
-                            <span class="mr-2">({{ $this->optionLabel($index) }})</span>{!! $opt->option_text !!}
-                        </button>
-                    </li>
-                @endforeach
-            </ul>
-
-            <div class="mt-4">
-                <button wire:click="next" class="bg-blue-500 text-white px-4 py-2 rounded" @disabled(!$selectedOption)>Next</button>
-
             </div>
 
             <script>
