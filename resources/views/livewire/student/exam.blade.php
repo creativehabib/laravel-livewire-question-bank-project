@@ -27,12 +27,12 @@
                 <div>সময়: {{ gmdate('i:s', $timeLeft) }}</div>
             </div>
 
-            <div class="mb-4 prose max-w-none">{{ $this->banglaNumber($currentIndex + 1) }}. {!! $currentQuestion->title !!}</div>
+            <div class="mb-4 prose max-w-none flex font-bold align-middle space-x-2"><span>{{ $this->banglaNumber($currentIndex + 1) }}.</span> <span>{!! $currentQuestion->title !!}</span></div>
 
             <ul class="space-y-2">
                 @foreach($currentQuestion->options as $index => $opt)
                     <li>
-                        <button wire:click="selectOption({{ $opt->id }})" class="border px-3 py-2 rounded w-full text-left @if($selectedOption == $opt->id) bg-indigo-100 @endif">
+                        <button wire:click="selectOption({{ $opt->id }})" class="border flex px-3 py-2 rounded w-full text-left @if($selectedOption == $opt->id) bg-indigo-100 @endif">
                             <span class="mr-2">({{ $this->optionLabel($index) }})</span>{!! $opt->option_text !!}
                         </button>
                     </li>
