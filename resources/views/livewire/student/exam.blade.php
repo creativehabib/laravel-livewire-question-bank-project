@@ -30,12 +30,12 @@
 
             @foreach($questions as $index => $question)
                 <div class="space-y-2">
-                    <div class="prose max-w-none">{{ $this->banglaNumber($index + 1) }}. {!! $question->title !!}</div>
+                    <div class="prose max-w-none flex align-middle space-x-2"><span>{{ $this->banglaNumber($index + 1) }}.</span> <span>{!! $question->title !!}</span></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                         @foreach($question->options as $optIndex => $opt)
                             <label class="border rounded p-3 flex items-start space-x-2 cursor-pointer">
                                 <input type="radio" class="mt-1" wire:model="selectedOptions.{{ $question->id }}" value="{{ $opt->id }}">
-                                <span><span class="mr-2">({{ $this->optionLabel($optIndex) }})</span>{!! $opt->option_text !!}</span>
+                                <span class="flex align-middle"><span class="mr-2">({{ $this->optionLabel($optIndex) }})</span>{!! $opt->option_text !!}</span>
                             </label>
                         @endforeach
                     </div>
