@@ -16,9 +16,7 @@ class Exam extends Component
     public $chapters = [];
 
     public $questions = [];
-    public $currentIndex = 0;
-    public $currentQuestion;
-    public $selectedOption;
+    public $selectedOptions = [];
     public $score = 0;
 
     public $examStarted = false;
@@ -57,38 +55,26 @@ class Exam extends Component
         }
 
         $this->questions = $query->inRandomOrder()->take($this->totalQuestions)->get();
-        $this->currentIndex = 0;
-        $this->currentQuestion = $this->questions[$this->currentIndex] ?? null;
         $this->score = 0;
-        $this->selectedOption = null;
+        $this->selectedOptions = [];
         $this->examStarted = true;
         $this->examFinished = false;
         $this->timeLeft = $this->duration * 60;
     }
 
-    public function selectOption(int $id): void
+    public function submitExam(): void
     {
-        $this->selectedOption = $id;
-    }
-
-    public function next(): void
-    {
-        if (!$this->currentQuestion) {
-            return;
+        $this->score = 0;
+        foreach ($this->questions as $question) {
+            $selectedOptionId = $this->selectedOptions[$question->id] ?? null;
+            if ($selectedOptionId) {
+                $selected = $question->options->firstWhere('id', $selectedOptionId);
+                if ($selected && $selected->is_correct) {
+                    $this->score++;
+                }
+            }
         }
-
-        $selected = $this->currentQuestion->options->firstWhere('id', $this->selectedOption);
-        if ($selected && $selected->is_correct) {
-            $this->score++;
-        }
-
-        $this->currentIndex++;
-        if ($this->currentIndex < count($this->questions)) {
-            $this->currentQuestion = $this->questions[$this->currentIndex];
-            $this->selectedOption = null;
-        } else {
-            $this->finishExam();
-        }
+        $this->finishExam();
     }
 
     public function tick(): void
@@ -96,7 +82,7 @@ class Exam extends Component
         if ($this->examStarted && $this->timeLeft > 0) {
             $this->timeLeft--;
             if ($this->timeLeft === 0) {
-                $this->finishExam();
+                $this->submitExam();
             }
         }
     }
@@ -116,10 +102,8 @@ class Exam extends Component
         $this->examStarted = false;
         $this->examFinished = false;
         $this->questions = [];
-        $this->currentQuestion = null;
-        $this->currentIndex = 0;
+        $this->selectedOptions = [];
         $this->score = 0;
-        $this->selectedOption = null;
         $this->timeLeft = 0;
     }
 

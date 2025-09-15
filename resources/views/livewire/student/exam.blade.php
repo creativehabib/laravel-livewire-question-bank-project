@@ -21,11 +21,29 @@
             <button wire:click="startExam" class="w-full bg-indigo-500 text-white py-2 rounded">পরীক্ষা শুরু করো</button>
         </div>
     @elseif($examStarted)
-        <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
-            <div class="flex justify-between mb-4">
-                <div>প্রশ্ন {{ $this->banglaNumber($currentIndex + 1) }} / {{ $this->banglaNumber($questions->count()) }}</div>
-                <div>সময়: {{ gmdate('i:s', $timeLeft) }}</div>
+        <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow space-y-6">
+            <div class="flex justify-between">
+                <div class="font-semibold">Time Left: {{ gmdate('i:s', $timeLeft) }}</div>
+                <div class="text-sm text-red-600">Auto-submitted when time is up.</div>
             </div>
+
+
+            @foreach($questions as $index => $question)
+                <div class="space-y-2">
+                    <div class="prose max-w-none">{{ $this->banglaNumber($index + 1) }}. {!! $question->title !!}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        @foreach($question->options as $optIndex => $opt)
+                            <label class="border rounded p-3 flex items-start space-x-2 cursor-pointer">
+                                <input type="radio" class="mt-1" wire:model="selectedOptions.{{ $question->id }}" value="{{ $opt->id }}">
+                                <span><span class="mr-2">({{ $this->optionLabel($optIndex) }})</span>{!! $opt->option_text !!}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+
+            <div class="text-center">
+                <button wire:click="submitExam" class="bg-blue-500 text-white px-4 py-2 rounded">Submit</button>
 
             <div class="mb-4 prose max-w-none flex font-bold align-middle space-x-2"><span>{{ $this->banglaNumber($currentIndex + 1) }}.</span> <span>{!! $currentQuestion->title !!}</span></div>
 
@@ -41,6 +59,7 @@
 
             <div class="mt-4">
                 <button wire:click="next" class="bg-blue-500 text-white px-4 py-2 rounded" @disabled(!$selectedOption)>Next</button>
+
             </div>
 
             <script>
