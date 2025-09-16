@@ -34,7 +34,7 @@ class RolePrompt extends Component
 
         $user = $this->currentUser();
 
-        if (! $user) {
+        if (! $user || ! $this->hasVerifiedEmail($user)) {
             return;
         }
 
@@ -75,7 +75,7 @@ class RolePrompt extends Component
 
         $user = $this->currentUser();
 
-        if (! $user) {
+        if (! $user || ! $this->hasVerifiedEmail($user)) {
             return;
         }
 
@@ -103,6 +103,12 @@ class RolePrompt extends Component
         $user = $this->currentUser();
 
         if (! $user || $user->role === Role::ADMIN) {
+            $this->showRoleModal = false;
+            $this->showTeacherForm = false;
+            return;
+        }
+
+        if (! $this->hasVerifiedEmail($user)) {
             $this->showRoleModal = false;
             $this->showTeacherForm = false;
             return;
@@ -156,5 +162,14 @@ class RolePrompt extends Component
         $user = Auth::user();
 
         return $user instanceof User ? $user : null;
+    }
+
+    protected function hasVerifiedEmail(User $user): bool
+    {
+        if (method_exists($user, 'hasVerifiedEmail')) {
+            return $user->hasVerifiedEmail();
+        }
+
+        return (bool) $user->email_verified_at;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -29,8 +31,14 @@ class RegistrationTest extends TestCase
 
         $component->call('register');
 
-        $component->assertRedirect(route('dashboard', absolute: false));
+        $component->assertRedirect(route('verification.notice', absolute: false));
 
         $this->assertAuthenticated();
+
+        $user = User::where('email', 'test@example.com')->first();
+
+        $this->assertNotNull($user);
+        $this->assertNull($user->role_confirmed_at);
+        $this->assertEquals(Role::STUDENT, $user->role);
     }
 }
