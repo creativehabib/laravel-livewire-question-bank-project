@@ -31,6 +31,7 @@
         <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden"></div>
     </div>
     @auth
+        <livewire:auth.role-prompt />
         <livewire:chat-popup />
     @endauth
     @livewireScripts

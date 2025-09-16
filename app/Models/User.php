@@ -27,6 +27,13 @@ class User extends Authenticatable
         'password',
         'role',
         'avatar_url',
+        'department',
+        'district',
+        'upazila',
+        'phone',
+        'address',
+        'role_confirmed_at',
+        'teacher_profile_completed_at',
     ];
 
     /**
@@ -50,6 +57,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'role_confirmed_at' => 'datetime',
+            'teacher_profile_completed_at' => 'datetime',
         ];
     }
 
