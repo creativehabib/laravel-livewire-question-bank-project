@@ -33,6 +33,7 @@
 
 {{-- ✅ Scripts --}}
 @auth
+    <livewire:auth.role-prompt />
     <livewire:chat-popup />
 @endauth
 <script>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Auth\Events\Registered;
@@ -30,6 +31,7 @@ new #[Layout('layouts.guest')] class extends Component
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['role'] = Role::STUDENT;
 
         event(new Registered($user = User::create($validated)));
 

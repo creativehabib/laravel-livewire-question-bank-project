@@ -57,6 +57,7 @@ class SocialiteController
                 'email' => $socialUser->getEmail(),
                 'password' => Hash::make(Str::random(16)),
                 'role' => Role::STUDENT,
+                'role_confirmed_at' => now(),
                 'email_verified_at' => now(),
                 'avatar_url' => $socialUser->getAvatar(),
             ]);
