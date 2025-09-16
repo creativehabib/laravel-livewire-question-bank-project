@@ -1,11 +1,15 @@
 <?php
 
 use App\Enums\Role;
-use App\Models\User;
+use App\Mail\EmailRegistrationLink;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -18,12 +22,28 @@ new #[Layout('layouts.guest')] class extends Component
     public string $password_confirmation = '';
     public bool $googleLogin = false;
     public bool $facebookLogin = false;
+    public bool $manualRegistrationEnabled = true;
+    public string $emailRegistrationName = '';
+    public string $emailRegistrationEmail = '';
+    public string $emailRegistrationRole;
 
     /**
      * Handle an incoming registration request.
      */
     public function register(): void
     {
+        if (! (bool) Setting::get('registration_enabled', true)) {
+            $this->addError('email', __('Registration is currently disabled.'));
+
+            return;
+        }
+
+        if (! $this->manualRegistrationEnabled) {
+            $this->addError('email', __('Manual registration is currently disabled. Please use the email registration form below.'));
+
+            return;
+        }
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
@@ -41,14 +61,52 @@ new #[Layout('layouts.guest')] class extends Component
         $this->redirect(route('verification.notice', absolute: false), navigate: true);
     }
 
+    public function sendRegistrationLink(): void
+    {
+        if (! (bool) Setting::get('registration_enabled', true)) {
+            $this->addError('emailRegistrationEmail', __('Registration is currently disabled.'));
+
+            return;
+        }
+
+        $this->validate([
+            'emailRegistrationName' => ['required', 'string', 'max:255'],
+            'emailRegistrationEmail' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'emailRegistrationRole' => ['required', Rule::in([Role::TEACHER->value, Role::STUDENT->value])],
+        ]);
+
+        $role = Role::from($this->emailRegistrationRole);
+
+        $url = URL::temporarySignedRoute('auth.email-register', now()->addMinutes(60), [
+            'email' => $this->emailRegistrationEmail,
+            'name' => $this->emailRegistrationName,
+            'role' => $role->value,
+        ]);
+
+        Mail::to($this->emailRegistrationEmail)->send(
+            new EmailRegistrationLink($this->emailRegistrationName, $this->emailRegistrationEmail, $role, $url)
+        );
+
+        session()->flash('status', __('We have emailed you a link to complete your registration.'));
+
+        $this->reset(['emailRegistrationName', 'emailRegistrationEmail']);
+        $this->emailRegistrationRole = Role::STUDENT->value;
+    }
+
     public function mount(): void
     {
         $this->googleLogin = (bool) Setting::get('google_login_enabled', false);
         $this->facebookLogin = (bool) Setting::get('facebook_login_enabled', false);
+        $this->manualRegistrationEnabled = (bool) Setting::get('manual_registration_enabled', true);
+        $this->emailRegistrationRole = Role::STUDENT->value;
     }
-}; ?>
+};
+?>
 
 <div>
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
     @if ($googleLogin || $facebookLogin)
         <div class="mb-4 space-y-2">
             @if ($googleLogin)
@@ -72,52 +130,93 @@ new #[Layout('layouts.guest')] class extends Component
             @endif
         </div>
     @endif
-    <form wire:submit="register">
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+
+    @if ($manualRegistrationEnabled)
+        <form wire:submit="register">
+            <!-- Name -->
+            <div>
+                <x-input-label for="name" :value="__('Name')" />
+                <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
+                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            </div>
+
+            <!-- Email Address -->
+            <div class="mt-4">
+                <x-input-label for="email" :value="__('Email')" />
+                <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </div>
+
+            <!-- Password -->
+            <div class="mt-4">
+                <x-input-label for="password" :value="__('Password')" />
+
+                <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
+                                type="password"
+                                name="password"
+                                required autocomplete="new-password" />
+
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mt-4">
+                <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+
+                <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
+                                type="password"
+                                name="password_confirmation" required autocomplete="new-password" />
+
+                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            </div>
+
+            <div class="flex items-center justify-end mt-4">
+                <x-primary-button class="ms-4">
+                    {{ __('Register') }}
+                </x-primary-button>
+            </div>
+        </form>
+    @else
+        <div class="mb-6 text-sm text-gray-600">
+            {{ __('Manual registration is disabled. Use the email confirmation option below to create your account.') }}
         </div>
+    @endif
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold">{{ __('Register with a confirmation email') }}</h2>
+        <p class="text-sm text-gray-600 mt-1">{{ __('Tell us who you are and we will email you a confirmation link. You must confirm whether you are registering as a student or teacher to finish the process.') }}</p>
+        <form wire:submit="sendRegistrationLink" class="mt-4 space-y-4">
+            <div>
+                <x-input-label for="email_registration_name" :value="__('Name')" />
+                <x-text-input wire:model="emailRegistrationName" id="email_registration_name" class="block mt-1 w-full" type="text" name="email_registration_name" required autocomplete="name" />
+                <x-input-error :messages="$errors->get('emailRegistrationName')" class="mt-2" />
+            </div>
+            <div>
+                <x-input-label for="email_registration_email" :value="__('Email')" />
+                <x-text-input wire:model="emailRegistrationEmail" id="email_registration_email" class="block mt-1 w-full" type="email" name="email_registration_email" required autocomplete="username" />
+                <x-input-error :messages="$errors->get('emailRegistrationEmail')" class="mt-2" />
+            </div>
+            <div>
+                <span class="block text-sm font-medium text-gray-700">{{ __('I am registering as') }}</span>
+                <div class="mt-2 space-y-2">
+                    <label class="inline-flex items-center">
+                        <input type="radio" value="{{ Role::STUDENT->value }}" wire:model="emailRegistrationRole" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2">{{ __('Student') }}</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" value="{{ Role::TEACHER->value }}" wire:model="emailRegistrationRole" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2">{{ __('Teacher') }}</span>
+                    </label>
+                </div>
+                <x-input-error :messages="$errors->get('emailRegistrationRole')" class="mt-2" />
+            </div>
+            <x-primary-button>
+                {{ __('Email me a registration link') }}
             </x-primary-button>
-        </div>
-    </form>
+        </form>
+    </div>
+
+    <div class="mt-6 text-center">
+        <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('login') }}" wire:navigate>{{ __('Already registered?') }}</a>
+    </div>
 </div>
