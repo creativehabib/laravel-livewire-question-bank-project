@@ -1,8 +1,12 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
-use Illuminate\Support\Facades\Session;
+use App\Mail\EmailLoginLink;
 use App\Models\Setting;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -12,12 +16,15 @@ new #[Layout('layouts.guest')] class extends Component
     public bool $googleLogin = false;
     public bool $facebookLogin = false;
     public bool $registrationEnabled = true;
+    public bool $manualLoginEnabled = true;
+    public string $loginEmail = '';
 
     public function mount(): void
     {
         $this->googleLogin = (bool) Setting::get('google_login_enabled', false);
         $this->facebookLogin = (bool) Setting::get('facebook_login_enabled', false);
         $this->registrationEnabled = (bool) Setting::get('registration_enabled', true);
+        $this->manualLoginEnabled = (bool) Setting::get('manual_login_enabled', true);
     }
 
     /**
@@ -25,6 +32,12 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function login(): void
     {
+        if (! $this->manualLoginEnabled) {
+            $this->addError('form.email', __('Manual login is currently disabled. Please use the email link option below.'));
+
+            return;
+        }
+
         $this->validate();
 
         $this->form->authenticate();
@@ -33,7 +46,33 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
-}; ?>
+
+    public function sendLoginLink(): void
+    {
+        $this->validate([
+            'loginEmail' => ['required', 'string', 'email', 'exists:'.User::class.',email'],
+        ], [
+            'loginEmail.exists' => __('We could not find a user with that email address.'),
+        ]);
+
+        $user = User::where('email', $this->loginEmail)->first();
+
+        if (! $user) {
+            return;
+        }
+
+        $url = URL::temporarySignedRoute('auth.email-login', now()->addMinutes(30), [
+            'user' => $user->id,
+        ]);
+
+        Mail::to($user->email)->send(new EmailLoginLink($user, $url));
+
+        session()->flash('status', __('We have emailed your login link!'));
+
+        $this->reset('loginEmail');
+    }
+};
+?>
 
 <div>
     <!-- Session Status -->
@@ -63,49 +102,71 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
     @endif
 
-    <form wire:submit="login">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-        @if ($registrationEnabled && Route::has('register'))
-            <div class="mt-4 text-center">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}" wire:navigate>{{ __('Register') }}</a>
+    @if ($manualLoginEnabled)
+        <form wire:submit="login">
+            <!-- Email Address -->
+            <div>
+                <x-input-label for="email" :value="__('Email')" />
+                <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
+                <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
             </div>
-        @endif
-    </form>
+
+            <!-- Password -->
+            <div class="mt-4">
+                <x-input-label for="password" :value="__('Password')" />
+
+                <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
+                                type="password"
+                                name="password"
+                                required autocomplete="current-password" />
+
+                <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+            </div>
+
+            <!-- Remember Me -->
+            <div class="block mt-4">
+                <label for="remember" class="inline-flex items-center">
+                    <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
+                    <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-end mt-4">
+                @if (Route::has('password.request'))
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
+                        {{ __('Forgot your password?') }}
+                    </a>
+                @endif
+
+                <x-primary-button class="ms-3">
+                    {{ __('Log in') }}
+                </x-primary-button>
+            </div>
+        </form>
+    @else
+        <div class="mb-6 text-sm text-gray-600">
+            {{ __('Manual email and password login is disabled. Request a secure login link below to access your account.') }}
+        </div>
+    @endif
+
+    <div class="mt-8">
+        <h2 class="text-lg font-semibold">{{ __('Log in with a secure email link') }}</h2>
+        <p class="text-sm text-gray-600 mt-1">{{ __('Enter your email address and we will send you a temporary link to access your account.') }}</p>
+        <form wire:submit="sendLoginLink" class="mt-4 space-y-4">
+            <div>
+                <x-input-label for="login_email" :value="__('Email')" />
+                <x-text-input wire:model="loginEmail" id="login_email" class="block mt-1 w-full" type="email" name="login_email" required autocomplete="username" />
+                <x-input-error :messages="$errors->get('loginEmail')" class="mt-2" />
+            </div>
+            <x-primary-button>
+                {{ __('Email me a login link') }}
+            </x-primary-button>
+        </form>
+    </div>
+
+    @if ($registrationEnabled && Route::has('register'))
+        <div class="mt-6 text-center">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}" wire:navigate>{{ __('Register') }}</a>
+        </div>
+    @endif
 </div>

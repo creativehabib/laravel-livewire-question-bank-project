@@ -99,7 +99,15 @@
         </div>
         <div class="flex items-center space-x-2">
             <input type="checkbox" wire:model="registration_enabled" id="registration_enabled">
-            <label for="registration_enabled" class="text-sm font-medium">Allow new user registration</label>
+            <label for="registration_enabled" class="text-sm font-medium">Allow self registration</label>
+        </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="manual_registration_enabled" id="manual_registration_enabled">
+            <label for="manual_registration_enabled" class="text-sm font-medium">Enable manual registration form</label>
+        </div>
+        <div class="flex items-center space-x-2">
+            <input type="checkbox" wire:model="manual_login_enabled" id="manual_login_enabled">
+            <label for="manual_login_enabled" class="text-sm font-medium">Enable manual email &amp; password login</label>
         </div>
         <div class="flex items-center space-x-2">
             <input type="checkbox" wire:model="google_login_enabled" id="google_login_enabled">

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\EmailLoginController;
+use App\Http\Controllers\Auth\EmailRegistrationController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Livewire\Actions\Logout;
@@ -24,6 +26,14 @@ Route::middleware('guest')->group(function () {
 
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('social.redirect');
     Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('social.callback');
+
+    Route::get('email-login/{user}', EmailLoginController::class)
+        ->middleware('signed')
+        ->name('auth.email-login');
+
+    Route::get('email-register', EmailRegistrationController::class)
+        ->middleware('signed')
+        ->name('auth.email-register');
 });
 
 Route::middleware('auth')->group(function () {
