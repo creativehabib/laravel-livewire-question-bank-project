@@ -38,7 +38,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         @foreach($question->options as $optIndex => $opt)
                             <label
-                                class="border rounded p-4 flex items-center gap-3 cursor-pointer
+                                class="border rounded p-3 flex items-center gap-3 cursor-pointer
                                        hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <!-- Radio -->
                                 <input
