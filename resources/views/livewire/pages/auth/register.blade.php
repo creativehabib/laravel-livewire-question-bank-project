@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -16,6 +17,7 @@ new #[Layout('layouts.guest')] class extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public ?string $selectedRole = null;
     public bool $googleLogin = false;
     public bool $facebookLogin = false;
 
@@ -28,10 +30,16 @@ new #[Layout('layouts.guest')] class extends Component
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'selectedRole' => ['required', Rule::in([Role::TEACHER->value, Role::STUDENT->value])],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
-        $validated['role'] = Role::STUDENT;
+        $role = Role::from($validated['selectedRole']);
+
+        unset($validated['selectedRole']);
+
+        $validated['role'] = $role;
+        $validated['role_confirmed_at'] = now();
 
         event(new Registered($user = User::create($validated)));
 
@@ -107,6 +115,22 @@ new #[Layout('layouts.guest')] class extends Component
                             name="password_confirmation" required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label :value="__('Register as')" />
+            <div class="mt-2 space-y-2">
+                <label class="flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition hover:border-indigo-500/50 hover:bg-indigo-50 dark:border-gray-700 dark:hover:border-indigo-400 dark:hover:bg-indigo-500/10">
+                    <input type="radio" wire:model="selectedRole" value="teacher" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ __('Teacher') }}</span>
+                </label>
+
+                <label class="flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition hover:border-indigo-500/50 hover:bg-indigo-50 dark:border-gray-700 dark:hover:border-indigo-400 dark:hover:bg-indigo-500/10">
+                    <input type="radio" wire:model="selectedRole" value="student" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ __('Student') }}</span>
+                </label>
+            </div>
+            <x-input-error :messages="$errors->get('selectedRole')" class="mt-2" />
         </div>
 
         <div class="flex items-center justify-end mt-4">
