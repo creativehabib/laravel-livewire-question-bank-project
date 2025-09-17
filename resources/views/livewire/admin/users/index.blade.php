@@ -203,7 +203,7 @@
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                Livewire.dispatch('deleteUserConfirmed', { id: id });
+                Livewire.dispatch('deleteUserConfirmed', { userId: id });
             }
         });
     }
