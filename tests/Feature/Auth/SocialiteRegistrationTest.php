@@ -49,7 +49,7 @@ class SocialiteRegistrationTest extends TestCase
         $this->assertSame('Google User', $pending['name']);
     }
 
-    public function test_pending_social_registration_can_be_completed_with_selected_role(): void
+    public function test_pending_social_registration_can_be_completed_as_teacher_with_additional_details(): void
     {
         $this->mockSocialiteUser('teacher@example.com', 'Teacher Example');
 
@@ -58,6 +58,12 @@ class SocialiteRegistrationTest extends TestCase
 
         $response = $this->post('/auth/google/register', [
             'role' => Role::TEACHER->value,
+            'institution_name' => 'Example School',
+            'division' => 'Dhaka',
+            'district' => 'Dhaka',
+            'thana' => 'Dhanmondi',
+            'phone' => '01700000000',
+            'address' => 'House 1, Road 2, Dhaka',
         ]);
 
         $response->assertRedirect(route('dashboard'));
@@ -70,6 +76,44 @@ class SocialiteRegistrationTest extends TestCase
         $this->assertEquals(Role::TEACHER, $user->role);
         $this->assertNotNull($user->role_confirmed_at);
         $this->assertNotNull($user->email_verified_at);
+        $this->assertEquals('Example School', $user->institution_name);
+        $this->assertEquals('Dhaka', $user->division);
+        $this->assertEquals('Dhaka', $user->district);
+        $this->assertEquals('Dhanmondi', $user->thana);
+        $this->assertEquals('01700000000', $user->phone);
+        $this->assertEquals('House 1, Road 2, Dhaka', $user->address);
+        $this->assertNotNull($user->teacher_profile_completed_at);
+        $this->assertNull(session()->get('socialite.registration'));
+    }
+
+    public function test_pending_social_registration_can_be_completed_as_student_without_teacher_details(): void
+    {
+        $this->mockSocialiteUser('student@example.com', 'Student Example');
+
+        $this->get('/auth/google/callback')
+            ->assertRedirect(route('social.register.show', ['provider' => 'google']));
+
+        $response = $this->post('/auth/google/register', [
+            'role' => Role::STUDENT->value,
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+
+        $this->assertAuthenticated();
+
+        $user = User::where('email', 'student@example.com')->first();
+
+        $this->assertNotNull($user);
+        $this->assertEquals(Role::STUDENT, $user->role);
+        $this->assertNotNull($user->role_confirmed_at);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertNull($user->institution_name);
+        $this->assertNull($user->division);
+        $this->assertNull($user->district);
+        $this->assertNull($user->thana);
+        $this->assertNull($user->phone);
+        $this->assertNull($user->address);
+        $this->assertNull($user->teacher_profile_completed_at);
         $this->assertNull(session()->get('socialite.registration'));
     }
 
