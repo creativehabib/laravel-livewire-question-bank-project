@@ -15,9 +15,10 @@ class RolePrompt extends Component
     public bool $showRoleModal = false;
     public bool $showTeacherForm = false;
 
-    public string $department = '';
+    public string $institution_name = '';
+    public string $division = '';
     public string $district = '';
-    public string $upazila = '';
+    public string $thana = '';
     public string $phone = '';
     public string $address = '';
 
@@ -66,9 +67,10 @@ class RolePrompt extends Component
     public function submitTeacherForm(): void
     {
         $this->validate([
-            'department' => ['required', 'string', 'max:255'],
+            'institution_name' => ['required', 'string', 'max:255'],
+            'division' => ['required', 'string', 'max:255'],
             'district' => ['required', 'string', 'max:255'],
-            'upazila' => ['required', 'string', 'max:255'],
+            'thana' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:30'],
             'address' => ['required', 'string', 'max:1000'],
         ]);
@@ -80,9 +82,10 @@ class RolePrompt extends Component
         }
 
         $user->forceFill([
-            'department' => $this->department,
+            'institution_name' => $this->institution_name,
+            'division' => $this->division,
             'district' => $this->district,
-            'upazila' => $this->upazila,
+            'thana' => $this->thana,
             'phone' => $this->phone,
             'address' => $this->address,
             'teacher_profile_completed_at' => now(),
@@ -131,27 +134,30 @@ class RolePrompt extends Component
 
     protected function fillTeacherFields(User $user): void
     {
-        $this->department = (string) ($user->department ?? '');
+        $this->institution_name = (string) ($user->institution_name ?? '');
+        $this->division = (string) ($user->division ?? '');
         $this->district = (string) ($user->district ?? '');
-        $this->upazila = (string) ($user->upazila ?? '');
+        $this->thana = (string) ($user->thana ?? '');
         $this->phone = (string) ($user->phone ?? '');
         $this->address = (string) ($user->address ?? '');
     }
 
     protected function resetTeacherFields(): void
     {
-        $this->department = '';
+        $this->institution_name = '';
+        $this->division = '';
         $this->district = '';
-        $this->upazila = '';
+        $this->thana = '';
         $this->phone = '';
         $this->address = '';
     }
 
     protected function teacherProfileComplete(User $user): bool
     {
-        return ! empty($user->department)
+        return ! empty($user->institution_name)
+            && ! empty($user->division)
             && ! empty($user->district)
-            && ! empty($user->upazila)
+            && ! empty($user->thana)
             && ! empty($user->phone)
             && ! empty($user->address)
             && ! empty($user->teacher_profile_completed_at);

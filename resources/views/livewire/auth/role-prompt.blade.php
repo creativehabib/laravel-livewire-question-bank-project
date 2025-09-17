@@ -36,9 +36,15 @@
 
                 <form wire:submit.prevent="submitTeacherForm" class="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div class="col-span-1">
-                        <x-input-label for="teacher-department" :value="__('Department')" />
-                        <x-text-input id="teacher-department" type="text" wire:model.defer="department" class="mt-1 block w-full" />
-                        <x-input-error :messages="$errors->get('department')" class="mt-2" />
+                        <x-input-label for="teacher-institution-name" :value="__('Institution Name')" />
+                        <x-text-input id="teacher-institution-name" type="text" wire:model.defer="institution_name" class="mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('institution_name')" class="mt-2" />
+                    </div>
+
+                    <div class="col-span-1">
+                        <x-input-label for="teacher-division" :value="__('Division')" />
+                        <x-text-input id="teacher-division" type="text" wire:model.defer="division" class="mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('division')" class="mt-2" />
                     </div>
 
                     <div class="col-span-1">
@@ -48,13 +54,13 @@
                     </div>
 
                     <div class="col-span-1">
-                        <x-input-label for="teacher-upazila" :value="__('Upazila')" />
-                        <x-text-input id="teacher-upazila" type="text" wire:model.defer="upazila" class="mt-1 block w-full" />
-                        <x-input-error :messages="$errors->get('upazila')" class="mt-2" />
+                        <x-input-label for="teacher-thana" :value="__('Thana')" />
+                        <x-text-input id="teacher-thana" type="text" wire:model.defer="thana" class="mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('thana')" class="mt-2" />
                     </div>
 
                     <div class="col-span-1">
-                        <x-input-label for="teacher-phone" :value="__('Phone Number')" />
+                        <x-input-label for="teacher-phone" :value="__('Mobile Number')" />
                         <x-text-input id="teacher-phone" type="text" wire:model.defer="phone" class="mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                     </div>

@@ -11,10 +11,11 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('role_confirmed_at')->nullable()->after('role');
-            $table->string('department')->nullable()->after('avatar_url');
-            $table->string('district')->nullable()->after('department');
-            $table->string('upazila')->nullable()->after('district');
-            $table->string('phone')->nullable()->after('upazila');
+            $table->string('institution_name')->nullable()->after('avatar_url');
+            $table->string('division')->nullable()->after('institution_name');
+            $table->string('district')->nullable()->after('division');
+            $table->string('thana')->nullable()->after('district');
+            $table->string('phone')->nullable()->after('thana');
             $table->text('address')->nullable()->after('phone');
             $table->timestamp('teacher_profile_completed_at')->nullable()->after('address');
         });
@@ -29,9 +30,10 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn([
                 'role_confirmed_at',
-                'department',
+                'institution_name',
+                'division',
                 'district',
-                'upazila',
+                'thana',
                 'phone',
                 'address',
                 'teacher_profile_completed_at',
