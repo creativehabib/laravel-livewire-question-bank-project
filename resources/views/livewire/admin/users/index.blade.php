@@ -1,95 +1,96 @@
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-    <div class="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
-        <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search users..."
-               class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
-    </div>
+<div>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div class="flex flex-col sm:flex-row sm:justify-between gap-4 mb-4">
+            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search users..."
+                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+        </div>
 
-    <div class="overflow-x-auto">
-        <table class="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-            <tr>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Name</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Email</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Role</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Status</th>
-                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            @forelse($users as $user)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->id }}</td>
-                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->name }}</td>
-                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->email }}</td>
-                    <td class="px-4 py-2">
-                        <select class="px-2 py-1 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" wire:change="changeRole({{ $user->id }}, $event.target.value)">
-                            @foreach($roles as $roleOption)
-                                <option value="{{ $roleOption->value }}" @selected($user->role === $roleOption)>{{ ucfirst($roleOption->value) }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td class="px-4 py-2">
-                        @if($user->isSuspended())
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200">
-                                Suspended
-                            </span>
-                            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                Until {{ $user->suspended_until?->timezone(config('app.timezone'))->format('M d, Y h:i A') }}
-                            </div>
-                        @elseif($user->suspended_until)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200">
-                                Suspension expired
-                            </span>
-                            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                Ended {{ $user->suspended_until?->timezone(config('app.timezone'))->format('M d, Y h:i A') }}
-                            </div>
-                        @else
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">
-                                Active
-                            </span>
-                        @endif
-                    </td>
-                    <td class="px-4 py-2 space-y-2 sm:space-y-0 sm:space-x-2 sm:flex sm:items-center">
-                        <button type="button"
-                                class="inline-flex items-center px-3 py-1.5 rounded-md bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                                wire:click="editUser({{ $user->id }})">
-                            Edit
-                        </button>
-
-                        <button type="button"
-                                class="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                                wire:click="openSuspendModal({{ $user->id }})">
-                            {{ $user->isSuspended() || $user->suspended_until ? 'Update Suspension' : 'Suspend' }}
-                        </button>
-
-                        @if($user->suspended_until)
-                            <button type="button"
-                                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-green-600 text-white text-xs font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                                    wire:click="clearSuspension({{ $user->id }})">
-                                Lift Suspension
-                            </button>
-                        @endif
-
-                        <button type="button"
-                                onclick="confirmDelete({{ $user->id }})"
-                                class="inline-flex items-center px-3 py-1.5 rounded-md bg-red-600 text-white text-xs font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            @empty
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No users found.</td>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">#</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Name</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Email</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Role</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Status</th>
+                    <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
                 </tr>
-            @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4">{{ $users->links() }}</div>
-</div>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                @forelse($users as $user)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->id }}</td>
+                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->name }}</td>
+                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $user->email }}</td>
+                        <td class="px-4 py-2">
+                            <select class="px-2 py-1 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200" wire:change="changeRole({{ $user->id }}, $event.target.value)">
+                                @foreach($roles as $roleOption)
+                                    <option value="{{ $roleOption->value }}" @selected($user->role === $roleOption)>{{ ucfirst($roleOption->value) }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="px-4 py-2">
+                            @if($user->isSuspended())
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200">
+                                    Suspended
+                                </span>
+                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Until {{ $user->suspended_until?->timezone(config('app.timezone'))->format('M d, Y h:i A') }}
+                                </div>
+                            @elseif($user->suspended_until)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-200">
+                                    Suspension expired
+                                </span>
+                                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    Ended {{ $user->suspended_until?->timezone(config('app.timezone'))->format('M d, Y h:i A') }}
+                                </div>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-200">
+                                    Active
+                                </span>
+                            @endif
+                        </td>
+                        <td class="px-4 py-2 space-y-2 sm:space-y-0 sm:space-x-2 sm:flex sm:items-center">
+                            <button type="button"
+                                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                    wire:click="editUser({{ $user->id }})">
+                                Edit
+                            </button>
 
-<x-modal name="edit-user" :show="$showEditModal" max-width="3xl" focusable>
+                            <button type="button"
+                                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                                    wire:click="openSuspendModal({{ $user->id }})">
+                                {{ $user->isSuspended() || $user->suspended_until ? 'Update Suspension' : 'Suspend' }}
+                            </button>
+
+                            @if($user->suspended_until)
+                                <button type="button"
+                                        class="inline-flex items-center px-3 py-1.5 rounded-md bg-green-600 text-white text-xs font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                        wire:click="clearSuspension({{ $user->id }})">
+                                    Lift Suspension
+                                </button>
+                            @endif
+
+                            <button type="button"
+                                    onclick="confirmDelete({{ $user->id }})"
+                                    class="inline-flex items-center px-3 py-1.5 rounded-md bg-red-600 text-white text-xs font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No users found.</td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4">{{ $users->links() }}</div>
+    </div>
+
+    <x-modal name="edit-user" :show="$showEditModal" max-width="3xl" focusable>
     <form wire:submit.prevent="updateUser" class="p-6 space-y-6">
         <div>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Edit user information</h2>
@@ -156,7 +157,7 @@
     </form>
 </x-modal>
 
-<x-modal name="suspend-user" :show="$showSuspendModal" focusable>
+    <x-modal name="suspend-user" :show="$showSuspendModal" focusable>
     <form wire:submit.prevent="saveSuspension" class="p-6 space-y-6">
         <div>
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Schedule a suspension</h2>
@@ -175,6 +176,7 @@
         </div>
     </form>
 </x-modal>
+</div>
 
 @push('scripts')
 <script>
