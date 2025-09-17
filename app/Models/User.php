@@ -35,6 +35,7 @@ class User extends Authenticatable
         'address',
         'role_confirmed_at',
         'teacher_profile_completed_at',
+        'suspended_until',
     ];
 
     /**
@@ -60,6 +61,7 @@ class User extends Authenticatable
             'role' => Role::class,
             'role_confirmed_at' => 'datetime',
             'teacher_profile_completed_at' => 'datetime',
+            'suspended_until' => 'datetime',
         ];
     }
 
@@ -76,6 +78,11 @@ class User extends Authenticatable
     public function isStudent(): bool
     {
         return $this->role === Role::STUDENT;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->suspended_until !== null && $this->suspended_until->isFuture();
     }
 
     public function isOnline(): bool
