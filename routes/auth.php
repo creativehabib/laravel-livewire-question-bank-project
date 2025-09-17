@@ -26,6 +26,8 @@ Route::middleware('guest')->group(function () {
 
     Route::get('auth/{provider}/redirect', [SocialiteController::class, 'redirect'])->name('social.redirect');
     Route::get('auth/{provider}/callback', [SocialiteController::class, 'callback'])->name('social.callback');
+    Route::get('auth/{provider}/register', [SocialiteController::class, 'showRegistrationForm'])->name('social.register.show');
+    Route::post('auth/{provider}/register', [SocialiteController::class, 'completeRegistration'])->name('social.register.complete');
 
     Route::get('email-login/{user}', EmailLoginController::class)
         ->middleware('signed')

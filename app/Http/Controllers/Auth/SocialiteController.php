@@ -5,14 +5,20 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\Role;
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController
 {
     protected array $providers = ['google', 'facebook'];
+
+    protected const REGISTRATION_SESSION_KEY = 'socialite.registration';
 
     protected function ensureEnabled(string $provider): void
     {
@@ -34,7 +40,7 @@ class SocialiteController
         return Socialite::driver($provider)->redirect();
     }
 
-    public function callback(string $provider)
+    public function callback(Request $request, string $provider)
     {
         $this->ensureEnabled($provider);
 
@@ -44,7 +50,13 @@ class SocialiteController
             return redirect()->route('login')->with('status', ucfirst($provider).' login failed.');
         }
 
-        $user = User::where('email', $socialUser->getEmail())->first();
+        $email = $socialUser->getEmail();
+
+        if (! $email) {
+            return redirect()->route('login')->with('status', __('We could not retrieve an email address from your :provider account. Please use a different login method.', ['provider' => ucfirst($provider)]));
+        }
+
+        $user = User::where('email', $email)->first();
 
         if (! $user) {
             $registrationEnabled = (bool) Setting::get('registration_enabled', true);
@@ -52,19 +64,106 @@ class SocialiteController
                 return redirect()->route('login')->with('status', 'Registration is disabled.');
             }
 
-            $user = User::create([
-                'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: $socialUser->getEmail(),
-                'email' => $socialUser->getEmail(),
-                'password' => Hash::make(Str::random(16)),
-                'role' => Role::STUDENT,
-                'role_confirmed_at' => now(),
-                'email_verified_at' => now(),
-                'avatar_url' => $socialUser->getAvatar(),
+            $request->session()->put(self::REGISTRATION_SESSION_KEY, [
+                'provider' => $provider,
+                'name' => $socialUser->getName() ?: $socialUser->getNickname() ?: $email,
+                'email' => $email,
+                'avatar' => $socialUser->getAvatar(),
             ]);
+
+            return redirect()->route('social.register.show', ['provider' => $provider]);
         }
+
+        $request->session()->forget(self::REGISTRATION_SESSION_KEY);
 
         Auth::login($user, true);
 
         return redirect()->route('dashboard');
+    }
+
+    public function showRegistrationForm(Request $request, string $provider): View|RedirectResponse
+    {
+        $this->ensureEnabled($provider);
+
+        if (! (bool) Setting::get('registration_enabled', true)) {
+            return redirect()->route('login')->with('status', 'Registration is disabled.');
+        }
+
+        $pending = $this->pendingRegistration($request, $provider);
+
+        if (! $pending) {
+            return redirect()->route('login')->with('status', __('Please start the :provider sign in process again.', ['provider' => ucfirst($provider)]));
+        }
+
+        return view('auth.social-register', [
+            'provider' => $provider,
+            'name' => $pending['name'],
+            'email' => $pending['email'],
+        ]);
+    }
+
+    public function completeRegistration(Request $request, string $provider): RedirectResponse
+    {
+        $this->ensureEnabled($provider);
+
+        if (! (bool) Setting::get('registration_enabled', true)) {
+            return redirect()->route('login')->with('status', 'Registration is disabled.');
+        }
+
+        $pending = $this->pendingRegistration($request, $provider);
+
+        if (! $pending) {
+            return redirect()->route('login')->with('status', __('Please start the :provider sign in process again.', ['provider' => ucfirst($provider)]));
+        }
+
+        $validated = $request->validate([
+            'role' => ['required', Rule::in([Role::TEACHER->value, Role::STUDENT->value])],
+        ]);
+
+        $existingUser = User::where('email', $pending['email'])->first();
+
+        if ($existingUser) {
+            $request->session()->forget(self::REGISTRATION_SESSION_KEY);
+            Auth::login($existingUser, true);
+
+            return redirect()->route('dashboard');
+        }
+
+        $role = Role::from($validated['role']);
+
+        $user = User::create([
+            'name' => $pending['name'],
+            'email' => $pending['email'],
+            'password' => Hash::make(Str::random(16)),
+            'role' => $role,
+            'role_confirmed_at' => now(),
+            'email_verified_at' => now(),
+            'avatar_url' => $pending['avatar'] ?? null,
+        ]);
+
+        $request->session()->forget(self::REGISTRATION_SESSION_KEY);
+
+        Auth::login($user, true);
+
+        return redirect()->route('dashboard');
+    }
+
+    protected function pendingRegistration(Request $request, string $provider): ?array
+    {
+        $pending = $request->session()->get(self::REGISTRATION_SESSION_KEY);
+
+        if (! is_array($pending)) {
+            return null;
+        }
+
+        if (($pending['provider'] ?? null) !== $provider) {
+            return null;
+        }
+
+        if (empty($pending['email'])) {
+            return null;
+        }
+
+        return $pending;
     }
 }
