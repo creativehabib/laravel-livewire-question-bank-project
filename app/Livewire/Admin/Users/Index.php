@@ -80,6 +80,7 @@ class Index extends Component
 
         $this->resetValidation();
         $this->showEditModal = true;
+        $this->dispatch('open-modal', 'edit-user');
     }
 
     public function updateUser(): void
@@ -100,6 +101,7 @@ class Index extends Component
     public function closeEditModal(): void
     {
         $this->showEditModal = false;
+        $this->dispatch('close-modal', 'edit-user');
         $this->resetValidation();
         $this->resetEditForm();
     }
@@ -113,6 +115,7 @@ class Index extends Component
 
         $this->resetValidation();
         $this->showSuspendModal = true;
+        $this->dispatch('open-modal', 'suspend-user');
     }
 
     public function saveSuspension(): void
@@ -133,6 +136,7 @@ class Index extends Component
     public function closeSuspendModal(): void
     {
         $this->showSuspendModal = false;
+        $this->dispatch('close-modal', 'suspend-user');
         $this->resetValidation();
         $this->resetSuspendForm();
     }
