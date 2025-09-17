@@ -118,6 +118,12 @@ class SocialiteController
 
         $validated = $request->validate([
             'role' => ['required', Rule::in([Role::TEACHER->value, Role::STUDENT->value])],
+            'institution_name' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
+            'division' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
+            'district' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
+            'thana' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
+            'phone' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:30'],
+            'address' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:1000'],
         ]);
 
         $existingUser = User::where('email', $pending['email'])->first();
@@ -131,6 +137,20 @@ class SocialiteController
 
         $role = Role::from($validated['role']);
 
+        $teacherData = [
+            'institution_name' => $validated['institution_name'] ?? null,
+            'division' => $validated['division'] ?? null,
+            'district' => $validated['district'] ?? null,
+            'thana' => $validated['thana'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'teacher_profile_completed_at' => null,
+        ];
+
+        if ($role === Role::TEACHER) {
+            $teacherData['teacher_profile_completed_at'] = now();
+        }
+
         $user = User::create([
             'name' => $pending['name'],
             'email' => $pending['email'],
@@ -139,6 +159,7 @@ class SocialiteController
             'role_confirmed_at' => now(),
             'email_verified_at' => now(),
             'avatar_url' => $pending['avatar'] ?? null,
+            ...$teacherData,
         ]);
 
         $request->session()->forget(self::REGISTRATION_SESSION_KEY);
