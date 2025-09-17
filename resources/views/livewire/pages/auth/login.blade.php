@@ -1,12 +1,8 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
-use App\Mail\EmailLoginLink;
 use App\Models\Setting;
-use App\Models\User;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -17,7 +13,6 @@ new #[Layout('layouts.guest')] class extends Component
     public bool $facebookLogin = false;
     public bool $registrationEnabled = true;
     public bool $manualLoginEnabled = true;
-    public string $loginEmail = '';
 
     public function mount(): void
     {
@@ -33,7 +28,7 @@ new #[Layout('layouts.guest')] class extends Component
     public function login(): void
     {
         if (! $this->manualLoginEnabled) {
-            $this->addError('form.email', __('Manual login is currently disabled. Please use the email link option below.'));
+            $this->addError('form.email', __('Manual login is currently disabled.'));
 
             return;
         }
@@ -47,30 +42,6 @@ new #[Layout('layouts.guest')] class extends Component
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 
-    public function sendLoginLink(): void
-    {
-        $this->validate([
-            'loginEmail' => ['required', 'string', 'email', 'exists:'.User::class.',email'],
-        ], [
-            'loginEmail.exists' => __('We could not find a user with that email address.'),
-        ]);
-
-        $user = User::where('email', $this->loginEmail)->first();
-
-        if (! $user) {
-            return;
-        }
-
-        $url = URL::temporarySignedRoute('auth.email-login', now()->addMinutes(30), [
-            'user' => $user->id,
-        ]);
-
-        Mail::to($user->email)->send(new EmailLoginLink($user, $url));
-
-        session()->flash('status', __('We have emailed your login link!'));
-
-        $this->reset('loginEmail');
-    }
 };
 ?>
 
@@ -145,24 +116,9 @@ new #[Layout('layouts.guest')] class extends Component
         </form>
     @else
         <div class="mb-6 text-sm text-gray-600">
-            {{ __('Manual email and password login is disabled. Request a secure login link below to access your account.') }}
+            {{ __('Manual email and password login is disabled. Please contact support for assistance.') }}
         </div>
     @endif
-
-    <div class="mt-8">
-        <h2 class="text-lg font-semibold">{{ __('Log in with a secure email link') }}</h2>
-        <p class="text-sm text-gray-600 mt-1">{{ __('Enter your email address and we will send you a temporary link to access your account.') }}</p>
-        <form wire:submit="sendLoginLink" class="mt-4 space-y-4">
-            <div>
-                <x-input-label for="login_email" :value="__('Email')" />
-                <x-text-input wire:model="loginEmail" id="login_email" class="block mt-1 w-full" type="email" name="login_email" required autocomplete="username" />
-                <x-input-error :messages="$errors->get('loginEmail')" class="mt-2" />
-            </div>
-            <x-primary-button>
-                {{ __('Email me a login link') }}
-            </x-primary-button>
-        </form>
-    </div>
 
     @if ($registrationEnabled && Route::has('register'))
         <div class="mt-6 text-center">
