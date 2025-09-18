@@ -296,8 +296,8 @@
             </div>
 
             <div class="qp-designer-layout">
-                <div class="qp-preview-wrapper">
-                    <div class="qp-preview-surface">
+                <div class="qp-preview-wrapper bg-gray-100 rounded-2xl p-4 md:p-6 print:bg-transparent print:p-0">
+                    <div class="qp-preview-surface bg-white rounded-2xl shadow-xl print:shadow-none">
                         <div class="qp-paper {{ $fontClass }}" data-paper-size="{{ $paperSize }}" style="--qp-font-size: {{ $fontSize }}px; --qp-column-count: {{ $columnCount }};">
                             <div class="qp-paper-header">
                                 <div class="qp-paper-header-main">
@@ -589,6 +589,12 @@
                     </svg>
                     প্রশ্ন প্রিন্ট করুন
                 </button>
+                <button type="button" onclick="downloadQuestionPaper()" class="inline-flex items-center gap-2 bg-white dark:bg-transparent border border-emerald-400 text-emerald-700 dark:text-emerald-200 px-4 py-2 rounded-lg shadow-sm hover:bg-emerald-50">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 12l4.5 4.5m0 0 4.5-4.5m-4.5 4.5V3" />
+                    </svg>
+                    পিডিএফ হিসেবে ডাউনলোড
+                </button>
                 <button type="button" class="inline-flex items-center gap-2 bg-white dark:bg-transparent border border-emerald-400 text-emerald-700 dark:text-emerald-200 px-4 py-2 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-1.125 0h11.25m-10.125 3.75h9" />
@@ -612,18 +618,42 @@
         .qp-designer-layout {
             display: grid;
             gap: 1.5rem;
+            align-items: flex-start;
         }
 
         @media (min-width: 1024px) {
             .qp-designer-layout {
-                grid-template-columns: minmax(0, 1fr) 18rem;
+                grid-template-columns: minmax(0, 1fr) 18.5rem;
+            }
+
+            .qp-settings-panel {
+                position: sticky;
+                top: 5rem;
+                max-height: calc(100vh - 6rem);
+                overflow-y: auto;
+                padding-right: 0.25rem;
+            }
+
+            .qp-settings-panel::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .qp-settings-panel::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .qp-settings-panel::-webkit-scrollbar-thumb {
+                background: rgba(16, 185, 129, 0.4);
+                border-radius: 9999px;
             }
         }
 
         .qp-preview-wrapper {
+            box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.08);
         }
 
         .qp-preview-surface {
+            padding: 1.5rem;
         }
 
         .qp-paper {
@@ -1054,6 +1084,14 @@
             .qp-paper-header-side {
                 align-items: center;
             }
+
+            .qp-preview-wrapper {
+                padding: 1rem;
+            }
+
+            .qp-preview-surface {
+                padding: 1rem;
+            }
         }
 
         @media print {
@@ -1083,4 +1121,44 @@
             }
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" defer></script>
+    <script defer>
+        window.downloadQuestionPaper = function () {
+            const paper = document.querySelector('.qp-paper');
+
+            if (!paper) {
+                return;
+            }
+
+            if (typeof html2pdf === 'undefined') {
+                window.print();
+                return;
+            }
+
+            const formatMap = {
+                a4: 'a4',
+                letter: 'letter',
+                legal: 'legal',
+                a5: 'a5',
+            };
+
+            const dataFormat = (paper.dataset.paperSize || 'A4').toLowerCase();
+            const filename = `question-paper-${new Date().toISOString().slice(0, 10)}.pdf`;
+
+            html2pdf()
+                .set({
+                    margin: 0.5,
+                    filename,
+                    pagebreak: { mode: ['css', 'legacy'] },
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'in', format: formatMap[dataFormat] || 'a4', orientation: 'portrait' },
+                })
+                .from(paper)
+                .save();
+        };
+    </script>
 @endpush
