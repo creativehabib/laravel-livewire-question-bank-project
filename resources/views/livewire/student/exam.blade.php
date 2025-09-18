@@ -8,6 +8,13 @@
                 @endforeach
             </select>
 
+            <select wire:model="subSubjectId" class="w-full border rounded px-3 py-2">
+                <option value="">সাব-বিষয় সিলেক্ট করো</option>
+                @foreach($subSubjects as $subSubject)
+                    <option value="{{ $subSubject->id }}">{{ $subSubject->name }}</option>
+                @endforeach
+            </select>
+
             <select wire:model="chapterId" class="w-full border rounded px-3 py-2">
                 <option value="">অধ্যায় সিলেক্ট করো</option>
                 @foreach($chapters as $chapter)
