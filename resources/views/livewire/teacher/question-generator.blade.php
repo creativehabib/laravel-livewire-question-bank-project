@@ -187,8 +187,13 @@
     @endif
 
     @if($questionPaperSummary)
+        @php
+            $isMcqPaper = ($questionPaperSummary['type_key'] ?? null) === 'mcq';
+            $optionLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
+        @endphp
+
         <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6 space-y-4">
-            <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200">
+            <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200 no-print">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m5.25 2.25a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -207,27 +212,57 @@
                 <div><span class="font-medium">মোট প্রশ্ন:</span> {{ $questionPaperSummary['total_questions'] }}</div>
             </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-emerald-100 dark:border-emerald-800 p-4 space-y-3">
-                <h4 class="text-sm font-medium text-emerald-700 dark:text-emerald-200">নির্বাচিত প্রশ্নসমূহ</h4>
-                <ol class="space-y-3 text-gray-700 dark:text-gray-200">
-                    @foreach($questionPaperSummary['questions'] as $index => $question)
-                        <li class="flex gap-3">
-                            <span class="font-semibold">{{ $index + 1 }}.</span>
-                            <div class="space-y-1">
-                                <div class="prose prose-sm max-w-none dark:prose-invert">
-                                    {!! $question['title'] !!}
-                                </div>
-                                @if($question['chapter'])
-                                    <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-200 rounded-full">{{ $question['chapter'] }}</span>
-                                @endif
-                            </div>
-                        </li>
-                    @endforeach
-                </ol>
+            <div class="bg-white dark:bg-gray-800 rounded-lg border border-emerald-100 dark:border-emerald-800 p-0 md:p-4">
+                <div class="p-4 pb-0 border-b border-emerald-100 dark:border-emerald-800">
+                    <h4 class="text-sm font-medium text-emerald-700 dark:text-emerald-200">নির্বাচিত প্রশ্নসমূহ</h4>
+                </div>
+
+                <div class="question-paper-preview text-gray-800 dark:text-gray-100">
+                    <div class="question-paper-header text-center border-b border-emerald-100 dark:border-emerald-800 px-6 py-4">
+                        <h2 class="text-xl font-semibold">{{ $questionPaperSummary['exam_name'] }}</h2>
+                        <div class="mt-2 text-sm space-y-1">
+                            <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
+                            <div><span class="font-medium">সাব-বিষয়:</span> {{ $questionPaperSummary['sub_subject'] }}</div>
+                            <div><span class="font-medium">অধ্যায়:</span> {{ $questionPaperSummary['chapter'] }}</div>
+                            <div><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $questionPaperSummary['type'] }}</div>
+                            <div><span class="font-medium">মোট প্রশ্ন:</span> {{ $questionPaperSummary['total_questions'] }}</div>
+                        </div>
+                    </div>
+
+                    <div class="question-paper-body px-6 py-6">
+                        <ol class="question-paper-list">
+                            @foreach($questionPaperSummary['questions'] as $index => $question)
+                                <li class="question-item">
+                                    <div class="question-number">{{ $index + 1 }}.</div>
+                                    <div class="question-content">
+                                        <div class="prose prose-sm max-w-none dark:prose-invert">
+                                            {!! $question['title'] !!}
+                                        </div>
+
+                                        @if($isMcqPaper && !empty($question['options']))
+                                            <ul class="question-options">
+                                                @foreach($question['options'] as $optIndex => $option)
+                                                    <li class="question-option">
+                                                        <span class="option-label">{{ $optionLabels[$optIndex] ?? ($optIndex + 1) }}.</span>
+                                                        <span class="option-text">{!! $option !!}</span>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+
+                                        @if($question['chapter'])
+                                            <span class="question-chip">{{ $question['chapter'] }}</span>
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <button type="button" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg shadow">
+            <div class="flex flex-wrap items-center gap-3 no-print">
+                <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg shadow">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5m-7.5 3h7.5m-7.5 3h7.5M5.25 19.5h13.5A1.5 1.5 0 0020.25 18V6a1.5 1.5 0 00-1.5-1.5H5.25A1.5 1.5 0 003.75 6v12a1.5 1.5 0 001.5 1.5z" />
                     </svg>
@@ -243,3 +278,108 @@
         </div>
     @endif
 </div>
+
+@push('styles')
+    <style>
+        .question-paper-preview {
+            background: #ffffff;
+        }
+
+        .question-paper-body {
+            column-count: 1;
+            column-gap: 2.5rem;
+        }
+
+        .question-paper-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            column-count: 1;
+            column-gap: 2.5rem;
+        }
+
+        .question-item {
+            break-inside: avoid;
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-number {
+            font-weight: 600;
+            min-width: 1.75rem;
+        }
+
+        .question-options {
+            margin-top: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .question-option {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-label {
+            font-weight: 600;
+            min-width: 1.5rem;
+        }
+
+        .question-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            background-color: #d1fae5;
+            color: #047857;
+        }
+
+        @media (min-width: 768px) {
+            .question-paper-body,
+            .question-paper-list {
+                column-count: 2;
+            }
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .question-paper-preview {
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .question-paper-body,
+            .question-paper-list {
+                column-count: 2;
+                column-gap: 18mm;
+            }
+
+            .question-item {
+                break-inside: avoid-column;
+            }
+
+            .question-chip {
+                background-color: #d1fae5 !important;
+                color: #047857 !important;
+            }
+        }
+    </style>
+@endpush
