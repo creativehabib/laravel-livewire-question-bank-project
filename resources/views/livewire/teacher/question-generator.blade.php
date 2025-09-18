@@ -108,6 +108,78 @@
                 </div>
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 pt-5 border-t border-gray-100 dark:border-gray-700">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="programName">প্রতিষ্ঠান / প্রোগ্রামের নাম</label>
+                    <input id="programName" type="text" wire:model.defer="programName"
+                           class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                           placeholder="যেমন: ডিজিটাল কোচিং হোম" />
+                    @error('programName')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="classLevel">শ্রেণি / লেভেল</label>
+                    <input id="classLevel" type="text" wire:model.defer="classLevel"
+                           class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                           placeholder="যেমন: নবম / দশম" />
+                    @error('classLevel')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="setCode">সেট কোড</label>
+                    <input id="setCode" type="text" wire:model.defer="setCode"
+                           class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                           placeholder="যেমন: ক" />
+                    @error('setCode')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="duration">সময়</label>
+                    <input id="duration" type="text" wire:model.defer="duration"
+                           class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                           placeholder="যেমন: ৩০ মিনিট" />
+                    @error('duration')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="totalMarks">পূর্ণমান</label>
+                    <input id="totalMarks" type="text" wire:model.defer="totalMarks"
+                           class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                           placeholder="যেমন: ২০" />
+                    @error('totalMarks')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="instructionText">নির্দেশনা</label>
+                    <textarea id="instructionText" rows="3" wire:model.defer="instructionText"
+                              class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    @error('instructionText')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="noticeText">বিশেষ ঘোষণা</label>
+                    <textarea id="noticeText" rows="3" wire:model.defer="noticeText"
+                              class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    @error('noticeText')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
             <div class="flex items-center justify-end gap-3">
                 <button type="submit"
                         class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-lg shadow">
@@ -190,73 +262,322 @@
         @php
             $isMcqPaper = ($questionPaperSummary['type_key'] ?? null) === 'mcq';
             $optionLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
+            $summary = $questionPaperSummary;
+            $fontClassMap = [
+                'Bangla' => 'qp-font-bangla',
+                'SolaimanLipi' => 'qp-font-solaiman',
+                'Kalpurush' => 'qp-font-kalpurush',
+                'roman' => 'qp-font-roman',
+            ];
+            $fontClass = $fontClassMap[$fontFamily] ?? 'qp-font-bangla';
+            $textAlignClass = 'qp-text-' . $textAlign;
         @endphp
 
-        <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6 space-y-4">
-            <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200 no-print">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m5.25 2.25a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <div>
-                    <h3 class="text-lg font-semibold">প্রশ্নপত্র প্রস্তুত হয়েছে!</h3>
-                    <p class="text-sm">সিলেক্ট করা প্রশ্নগুলো দিয়ে নতুন প্রশ্নপত্র তৈরি হয়েছে। প্রয়োজনে ডাউনলোড বা শেয়ার করুন।</p>
+        <div class="space-y-6">
+            <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6 space-y-4">
+                <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200 no-print">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m5.25 2.25a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h3 class="text-lg font-semibold">প্রশ্নপত্র প্রস্তুত হয়েছে!</h3>
+                        <p class="text-sm">সিলেক্ট করা প্রশ্নগুলো দিয়ে নতুন প্রশ্নপত্র তৈরি হয়েছে। প্রয়োজনে ডাউনলোড বা শেয়ার করুন।</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-700 dark:text-gray-200 no-print">
+                    <div class="qp-summary-chip"><span class="font-medium">পরীক্ষা:</span> {{ $summary['exam_name'] }}</div>
+                    <div class="qp-summary-chip"><span class="font-medium">বিষয়:</span> {{ $summary['subject'] }}</div>
+                    <div class="qp-summary-chip"><span class="font-medium">সাব-বিষয়:</span> {{ $summary['sub_subject'] }}</div>
+                    <div class="qp-summary-chip"><span class="font-medium">অধ্যায়:</span> {{ $summary['chapter'] }}</div>
+                    <div class="qp-summary-chip"><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $summary['type'] }}</div>
+                    <div class="qp-summary-chip"><span class="font-medium">মোট প্রশ্ন:</span> {{ $summary['total_questions'] }}</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200 no-print">
-                <div><span class="font-medium">পরীক্ষার নাম:</span> {{ $questionPaperSummary['exam_name'] }}</div>
-                <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
-                <div><span class="font-medium">সাব-বিষয়:</span> {{ $questionPaperSummary['sub_subject'] }}</div>
-                <div><span class="font-medium">অধ্যায়:</span> {{ $questionPaperSummary['chapter'] }}</div>
-                <div><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $questionPaperSummary['type'] }}</div>
-                <div><span class="font-medium">মোট প্রশ্ন:</span> {{ $questionPaperSummary['total_questions'] }}</div>
-            </div>
+            <div class="qp-designer-layout">
+                <div class="qp-preview-wrapper">
+                    <div class="qp-preview-surface">
+                        <div class="qp-paper {{ $fontClass }}" data-paper-size="{{ $paperSize }}" style="--qp-font-size: {{ $fontSize }}px; --qp-column-count: {{ $columnCount }};">
+                            <div class="qp-paper-header">
+                                <div class="qp-paper-header-main">
+                                    <h1 class="qp-paper-title">{{ $summary['program_name'] ?? $summary['exam_name'] }}</h1>
+                                    @if(! empty($summary['class_level']))
+                                        <p class="qp-paper-subtitle">{{ $summary['class_level'] }}</p>
+                                    @endif
+                                    <p class="qp-paper-subject">{{ $summary['subject'] }}</p>
+                                    @if($previewOptions['showSubSubject'] && ! empty($summary['sub_subject']))
+                                        <p class="qp-paper-subject">{{ $summary['sub_subject'] }}</p>
+                                    @endif
+                                    @if($previewOptions['showChapter'] && ! empty($summary['chapter']))
+                                        <p class="qp-paper-chapter">{{ $summary['chapter'] }}</p>
+                                    @endif
+                                </div>
+                                <div class="qp-paper-header-side">
+                                    @if($previewOptions['showSetCode'])
+                                        <div class="qp-setcode-box">
+                                            <span class="qp-setcode-label">সেট -</span>
+                                            <span class="qp-setcode-value">{{ $summary['set_code'] ?: '—' }}</span>
+                                        </div>
+                                    @endif
+                                    @if($previewOptions['showMarksBox'])
+                                        <div class="qp-marks-box">
+                                            <span>প্রাপ্ত নম্বর</span>
+                                            <span class="qp-marks-line"></span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
 
-            <div class="bg-white dark:bg-gray-800 rounded-lg border border-emerald-100 dark:border-emerald-800 p-0 md:p-4">
-                <div class="p-4 pb-0 border-b border-emerald-100 dark:border-emerald-800">
-                    <h4 class="text-sm font-medium text-emerald-700 dark:text-emerald-200">নির্বাচিত প্রশ্নসমূহ</h4>
+                            <div class="qp-paper-meta">
+                                <div>সময়— <span>{{ $summary['duration'] ?: '........' }}</span></div>
+                                <div>পূর্ণমান— <span>{{ $summary['total_marks'] ?: '........' }}</span></div>
+                                <div>প্রশ্ন সংখ্যা— <span>{{ $summary['total_questions'] }}</span></div>
+                            </div>
+
+                            @if($previewOptions['showQuestionInfo'])
+                                <div class="qp-paper-tags">
+                                    <span class="qp-badge">পরীক্ষা: {{ $summary['exam_name'] }}</span>
+                                    <span class="qp-badge">প্রশ্নের ধরন: {{ $summary['type'] }}</span>
+                                    <span class="qp-badge">মোট প্রশ্ন: {{ $summary['total_questions'] }}</span>
+                                </div>
+                            @endif
+
+                            @if($previewOptions['attachAnswerSheet'])
+                                <div class="qp-paper-tags">
+                                    <span class="qp-badge qp-badge-outline">উত্তরপত্র সংযুক্ত</span>
+                                </div>
+                            @endif
+
+                            @if($previewOptions['attachOmrSheet'])
+                                <div class="qp-paper-tags">
+                                    <span class="qp-badge qp-badge-outline">OMR শীট সংযুক্ত</span>
+                                </div>
+                            @endif
+
+                            @if($previewOptions['markImportant'])
+                                <div class="qp-paper-tags">
+                                    <span class="qp-badge qp-badge-important">গুরুত্বপূর্ণ প্রশ্ন</span>
+                                </div>
+                            @endif
+
+                            @if($previewOptions['showInstructions'] && ! empty($summary['instruction_text']))
+                                <div class="qp-paper-instruction">
+                                    <span class="qp-paper-instruction-label">দ্রষ্টব্যঃ</span>
+                                    <span>{!! nl2br(e($summary['instruction_text'])) !!}</span>
+                                </div>
+                            @endif
+
+                            @if($previewOptions['showNotice'] && ! empty($summary['notice_text']))
+                                <div class="qp-paper-notice">{!! nl2br(e($summary['notice_text'])) !!}</div>
+                            @endif
+
+                            @if($previewOptions['showStudentInfo'])
+                                <div class="qp-student-info">
+                                    <div>শিক্ষার্থীর নাম: .......................................................</div>
+                                    <div>রোল নং: ............................... শ্রেণি: ...............................</div>
+                                    <div>প্রদত্ত নম্বর: ............................................................</div>
+                                </div>
+                            @endif
+
+                            <div class="qp-question-area">
+                                <ol class="qp-question-list">
+                                    @foreach($summary['questions'] as $index => $question)
+                                        <li class="qp-question-item">
+                                            <div class="qp-question-number">{{ $index + 1 }}.</div>
+                                            <div class="qp-question-body">
+                                                <div class="qp-question-text {{ $textAlignClass }}">{!! $question['title'] !!}</div>
+
+                                                @if($isMcqPaper && ! empty($question['options']))
+                                                    <ul class="qp-option-list qp-option-list--{{ $optionStyle }}">
+                                                        @foreach($question['options'] as $optIndex => $option)
+                                                            <li class="qp-option-item">
+                                                                <span class="qp-option-label qp-option-label--{{ $optionStyle }}">{{ $optionLabels[$optIndex] ?? ($optIndex + 1) }}</span>
+                                                                <span class="qp-option-text">{!! $option !!}</span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+
+                                                @if($previewOptions['showChapter'] && ! empty($question['chapter']))
+                                                    <span class="qp-question-chip">{{ $question['chapter'] }}</span>
+                                                @endif
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="question-paper-preview text-gray-800 dark:text-gray-100">
-                    <div class="question-paper-header text-center border-b border-emerald-100 dark:border-emerald-800 px-6 py-4 no-print">
-                        <h2 class="text-xl font-semibold">{{ $questionPaperSummary['exam_name'] }}</h2>
-                        <div class="mt-2 text-sm space-y-1">
-                            <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
-                            <div><span class="font-medium">সাব-বিষয়:</span> {{ $questionPaperSummary['sub_subject'] }}</div>
-                            <div><span class="font-medium">অধ্যায়:</span> {{ $questionPaperSummary['chapter'] }}</div>
-                            <div><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $questionPaperSummary['type'] }}</div>
-                            <div><span class="font-medium">মোট প্রশ্ন:</span> {{ $questionPaperSummary['total_questions'] }}</div>
+                <div class="qp-settings-panel no-print">
+                    <div class="qp-settings-card">
+                        <h4 class="qp-settings-title">কুইক সেটিংস</h4>
+                        <button type="button" class="qp-primary-btn">+ আরও প্রশ্ন যুক্ত করুন</button>
+                    </div>
+
+                    <div class="qp-settings-card">
+                        <p class="qp-settings-section">প্রশ্নে সংযুক্তি</p>
+                        <div class="space-y-2">
+                            <div class="qp-toggle-row">
+                                <span>উত্তরপত্র</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.attachAnswerSheet">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>OMR সংযুক্ত</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.attachOmrSheet">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>গুরুত্বপূর্ণ প্রশ্ন</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.markImportant">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>প্রশ্নের তথ্য</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showQuestionInfo">
+                                    <span></span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="question-paper-body px-6 py-6">
-                        <ol class="question-paper-list">
-                            @foreach($questionPaperSummary['questions'] as $index => $question)
-                                <li class="question-item">
-                                    <div class="question-number">{{ $index + 1 }}.</div>
-                                    <div class="question-content">
-                                        <div class="prose prose-sm max-w-none dark:prose-invert">
-                                            {!! $question['title'] !!}
-                                        </div>
+                    <div class="qp-settings-card">
+                        <p class="qp-settings-section">প্রশ্নের মেটাডাটা</p>
+                        <div class="space-y-2">
+                            <div class="qp-toggle-row">
+                                <span>সাব-বিষয়ের নাম</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showSubSubject">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>অধ্যায়ের নাম</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showChapter">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>সেট কোড</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showSetCode">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>নির্দেশনা</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showInstructions">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>বিশেষ ঘোষণা</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showNotice">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
-                                        @if($isMcqPaper && !empty($question['options']))
-                                            <ul class="question-options">
-                                                @foreach($question['options'] as $optIndex => $option)
-                                                    <li class="question-option">
-                                                        <span class="option-label">{{ $optionLabels[$optIndex] ?? ($optIndex + 1) }}.</span>
-                                                        <span class="option-text">{!! $option !!}</span>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        @endif
+                    <div class="qp-settings-card">
+                        <p class="qp-settings-section">ডকুমেন্ট কাস্টমাইজেশন</p>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">টেক্সট এলাইনমেন্ট</p>
+                                <div class="flex gap-2">
+                                    @foreach(['left' => 'L', 'center' => 'C', 'right' => 'R', 'justify' => 'J'] as $align => $label)
+                                        <button type="button" wire:click="setTextAlign('{{ $align }}')"
+                                                @class(['qp-icon-btn', 'qp-icon-btn--active' => $textAlign === $align])>{{ $label }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
 
-                                        @if($question['chapter'])
-                                            <span class="question-chip">{{ $question['chapter'] }}</span>
-                                        @endif
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ol>
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">পেপার সাইজ</p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    @foreach(['A4' => 'A4', 'Letter' => 'Letter', 'Legal' => 'Legal', 'A5' => 'A5'] as $size => $label)
+                                        <button type="button" wire:click="setPaperSize('{{ $size }}')"
+                                                @class(['qp-size-btn', 'qp-size-btn--active' => $paperSize === $size])>{{ $label }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">অপশন স্টাইল</p>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <button type="button" wire:click="setOptionStyle('circle')"
+                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'circle'])>◎</button>
+                                    <button type="button" wire:click="setOptionStyle('dot')"
+                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'dot'])>•</button>
+                                    <button type="button" wire:click="setOptionStyle('parentheses')"
+                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'parentheses'])>( )</button>
+                                    <button type="button" wire:click="setOptionStyle('minimal')"
+                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'minimal'])>ক.</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">ফন্ট পরিবর্তন</p>
+                                <select class="qp-select" wire:model.live="fontFamily" wire:change="setFontFamily($event.target.value)">
+                                    <option value="Bangla">বাংলা</option>
+                                    <option value="SolaimanLipi">সোলাইমান লিপি</option>
+                                    <option value="Kalpurush">কালপুরুষ</option>
+                                    <option value="roman">Times New Roman</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">ফন্ট সাইজ</span>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" class="qp-icon-btn" wire:click="decreaseFontSize">-</button>
+                                    <span class="text-sm font-medium w-10 text-center">{{ $fontSize }}</span>
+                                    <button type="button" class="qp-icon-btn" wire:click="increaseFontSize">+</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-gray-500 mb-1">কলাম</p>
+                                <div class="flex gap-2">
+                                    @foreach([1, 2, 3] as $col)
+                                        <button type="button" wire:click="setColumnCount({{ $col }})"
+                                                @class(['qp-size-btn', 'qp-size-btn--active' => $columnCount === $col])>{{ $col }}</button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="qp-settings-card">
+                        <p class="qp-settings-section">অতিরিক্ত সেকশন</p>
+                        <div class="space-y-2">
+                            <div class="qp-toggle-row">
+                                <span>শিক্ষার্থীর তথ্য</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showStudentInfo">
+                                    <span></span>
+                                </label>
+                            </div>
+                            <div class="qp-toggle-row">
+                                <span>প্রাপ্ত নম্বর ঘর</span>
+                                <label class="qp-toggle">
+                                    <input type="checkbox" wire:model.live="previewOptions.showMarksBox">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -281,78 +602,468 @@
 
 @push('styles')
     <style>
-        .question-paper-preview {
+        .qp-summary-chip {
+            background-color: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 9999px;
+            padding: 0.35rem 0.75rem;
+        }
+
+        .qp-designer-layout {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 1024px) {
+            .qp-designer-layout {
+                grid-template-columns: minmax(0, 1fr) 18rem;
+            }
+        }
+
+        .qp-preview-wrapper {
+            background: linear-gradient(135deg, rgba(236, 253, 245, 0.8), rgba(240, 253, 244, 0.8));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .qp-preview-surface {
+            background: linear-gradient(145deg, rgba(248, 113, 113, 0.12), rgba(16, 185, 129, 0.12));
+            border-radius: 14px;
+            padding: 1.25rem;
+        }
+
+        .qp-paper {
+            position: relative;
             background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            color: #1f2937;
+            line-height: 1.6;
+            font-size: var(--qp-font-size, 14px);
         }
 
-        .question-paper-body {
-            column-count: 1;
-            column-gap: 2.5rem;
+        .qp-font-bangla {
+            font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
         }
 
-        .question-paper-list {
+        .qp-font-solaiman {
+            font-family: 'SolaimanLipi', 'Noto Sans Bengali', sans-serif;
+        }
+
+        .qp-font-kalpurush {
+            font-family: 'Kalpurush', 'Noto Sans Bengali', sans-serif;
+        }
+
+        .qp-font-roman {
+            font-family: 'Times New Roman', serif;
+        }
+
+        .qp-paper-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            border-bottom: 1px solid rgba(15, 118, 110, 0.2);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .qp-paper-header-main {
+            text-align: center;
+            flex: 1;
+        }
+
+        .qp-paper-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        .qp-paper-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .qp-paper-subject {
+            font-weight: 600;
+        }
+
+        .qp-paper-chapter {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .qp-paper-header-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.75rem;
+        }
+
+        .qp-setcode-box {
+            display: inline-flex;
+            border: 1px solid #1f2937;
+            border-radius: 0.375rem;
+            overflow: hidden;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .qp-setcode-label {
+            padding: 0.25rem 0.5rem;
+            border-right: 1px solid #1f2937;
+        }
+
+        .qp-setcode-value {
+            padding: 0.25rem 0.75rem;
+        }
+
+        .qp-marks-box {
+            border: 1px dashed rgba(15, 118, 110, 0.5);
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .qp-marks-line {
+            display: block;
+            border-bottom: 1px solid rgba(15, 118, 110, 0.5);
+            margin-top: 0.25rem;
+        }
+
+        .qp-paper-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem 2rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .qp-paper-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .qp-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.75rem;
+            background-color: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .qp-badge-outline {
+            background-color: transparent;
+            border: 1px dashed rgba(4, 120, 87, 0.5);
+        }
+
+        .qp-badge-important {
+            background: rgba(239, 68, 68, 0.15);
+            color: #b91c1c;
+        }
+
+        .qp-paper-instruction {
+            background: rgba(252, 211, 77, 0.2);
+            border-left: 4px solid rgba(217, 119, 6, 0.6);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .qp-paper-instruction-label {
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        .qp-paper-notice {
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .qp-student-info {
+            display: grid;
+            gap: 0.35rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .qp-question-area {
+            margin-top: 1rem;
+        }
+
+        .qp-question-list {
             list-style: none;
             margin: 0;
             padding: 0;
-            column-count: 1;
-            column-gap: 2.5rem;
+            column-count: var(--qp-column-count, 2);
+            column-gap: 2.25rem;
         }
 
-        .question-item {
-            break-inside: avoid;
+        .qp-question-item {
+            break-inside: avoid-column;
             display: flex;
             gap: 0.75rem;
             margin-bottom: 1.5rem;
         }
 
-        .question-number {
-            font-weight: 600;
-            min-width: 1.75rem;
-        }
-
-        .question-options {
-            margin-top: 0.75rem;
-            margin-bottom: 0.75rem;
-            padding-left: 0;
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.75rem 1.5rem;
-        }
-
-        .question-option {
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-start;
-            margin: 0;
-        }
-
-        .option-label {
-            font-weight: 600;
+        .qp-question-number {
+            font-weight: 700;
             min-width: 1.5rem;
         }
 
-        .question-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.75rem;
-            padding: 0.125rem 0.5rem;
-            border-radius: 9999px;
-            background-color: #d1fae5;
-            color: #047857;
+        .qp-question-body {
+            flex: 1;
         }
 
-        @media (min-width: 768px) {
-            .question-paper-body,
-            .question-paper-list {
-                column-count: 2;
-            }
+        .qp-question-text {
+            font-size: 1em;
+        }
+
+        .qp-text-left {
+            text-align: left;
+        }
+
+        .qp-text-center {
+            text-align: center;
+        }
+
+        .qp-text-right {
+            text-align: right;
+        }
+
+        .qp-text-justify {
+            text-align: justify;
+        }
+
+        .qp-option-list {
+            margin: 0.75rem 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem 1.25rem;
+        }
+
+        .qp-option-item {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .qp-option-label {
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.6rem;
+        }
+
+        .qp-option-label--circle {
+            border: 1.5px solid rgba(14, 116, 144, 0.8);
+            border-radius: 9999px;
+            height: 1.6rem;
+        }
+
+        .qp-option-label--dot {
+            border-radius: 9999px;
+            height: 1.6rem;
+            background-color: rgba(16, 185, 129, 0.15);
+        }
+
+        .qp-option-label--parentheses::before {
+            content: '(';
+            margin-right: 0.15rem;
+        }
+
+        .qp-option-label--parentheses::after {
+            content: ')';
+            margin-left: 0.15rem;
+        }
+
+        .qp-option-label--minimal {
+            font-weight: 600;
+        }
+
+        .qp-question-chip {
+            display: inline-flex;
+            margin-top: 0.5rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 9999px;
+            background: rgba(59, 130, 246, 0.12);
+            color: #1d4ed8;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .qp-settings-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .qp-settings-card {
+            background: #ffffff;
+            border: 1px solid rgba(209, 213, 219, 0.8);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 10px 25px -15px rgba(15, 118, 110, 0.3);
+        }
+
+        .qp-settings-title {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .qp-settings-section {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .qp-primary-btn {
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            background: #059669;
+            color: #fff;
+            padding: 0.6rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background 0.2s ease;
+        }
+
+        .qp-primary-btn:hover {
+            background: #047857;
+        }
+
+        .qp-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .qp-toggle {
+            position: relative;
+            display: inline-flex;
+            width: 44px;
+            height: 24px;
+        }
+
+        .qp-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .qp-toggle span {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #d1d5db;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+        }
+
+        .qp-toggle span::after {
+            content: '';
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            top: 3px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .qp-toggle input:checked + span {
+            background-color: #10b981;
+        }
+
+        .qp-toggle input:checked + span::after {
+            transform: translateX(20px);
+        }
+
+        .qp-icon-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(209, 213, 219, 0.8);
+            background: #ffffff;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .qp-icon-btn--active,
+        .qp-icon-btn:hover {
+            background: #10b981;
+            color: #ffffff;
+            border-color: #10b981;
+        }
+
+        .qp-size-btn,
+        .qp-style-btn {
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(209, 213, 219, 0.9);
+            background: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .qp-size-btn--active,
+        .qp-style-btn--active,
+        .qp-size-btn:hover,
+        .qp-style-btn:hover {
+            border-color: #10b981;
+            color: #047857;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .qp-select {
+            width: 100%;
+            border: 1px solid rgba(209, 213, 219, 0.9);
+            border-radius: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            background: #ffffff;
         }
 
         @media (max-width: 640px) {
-            .question-options {
+            .qp-option-list {
                 grid-template-columns: 1fr;
+            }
+
+            .qp-paper-header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .qp-paper-header-side {
+                align-items: center;
             }
         }
 
@@ -361,36 +1072,25 @@
                 background: #ffffff !important;
             }
 
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
-
             .no-print {
                 display: none !important;
             }
 
-            .question-paper-preview {
-                border: none !important;
+            .qp-preview-wrapper,
+            .qp-preview-surface,
+            .qp-paper {
                 box-shadow: none !important;
+                border: none !important;
+                background: #ffffff;
             }
 
-            .question-paper-body,
-            .question-paper-list {
-                column-count: 2;
+            .qp-question-list {
                 column-gap: 18mm;
             }
 
-            .question-options {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-
-            .question-item {
-                break-inside: avoid-column;
-            }
-
-            .question-chip {
-                display: none !important;
+            @page {
+                size: A4;
+                margin: 15mm;
             }
         }
     </style>

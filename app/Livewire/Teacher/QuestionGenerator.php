@@ -14,6 +14,40 @@ class QuestionGenerator extends Component
     public string $questionType = 'mcq';
     public int $questionCount = 5;
 
+    public string $programName = '';
+    public string $classLevel = '';
+    public string $setCode = '';
+    public string $duration = '';
+    public string $totalMarks = '';
+    public string $instructionText = 'সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।';
+    public string $noticeText = 'প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা।';
+
+    /**
+     * Options to toggle sections within the preview layout.
+     *
+     * @var array<string, bool>
+     */
+    public array $previewOptions = [
+        'attachAnswerSheet' => false,
+        'attachOmrSheet' => false,
+        'markImportant' => false,
+        'showQuestionInfo' => true,
+        'showSubSubject' => true,
+        'showChapter' => true,
+        'showSetCode' => true,
+        'showStudentInfo' => false,
+        'showMarksBox' => false,
+        'showInstructions' => true,
+        'showNotice' => true,
+    ];
+
+    public int $columnCount = 2;
+    public string $textAlign = 'justify';
+    public string $fontFamily = 'Bangla';
+    public int $fontSize = 14;
+    public string $optionStyle = 'circle';
+    public string $paperSize = 'A4';
+
     /** @var array<int, array{id:int,name:string}> */
     public array $subSubjects = [];
 
@@ -39,6 +73,13 @@ class QuestionGenerator extends Component
         'chapterId' => 'nullable|exists:chapters,id',
         'questionType' => 'required|string|in:mcq,creative,composite',
         'questionCount' => 'required|integer|min:1|max:50',
+        'programName' => 'nullable|string|max:191',
+        'classLevel' => 'nullable|string|max:191',
+        'setCode' => 'nullable|string|max:50',
+        'duration' => 'nullable|string|max:50',
+        'totalMarks' => 'nullable|string|max:50',
+        'instructionText' => 'nullable|string',
+        'noticeText' => 'nullable|string',
     ];
 
     protected array $validationAttributes = [
@@ -49,6 +90,13 @@ class QuestionGenerator extends Component
         'questionType' => 'প্রশ্নের ধরন',
         'questionCount' => 'প্রশ্নের সংখ্যা',
         'selectedQuestionIds' => 'নির্বাচিত প্রশ্ন',
+        'programName' => 'প্রোগ্রাম/প্রতিষ্ঠানের নাম',
+        'classLevel' => 'শ্রেণি/লেভেল',
+        'setCode' => 'সেট কোড',
+        'duration' => 'সময়',
+        'totalMarks' => 'পূর্ণমান',
+        'instructionText' => 'নির্দেশনা',
+        'noticeText' => 'ঘোষণা',
     ];
 
     public function updatedSubjectId($value): void
@@ -213,6 +261,7 @@ class QuestionGenerator extends Component
 
         $this->questionPaperSummary = [
             'exam_name' => $this->examName,
+            'program_name' => $this->programName ?: $this->examName,
             'subject' => optional($selectedQuestions->first()->subject)->name,
             'sub_subject' => $this->subSubjectId
                 ? optional($selectedQuestions->first()->chapter?->subSubject)->name
@@ -221,6 +270,12 @@ class QuestionGenerator extends Component
             'type' => $this->questionTypeLabel($this->questionType),
             'type_key' => $this->questionType,
             'total_questions' => $selectedQuestions->count(),
+            'class_level' => $this->classLevel,
+            'duration' => $this->duration,
+            'total_marks' => $this->totalMarks,
+            'set_code' => $this->setCode,
+            'instruction_text' => $this->instructionText,
+            'notice_text' => $this->noticeText,
             'questions' => $selectedQuestions->map(fn (Question $question) => [
                 'id' => $question->id,
                 'title' => $question->title,
@@ -239,6 +294,61 @@ class QuestionGenerator extends Component
             'type' => 'success',
             'message' => __('প্রশ্নপত্র সফলভাবে প্রস্তুত হয়েছে!'),
         ];
+    }
+
+    public function setTextAlign(string $alignment): void
+    {
+        if (! in_array($alignment, ['left', 'center', 'right', 'justify'], true)) {
+            return;
+        }
+
+        $this->textAlign = $alignment;
+    }
+
+    public function setColumnCount(int $count): void
+    {
+        if ($count < 1 || $count > 3) {
+            return;
+        }
+
+        $this->columnCount = $count;
+    }
+
+    public function increaseFontSize(): void
+    {
+        $this->fontSize = min($this->fontSize + 1, 20);
+    }
+
+    public function decreaseFontSize(): void
+    {
+        $this->fontSize = max($this->fontSize - 1, 10);
+    }
+
+    public function setFontFamily(string $font): void
+    {
+        if (! in_array($font, ['Bangla', 'SolaimanLipi', 'Kalpurush', 'roman'], true)) {
+            return;
+        }
+
+        $this->fontFamily = $font;
+    }
+
+    public function setPaperSize(string $size): void
+    {
+        if (! in_array($size, ['A4', 'Letter', 'Legal', 'A5'], true)) {
+            return;
+        }
+
+        $this->paperSize = $size;
+    }
+
+    public function setOptionStyle(string $style): void
+    {
+        if (! in_array($style, ['circle', 'dot', 'parentheses', 'minimal'], true)) {
+            return;
+        }
+
+        $this->optionStyle = $style;
     }
 
     public function render()
