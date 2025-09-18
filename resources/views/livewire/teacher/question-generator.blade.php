@@ -35,20 +35,6 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="grade">শ্রেণি</label>
-                    <select id="grade" wire:model="grade"
-                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="">শ্রেণি নির্বাচন করুন</option>
-                        @foreach($grades as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                    @error('grade')
-                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="subject">বিষয় নির্বাচন</label>
                     <select id="subject" wire:model="subjectId"
                             class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500">
@@ -58,6 +44,21 @@
                         @endforeach
                     </select>
                     @error('subjectId')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="subSubject">সাব-বিষয়</label>
+                    <select id="subSubject" wire:model="subSubjectId"
+                            class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
+                            @disabled(empty($subSubjects))>
+                        <option value="">সাব-বিষয় নির্বাচন করুন</option>
+                        @foreach($subSubjects as $subSubject)
+                            <option value="{{ $subSubject['id'] }}">{{ $subSubject['name'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('subSubjectId')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -199,8 +200,8 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
                 <div><span class="font-medium">পরীক্ষার নাম:</span> {{ $questionPaperSummary['exam_name'] }}</div>
-                <div><span class="font-medium">শ্রেণি:</span> {{ $questionPaperSummary['grade'] }}</div>
                 <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
+                <div><span class="font-medium">সাব-বিষয়:</span> {{ $questionPaperSummary['sub_subject'] }}</div>
                 <div><span class="font-medium">অধ্যায়:</span> {{ $questionPaperSummary['chapter'] }}</div>
                 <div><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $questionPaperSummary['type'] }}</div>
                 <div><span class="font-medium">মোট প্রশ্ন:</span> {{ $questionPaperSummary['total_questions'] }}</div>
