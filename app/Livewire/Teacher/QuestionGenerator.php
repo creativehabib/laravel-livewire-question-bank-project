@@ -3,16 +3,19 @@
 namespace App\Livewire\Teacher;
 
 use Livewire\Component;
-use App\Models\{Subject, Chapter, Question};
+use App\Models\{Subject, SubSubject, Chapter, Question};
 
 class QuestionGenerator extends Component
 {
     public string $examName = '';
-    public string $grade = '';
     public ?int $subjectId = null;
+    public ?int $subSubjectId = null;
     public ?int $chapterId = null;
     public string $questionType = 'mcq';
     public int $questionCount = 5;
+
+    /** @var array<int, array{id:int,name:string}> */
+    public array $availableSubSubjects = [];
 
     /** @var array<int, array{id:int,name:string}> */
     public array $availableChapters = [];
@@ -31,8 +34,8 @@ class QuestionGenerator extends Component
 
     protected array $rules = [
         'examName' => 'required|string|min:3',
-        'grade' => 'required|string',
         'subjectId' => 'required|exists:subjects,id',
+        'subSubjectId' => 'nullable|exists:sub_subjects,id',
         'chapterId' => 'nullable|exists:chapters,id',
         'questionType' => 'required|string|in:mcq,creative,composite',
         'questionCount' => 'required|integer|min:1|max:50',
@@ -40,8 +43,8 @@ class QuestionGenerator extends Component
 
     protected array $validationAttributes = [
         'examName' => 'পরীক্ষার নাম',
-        'grade' => 'শ্রেণি',
         'subjectId' => 'বিষয়',
+        'subSubjectId' => 'সাব-বিষয়',
         'chapterId' => 'অধ্যায়',
         'questionType' => 'প্রশ্নের ধরন',
         'questionCount' => 'প্রশ্নের সংখ্যা',
@@ -51,19 +54,54 @@ class QuestionGenerator extends Component
     public function updatedSubjectId($value): void
     {
         $this->chapterId = null;
-        $this->availableChapters = $value
-            ? Chapter::query()
+        $this->subSubjectId = null;
+        $this->availableSubSubjects = $value
+            ? SubSubject::query()
+                ->where('subject_id', $value)
+                ->orderBy('name')
+                ->get(['id', 'name'])
+                ->map(fn (SubSubject $subSubject) => ['id' => $subSubject->id, 'name' => $subSubject->name])
+                ->all()
+            : [];
+
+        $this->availableChapters = [];
+
+        if ($value && empty($this->availableSubSubjects)) {
+            $this->availableChapters = Chapter::query()
                 ->where('subject_id', $value)
                 ->orderBy('name')
                 ->get(['id', 'name'])
                 ->map(fn (Chapter $chapter) => ['id' => $chapter->id, 'name' => $chapter->name])
-                ->all()
-            : [];
+                ->all();
+        }
+    }
+
+    public function updatedSubSubjectId($value): void
+    {
+        $this->chapterId = null;
+
+        if (! $value) {
+            $this->availableChapters = [];
+            return;
+        }
+
+        $this->availableChapters = Chapter::query()
+            ->where('sub_subject_id', $value)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn (Chapter $chapter) => ['id' => $chapter->id, 'name' => $chapter->name])
+            ->all();
     }
 
     public function updatedChapterId($value): void
     {
         if (! $value) {
+            return;
+        }
+
+        if ($this->subSubjectId && ! Chapter::where('id', $value)->where('sub_subject_id', $this->subSubjectId)->exists()) {
+            $this->addError('chapterId', __('নির্বাচিত অধ্যায় এই সাব-বিষয়ের অন্তর্ভুক্ত নয়।'));
+            $this->chapterId = null;
             return;
         }
 
@@ -78,8 +116,12 @@ class QuestionGenerator extends Component
         $this->validate();
 
         $query = Question::query()
-            ->with(['chapter', 'subject', 'tags'])
+            ->with(['chapter.subSubject', 'subject', 'tags'])
             ->where('subject_id', $this->subjectId);
+
+        if ($this->subSubjectId) {
+            $query->where('sub_subject_id', $this->subSubjectId);
+        }
 
         if ($this->chapterId) {
             $query->where('chapter_id', $this->chapterId);
@@ -136,7 +178,7 @@ class QuestionGenerator extends Component
         ]);
 
         $selectedQuestions = Question::query()
-            ->with(['chapter', 'subject'])
+            ->with(['chapter.subSubject', 'subject'])
             ->whereIn('id', $this->selectedQuestionIds)
             ->get();
 
@@ -145,10 +187,14 @@ class QuestionGenerator extends Component
             return;
         }
 
+        $hasSubSubjects = ! empty($this->availableSubSubjects);
+
         $this->questionPaperSummary = [
             'exam_name' => $this->examName,
-            'grade' => $this->grades()[$this->grade] ?? $this->grade,
             'subject' => optional($selectedQuestions->first()->subject)->name,
+            'sub_subject' => $this->subSubjectId
+                ? optional($selectedQuestions->first()->chapter?->subSubject)->name
+                : ($hasSubSubjects ? __('বহু সাব-বিষয়') : __('সাব-বিষয় প্রযোজ্য নয়')),
             'chapter' => $this->chapterId ? optional($selectedQuestions->first()->chapter)->name : __('বহু অধ্যায়'),
             'type' => $this->questionTypeLabel($this->questionType),
             'total_questions' => $selectedQuestions->count(),
@@ -169,26 +215,10 @@ class QuestionGenerator extends Component
     {
         return view('livewire.teacher.question-generator', [
             'subjects' => Subject::orderBy('name')->get(['id', 'name']),
-            'grades' => $this->grades(),
             'typeOptions' => $this->questionTypeOptions(),
+            'subSubjects' => $this->availableSubSubjects,
             'chapters' => $this->availableChapters,
         ])->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    protected function grades(): array
-    {
-        return [
-            'six' => __('ষষ্ঠ শ্রেণি'),
-            'seven' => __('সপ্তম শ্রেণি'),
-            'eight' => __('অষ্টম শ্রেণি'),
-            'nine' => __('নবম শ্রেণি'),
-            'ten' => __('দশম শ্রেণি'),
-            'eleven' => __('একাদশ শ্রেণি'),
-            'twelve' => __('দ্বাদশ শ্রেণি'),
-        ];
     }
 
     /**
