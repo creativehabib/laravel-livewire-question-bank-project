@@ -115,21 +115,23 @@ class QuestionGenerator extends Component
     {
         $this->validate();
 
-        $query = Question::query()
+        $baseQuery = Question::query()
             ->with(['chapter.subSubject', 'subject', 'tags'])
             ->where('subject_id', $this->subjectId);
 
         if ($this->subSubjectId) {
-            $query->where('sub_subject_id', $this->subSubjectId);
+            $baseQuery->where('sub_subject_id', $this->subSubjectId);
         }
 
         if ($this->chapterId) {
-            $query->where('chapter_id', $this->chapterId);
+            $baseQuery->where('chapter_id', $this->chapterId);
         }
 
         $typeKeywords = $this->questionTypeKeywords($this->questionType);
+        $queryWithType = clone $baseQuery;
+
         if (! empty($typeKeywords)) {
-            $query->whereHas('tags', function ($tagQuery) use ($typeKeywords) {
+            $queryWithType->whereHas('tags', function ($tagQuery) use ($typeKeywords) {
                 $tagQuery->where(function ($inner) use ($typeKeywords) {
                     foreach ($typeKeywords as $keyword) {
                         $inner->orWhere('name', 'like', "%{$keyword}%");
@@ -138,7 +140,13 @@ class QuestionGenerator extends Component
             });
         }
 
-        $questions = $query->inRandomOrder()->take($this->questionCount * 2)->get();
+        $questions = $queryWithType->inRandomOrder()->take($this->questionCount * 2)->get();
+
+        $usedFallback = false;
+        if ($questions->isEmpty() && ! empty($typeKeywords)) {
+            $questions = (clone $baseQuery)->inRandomOrder()->take($this->questionCount * 2)->get();
+            $usedFallback = $questions->isNotEmpty();
+        }
 
         if ($questions->isEmpty()) {
             $this->generatedQuestions = [];
@@ -165,7 +173,12 @@ class QuestionGenerator extends Component
         $this->selectedQuestionIds = [];
         $this->showGenerationResults = true;
         $this->questionPaperSummary = null;
-        $this->notification = null;
+        $this->notification = $usedFallback
+            ? [
+                'type' => 'warning',
+                'message' => __('নির্বাচিত প্রশ্নের ধরন অনুযায়ী প্রশ্ন পাওয়া যায়নি, সাধারণ প্রশ্নগুলো দেখানো হচ্ছে।'),
+            ]
+            : null;
     }
 
     public function saveSelection(): void
