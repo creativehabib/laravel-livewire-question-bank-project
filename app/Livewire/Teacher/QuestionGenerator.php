@@ -15,10 +15,10 @@ class QuestionGenerator extends Component
     public int $questionCount = 5;
 
     /** @var array<int, array{id:int,name:string}> */
-    public array $availableSubSubjects = [];
+    public array $subSubjects = [];
 
     /** @var array<int, array{id:int,name:string}> */
-    public array $availableChapters = [];
+    public array $chapters = [];
 
     /** @var array<int, array<string, mixed>> */
     public array $generatedQuestions = [];
@@ -55,7 +55,7 @@ class QuestionGenerator extends Component
     {
         $this->chapterId = null;
         $this->subSubjectId = null;
-        $this->availableSubSubjects = $value
+        $this->subSubjects = $value
             ? SubSubject::query()
                 ->where('subject_id', $value)
                 ->orderBy('name')
@@ -64,10 +64,10 @@ class QuestionGenerator extends Component
                 ->all()
             : [];
 
-        $this->availableChapters = [];
+        $this->chapters = [];
 
-        if ($value && empty($this->availableSubSubjects)) {
-            $this->availableChapters = Chapter::query()
+        if ($value && empty($this->subSubjects)) {
+            $this->chapters = Chapter::query()
                 ->where('subject_id', $value)
                 ->orderBy('name')
                 ->get(['id', 'name'])
@@ -81,11 +81,11 @@ class QuestionGenerator extends Component
         $this->chapterId = null;
 
         if (! $value) {
-            $this->availableChapters = [];
+            $this->chapters = [];
             return;
         }
 
-        $this->availableChapters = Chapter::query()
+        $this->chapters = Chapter::query()
             ->where('sub_subject_id', $value)
             ->orderBy('name')
             ->get(['id', 'name'])
@@ -187,7 +187,7 @@ class QuestionGenerator extends Component
             return;
         }
 
-        $hasSubSubjects = ! empty($this->availableSubSubjects);
+        $hasSubSubjects = ! empty($this->subSubjects);
 
         $this->questionPaperSummary = [
             'exam_name' => $this->examName,
@@ -216,8 +216,8 @@ class QuestionGenerator extends Component
         return view('livewire.teacher.question-generator', [
             'subjects' => Subject::orderBy('name')->get(['id', 'name']),
             'typeOptions' => $this->questionTypeOptions(),
-            'subSubjects' => $this->availableSubSubjects,
-            'chapters' => $this->availableChapters,
+            'subSubjects' => $this->subSubjects,
+            'chapters' => $this->chapters,
         ])->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]);
     }
 
