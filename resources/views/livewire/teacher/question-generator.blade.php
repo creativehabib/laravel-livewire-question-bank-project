@@ -203,7 +203,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 dark:text-gray-200 no-print">
                 <div><span class="font-medium">পরীক্ষার নাম:</span> {{ $questionPaperSummary['exam_name'] }}</div>
                 <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
                 <div><span class="font-medium">সাব-বিষয়:</span> {{ $questionPaperSummary['sub_subject'] }}</div>
@@ -218,7 +218,7 @@
                 </div>
 
                 <div class="question-paper-preview text-gray-800 dark:text-gray-100">
-                    <div class="question-paper-header text-center border-b border-emerald-100 dark:border-emerald-800 px-6 py-4">
+                    <div class="question-paper-header text-center border-b border-emerald-100 dark:border-emerald-800 px-6 py-4 no-print">
                         <h2 class="text-xl font-semibold">{{ $questionPaperSummary['exam_name'] }}</h2>
                         <div class="mt-2 text-sm space-y-1">
                             <div><span class="font-medium">বিষয়:</span> {{ $questionPaperSummary['subject'] }}</div>
@@ -315,13 +315,16 @@
             margin-bottom: 0.75rem;
             padding-left: 0;
             list-style: none;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem 1.5rem;
         }
 
         .question-option {
             display: flex;
             gap: 0.5rem;
             align-items: flex-start;
-            margin-bottom: 0.5rem;
+            margin: 0;
         }
 
         .option-label {
@@ -344,6 +347,12 @@
             .question-paper-body,
             .question-paper-list {
                 column-count: 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .question-options {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -372,13 +381,16 @@
                 column-gap: 18mm;
             }
 
+            .question-options {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .question-item {
                 break-inside: avoid-column;
             }
 
             .question-chip {
-                background-color: #d1fae5 !important;
-                color: #047857 !important;
+                display: none !important;
             }
         }
     </style>
