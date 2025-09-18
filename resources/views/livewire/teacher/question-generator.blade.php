@@ -621,28 +621,19 @@
         }
 
         .qp-preview-wrapper {
-            background: linear-gradient(135deg, rgba(236, 253, 245, 0.8), rgba(240, 253, 244, 0.8));
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
         }
 
         .qp-preview-surface {
-            background: linear-gradient(145deg, rgba(248, 113, 113, 0.12), rgba(16, 185, 129, 0.12));
-            border-radius: 14px;
-            padding: 1.25rem;
         }
 
         .qp-paper {
             position: relative;
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
             padding: 2rem;
-            max-width: 900px;
+            max-width: 210mm;
             margin: 0 auto;
             color: #1f2937;
-            line-height: 1.6;
+            line-height: 1.3;
             font-size: var(--qp-font-size, 14px);
         }
 
@@ -880,18 +871,16 @@
 
         .qp-option-label--dot {
             border-radius: 9999px;
-            height: 1.6rem;
+            height: 1rem;
             background-color: rgba(16, 185, 129, 0.15);
         }
 
         .qp-option-label--parentheses::before {
             content: '(';
-            margin-right: 0.12rem;
         }
 
         .qp-option-label--parentheses::after {
             content: ')';
-            margin-left: 0.12rem;
         }
 
         .qp-option-label--minimal {
