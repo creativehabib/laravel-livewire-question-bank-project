@@ -30,6 +30,7 @@ use App\Livewire\Admin\JobCompanies\Create as JobCompanyCreate;
 use App\Livewire\Admin\JobCompanies\Edit as JobCompanyEdit;
 use App\Livewire\Admin\Media\Index as MediaIndex;
 use App\Livewire\Teacher\Dashboard as TeacherDashboard;
+use App\Livewire\Teacher\QuestionGenerator as TeacherQuestionGenerator;
 use App\Livewire\Student\Dashboard as StudentDashboard;
 use App\Livewire\Student\Exam as StudentExam;
 use App\Livewire\Practice;
@@ -124,6 +125,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teacher/questions', Questions::class)->name('teacher.questions.index');
     Route::get('/teacher/questions/create', Create::class)->name('teacher.questions.create');
     Route::get('/teacher/questions/{question}/edit', Edit::class)->name('teacher.questions.edit');
+    Route::get('/teacher/question-create', TeacherQuestionGenerator::class)->name('teacher.questions.generate');
 });
 include __DIR__.'/auth.php';
 
