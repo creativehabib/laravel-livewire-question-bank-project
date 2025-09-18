@@ -262,8 +262,6 @@
 
     @if($questionPaperSummary)
         @php
-            use Illuminate\Support\Str;
-
             $isMcqPaper = ($questionPaperSummary['type_key'] ?? null) === 'mcq';
             $optionLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
             $summary = $questionPaperSummary;
@@ -325,7 +323,7 @@
                     </div>
 
                     <div class="px-4 pb-6 pt-6 sm:px-6">
-                        <div id="question-paper-preview" class="mx-auto w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 text-slate-800 shadow-lg ring-1 ring-emerald-500/5 dark:border-slate-700 dark:bg-white" data-paper-size="{{ $paperSizeKey }}" data-file-name="{{ Str::slug($summary['exam_name'] ?: 'question-paper') }}" style="font-family: {{ $fontStack }}; font-size: {{ $fontSize }}px;">
+                        <div id="question-paper-preview" class="mx-auto w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 text-slate-800 shadow-lg ring-1 ring-emerald-500/5 dark:border-slate-700 dark:bg-white" data-paper-size="{{ $paperSizeKey }}" data-file-name="{{ \Illuminate\Support\Str::slug($summary['exam_name'] ?: 'question-paper') }}" style="font-family: {{ $fontStack }}; font-size: {{ $fontSize }}px;">
                             <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
                                 <div class="flex-1 text-center sm:text-left">
                                     <h1 class="text-2xl font-bold tracking-wide text-slate-900">{{ $summary['program_name'] ?? $summary['exam_name'] }}</h1>
@@ -451,7 +449,7 @@
 
                     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/60 print:hidden">
                         <span class="text-sm text-slate-500 dark:text-slate-300">বর্তমান পেপার সাইজ: {{ $paperSize }}</span>
-                        <button type="button" data-question-pdf-trigger data-file-name="{{ Str::slug($summary['exam_name'] ?: 'question-paper') }}" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                        <button type="button" data-question-pdf-trigger data-file-name="{{ \Illuminate\Support\Str::slug($summary['exam_name'] ?: 'question-paper') }}" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v4.125c0 .621-.504 1.125-1.125 1.125h-12.75a1.125 1.125 0 01-1.125-1.125V14.25m3.375-3.375L12 15.375m0 0l4.125-4.5M12 15.375V3.75" />
                             </svg>
