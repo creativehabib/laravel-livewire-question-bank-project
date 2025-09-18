@@ -190,8 +190,17 @@ class QuestionGenerator extends Component
             'selectedQuestionIds.min' => __('কমপক্ষে একটি প্রশ্ন নির্বাচন করুন।'),
         ]);
 
+        $relations = [
+            'chapter.subSubject',
+            'subject',
+        ];
+
+        if ($this->questionType === 'mcq') {
+            $relations['options'] = static fn ($query) => $query->orderBy('id');
+        }
+
         $selectedQuestions = Question::query()
-            ->with(['chapter.subSubject', 'subject'])
+            ->with($relations)
             ->whereIn('id', $this->selectedQuestionIds)
             ->get();
 
@@ -210,11 +219,19 @@ class QuestionGenerator extends Component
                 : ($hasSubSubjects ? __('বহু সাব-বিষয়') : __('সাব-বিষয় প্রযোজ্য নয়')),
             'chapter' => $this->chapterId ? optional($selectedQuestions->first()->chapter)->name : __('বহু অধ্যায়'),
             'type' => $this->questionTypeLabel($this->questionType),
+            'type_key' => $this->questionType,
             'total_questions' => $selectedQuestions->count(),
             'questions' => $selectedQuestions->map(fn (Question $question) => [
                 'id' => $question->id,
                 'title' => $question->title,
                 'chapter' => optional($question->chapter)->name,
+                'options' => $this->questionType === 'mcq'
+                    ? $question->options
+                        ->map(static fn ($option) => $option->option_text)
+                        ->filter()
+                        ->values()
+                        ->all()
+                    : [],
             ])->all(),
         ];
 
