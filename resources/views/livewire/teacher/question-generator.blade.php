@@ -16,7 +16,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                     @else
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m6 .75a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    @endif
+@endif
+
+
                 </svg>
                 <span>{{ $notification['message'] }}</span>
             </div>
@@ -260,148 +262,185 @@
 
     @if($questionPaperSummary)
         @php
+            use Illuminate\Support\Str;
+
             $isMcqPaper = ($questionPaperSummary['type_key'] ?? null) === 'mcq';
             $optionLabels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ'];
             $summary = $questionPaperSummary;
-            $fontClassMap = [
-                'Bangla' => 'qp-font-bangla',
-                'SolaimanLipi' => 'qp-font-solaiman',
-                'Kalpurush' => 'qp-font-kalpurush',
-                'roman' => 'qp-font-roman',
+            $textAlignClassMap = [
+                'left' => 'text-left',
+                'center' => 'text-center',
+                'right' => 'text-right',
+                'justify' => 'text-justify',
             ];
-            $fontClass = $fontClassMap[$fontFamily] ?? 'qp-font-bangla';
-            $textAlignClass = 'qp-text-' . $textAlign;
+            $columnClassMap = [
+                1 => 'columns-1',
+                2 => 'columns-1 md:columns-2',
+                3 => 'columns-1 md:columns-3',
+            ];
+            $fontStacks = [
+                'Bangla' => "'Shurjo', 'Noto Sans Bengali', 'SolaimanLipi', sans-serif",
+                'SolaimanLipi' => "'SolaimanLipi', 'Shurjo', 'Noto Sans Bengali', sans-serif",
+                'Kalpurush' => "'Kalpurush', 'Shurjo', 'Noto Sans Bengali', sans-serif",
+                'roman' => "'Times New Roman', serif",
+            ];
+            $textAlignClass = $textAlignClassMap[$textAlign] ?? 'text-justify';
+            $columnClass = $columnClassMap[$columnCount] ?? 'columns-1 md:columns-2';
+            $fontStack = $fontStacks[$fontFamily] ?? $fontStacks['Bangla'];
+            $paperSizeKey = strtolower($paperSize);
+            $optionLabelClasses = [
+                'circle' => 'flex h-7 w-7 items-center justify-center rounded-full border border-cyan-600 text-sm font-semibold text-cyan-700',
+                'dot' => 'flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700',
+                'parentheses' => 'text-sm font-semibold text-cyan-700',
+                'minimal' => 'text-sm font-semibold text-slate-600',
+            ];
         @endphp
 
         <div class="space-y-6">
-            <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6 space-y-4">
-                <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200 no-print">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <div class="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 text-emerald-700 shadow-sm dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-200 print:hidden">
+                <div class="flex items-start gap-3">
+                    <svg class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m5.25 2.25a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <div>
+                    <div class="space-y-1">
                         <h3 class="text-lg font-semibold">প্রশ্নপত্র প্রস্তুত হয়েছে!</h3>
-                        <p class="text-sm">সিলেক্ট করা প্রশ্নগুলো দিয়ে নতুন প্রশ্নপত্র তৈরি হয়েছে। প্রয়োজনে ডাউনলোড বা শেয়ার করুন।</p>
+                        <p class="text-sm text-emerald-600/80 dark:text-emerald-100/80">সিলেক্ট করা প্রশ্নগুলো দিয়ে নতুন প্রশ্নপত্র তৈরি হয়েছে। প্রয়োজনে ডাউনলোড বা শেয়ার করুন।</p>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-700 dark:text-gray-200 no-print">
-                    <div class="qp-summary-chip"><span class="font-medium">পরীক্ষা:</span> {{ $summary['exam_name'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">বিষয়:</span> {{ $summary['subject'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">সাব-বিষয়:</span> {{ $summary['sub_subject'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">অধ্যায়:</span> {{ $summary['chapter'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $summary['type'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">মোট প্রশ্ন:</span> {{ $summary['total_questions'] }}</div>
+                <div class="mt-4 grid gap-3 text-sm text-emerald-800 dark:text-emerald-100 sm:grid-cols-2 xl:grid-cols-3">
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">পরীক্ষা</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['exam_name'] }}</span></div>
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">বিষয়</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['subject'] }}</span></div>
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">সাব-বিষয়</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['sub_subject'] }}</span></div>
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">অধ্যায়</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['chapter'] }}</span></div>
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">ধরণ</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['type'] }}</span></div>
+                    <div class="flex items-center gap-2 rounded-xl border border-emerald-200/60 bg-white/60 px-3 py-2 dark:border-emerald-700/70 dark:bg-emerald-900/40"><span class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-300">মোট প্রশ্ন</span><span class="font-medium text-emerald-700 dark:text-emerald-100">{{ $summary['total_questions'] }}</span></div>
                 </div>
             </div>
 
-            <div class="qp-designer-layout">
-                <div class="qp-preview-wrapper">
-                    <div class="qp-preview-surface">
-                        <div class="qp-paper {{ $fontClass }}" data-paper-size="{{ $paperSize }}" style="--qp-font-size: {{ $fontSize }}px; --qp-column-count: {{ $columnCount }};">
-                            <div class="qp-paper-header">
-                                <div class="qp-paper-header-main">
-                                    <h1 class="qp-paper-title">{{ $summary['program_name'] ?? $summary['exam_name'] }}</h1>
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                <div class="flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                    <div class="border-b border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/60">
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">প্রশ্নপত্র প্রিভিউ</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">নির্বাচিত সেটিং অনুসারে লাইভ প্রিভিউ দেখুন।</p>
+                    </div>
+
+                    <div class="px-4 pb-6 pt-6 sm:px-6">
+                        <div id="question-paper-preview" class="mx-auto w-full max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 text-slate-800 shadow-lg ring-1 ring-emerald-500/5 dark:border-slate-700 dark:bg-white" data-paper-size="{{ $paperSizeKey }}" data-file-name="{{ Str::slug($summary['exam_name'] ?: 'question-paper') }}" style="font-family: {{ $fontStack }}; font-size: {{ $fontSize }}px;">
+                            <div class="flex flex-col gap-4 border-b border-slate-200 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                                <div class="flex-1 text-center sm:text-left">
+                                    <h1 class="text-2xl font-bold tracking-wide text-slate-900">{{ $summary['program_name'] ?? $summary['exam_name'] }}</h1>
                                     @if(! empty($summary['class_level']))
-                                        <p class="qp-paper-subtitle">{{ $summary['class_level'] }}</p>
+                                        <p class="mt-1 text-lg font-semibold text-slate-700">{{ $summary['class_level'] }}</p>
                                     @endif
-                                    <p class="qp-paper-subject">{{ $summary['subject'] }}</p>
-                                    @if($previewOptions['showSubSubject'] && ! empty($summary['sub_subject']))
-                                        <p class="qp-paper-subject">{{ $summary['sub_subject'] }}</p>
-                                    @endif
-                                    @if($previewOptions['showChapter'] && ! empty($summary['chapter']))
-                                        <p class="qp-paper-chapter">{{ $summary['chapter'] }}</p>
-                                    @endif
+                                    <div class="mt-2 space-y-1 text-sm font-medium text-slate-700">
+                                        <p>{{ $summary['subject'] }}</p>
+                                        @if($previewOptions['showSubSubject'] && ! empty($summary['sub_subject']))
+                                            <p>{{ $summary['sub_subject'] }}</p>
+                                        @endif
+                                        @if($previewOptions['showChapter'] && ! empty($summary['chapter']))
+                                            <p>{{ $summary['chapter'] }}</p>
+                                        @endif
+                                    </div>
                                 </div>
-                                <div class="qp-paper-header-side">
+                                <div class="flex flex-col items-center gap-3 sm:items-end">
                                     @if($previewOptions['showSetCode'])
-                                        <div class="qp-setcode-box">
-                                            <span class="qp-setcode-label">সেট -</span>
-                                            <span class="qp-setcode-value">{{ $summary['set_code'] ?: '—' }}</span>
+                                        <div class="inline-flex overflow-hidden rounded-lg border border-slate-700 text-sm font-semibold text-slate-700">
+                                            <span class="bg-slate-100 px-2 py-1 text-xs uppercase tracking-widest text-slate-600">সেট</span>
+                                            <span class="px-3 py-1">{{ $summary['set_code'] ?: '—' }}</span>
                                         </div>
                                     @endif
                                     @if($previewOptions['showMarksBox'])
-                                        <div class="qp-marks-box">
-                                            <span>প্রাপ্ত নম্বর</span>
-                                            <span class="qp-marks-line"></span>
+                                        <div class="w-full min-w-[150px] rounded-lg border border-dashed border-teal-500 px-3 py-2 text-center text-sm text-slate-700">
+                                            <span class="font-semibold">প্রাপ্ত নম্বর</span>
+                                            <span class="mt-1 block h-px w-full bg-teal-500/40"></span>
                                         </div>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="qp-paper-meta">
-                                <div>সময়— <span>{{ $summary['duration'] ?: '........' }}</span></div>
-                                <div>পূর্ণমান— <span>{{ $summary['total_marks'] ?: '........' }}</span></div>
-                                <div>প্রশ্ন সংখ্যা— <span>{{ $summary['total_questions'] }}</span></div>
+                            <div class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-slate-600">
+                                <span>সময়— <span class="font-normal text-slate-700">{{ $summary['duration'] ?: '........' }}</span></span>
+                                <span>পূর্ণমান— <span class="font-normal text-slate-700">{{ $summary['total_marks'] ?: '........' }}</span></span>
+                                <span>প্রশ্ন সংখ্যা— <span class="font-normal text-slate-700">{{ $summary['total_questions'] }}</span></span>
                             </div>
 
                             @if($previewOptions['showQuestionInfo'])
-                                <div class="qp-paper-tags">
-                                    <span class="qp-badge">পরীক্ষা: {{ $summary['exam_name'] }}</span>
-                                    <span class="qp-badge">প্রশ্নের ধরন: {{ $summary['type'] }}</span>
-                                    <span class="qp-badge">মোট প্রশ্ন: {{ $summary['total_questions'] }}</span>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">পরীক্ষা: {{ $summary['exam_name'] }}</span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">প্রশ্নের ধরন: {{ $summary['type'] }}</span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">মোট প্রশ্ন: {{ $summary['total_questions'] }}</span>
                                 </div>
                             @endif
 
                             @if($previewOptions['attachAnswerSheet'])
-                                <div class="qp-paper-tags">
-                                    <span class="qp-badge qp-badge-outline">উত্তরপত্র সংযুক্ত</span>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="inline-flex items-center gap-1 rounded-full border border-emerald-500/60 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">উত্তরপত্র সংযুক্ত</span>
                                 </div>
                             @endif
 
                             @if($previewOptions['attachOmrSheet'])
-                                <div class="qp-paper-tags">
-                                    <span class="qp-badge qp-badge-outline">OMR শীট সংযুক্ত</span>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="inline-flex items-center gap-1 rounded-full border border-cyan-500/60 bg-cyan-50 px-3 py-1 text-xs font-semibold text-cyan-700">OMR শীট সংযুক্ত</span>
                                 </div>
                             @endif
 
                             @if($previewOptions['markImportant'])
-                                <div class="qp-paper-tags">
-                                    <span class="qp-badge qp-badge-important">গুরুত্বপূর্ণ প্রশ্ন</span>
+                                <div class="mt-3 flex flex-wrap gap-2">
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">গুরুত্বপূর্ণ প্রশ্ন</span>
                                 </div>
                             @endif
 
                             @if($previewOptions['showInstructions'] && ! empty($summary['instruction_text']))
-                                <div class="qp-paper-instruction">
-                                    <span class="qp-paper-instruction-label">দ্রষ্টব্যঃ</span>
-                                    <span>{!! nl2br(e($summary['instruction_text'])) !!}</span>
+                                <div class="mt-4 rounded-xl border-l-4 border-amber-400/80 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                                    <span class="font-semibold">দ্রষ্টব্যঃ</span>
+                                    <span class="ms-1 align-middle">{!! nl2br(e($summary['instruction_text'])) !!}</span>
                                 </div>
                             @endif
 
                             @if($previewOptions['showNotice'] && ! empty($summary['notice_text']))
-                                <div class="qp-paper-notice">{!! nl2br(e($summary['notice_text'])) !!}</div>
+                                <p class="mt-3 text-center text-sm font-semibold text-slate-700">{!! nl2br(e($summary['notice_text'])) !!}</p>
                             @endif
 
                             @if($previewOptions['showStudentInfo'])
-                                <div class="qp-student-info">
-                                    <div>শিক্ষার্থীর নাম: .......................................................</div>
-                                    <div>রোল নং: ............................... শ্রেণি: ...............................</div>
-                                    <div>প্রদত্ত নম্বর: ............................................................</div>
+                                <div class="mt-4 grid gap-1 text-sm text-slate-700">
+                                    <p>শিক্ষার্থীর নাম: .......................................................</p>
+                                    <p>রোল নং: ............................... শ্রেণি: ...............................</p>
+                                    <p>প্রদত্ত নম্বর: ............................................................</p>
                                 </div>
                             @endif
 
-                            <div class="qp-question-area">
-                                <ol class="qp-question-list">
+                            <div class="mt-6">
+                                <ol class="{{ $columnClass }} [column-gap:2.5rem]">
                                     @foreach($summary['questions'] as $index => $question)
-                                        <li class="qp-question-item">
-                                            <div class="qp-question-number">{{ $index + 1 }}.</div>
-                                            <div class="qp-question-body">
-                                                <div class="qp-question-text {{ $textAlignClass }}">{!! $question['title'] !!}</div>
+                                        <li class="mb-6 break-inside-avoid">
+                                            <div class="flex items-start gap-3 text-sm leading-relaxed text-slate-700">
+                                                <span class="mt-0.5 font-semibold text-slate-800">{{ $index + 1 }}.</span>
+                                                <div class="flex-1 space-y-3">
+                                                    <div class="prose prose-sm max-w-none text-slate-800 {{ $textAlignClass }}">{!! $question['title'] !!}</div>
+                                                    @if($isMcqPaper && ! empty($question['options']))
+                                                        <ul class="grid gap-2 text-slate-700 sm:grid-cols-2">
+                                                            @foreach($question['options'] as $optIndex => $option)
+                                                                <li class="flex items-start gap-2">
+                                                                    <span class="{{ $optionLabelClasses[$optionStyle] ?? $optionLabelClasses['circle'] }}">
+                                                                        @php $label = $optionLabels[$optIndex] ?? ($optIndex + 1); @endphp
+                                                                        @if($optionStyle === 'parentheses')
+                                                                            ({{ $label }})
+                                                                        @elseif($optionStyle === 'minimal')
+                                                                            {{ $label }}.
+                                                                        @else
+                                                                            {{ $label }}
+                                                                        @endif
+                                                                    </span>
+                                                                    <span class="prose prose-sm max-w-none text-slate-700">{!! $option !!}</span>
+                                                                </li>
+                                                            @endforeach
+                                                        </ul>
+                                                    @endif
 
-                                                @if($isMcqPaper && ! empty($question['options']))
-                                                    <ul class="qp-option-list qp-option-list--{{ $optionStyle }}">
-                                                        @foreach($question['options'] as $optIndex => $option)
-                                                            <li class="qp-option-item">
-                                                                <span class="qp-option-label qp-option-label--{{ $optionStyle }}">{{ $optionLabels[$optIndex] ?? ($optIndex + 1) }}</span>
-                                                                <span class="qp-option-text">{!! $option !!}</span>
-                                                            </li>
-                                                        @endforeach
-                                                    </ul>
-                                                @endif
-
-                                                @if($previewOptions['showChapter'] && ! empty($question['chapter']))
-                                                    <span class="qp-question-chip">{{ $question['chapter'] }}</span>
-                                                @endif
+                                                    @if($previewOptions['showChapter'] && ! empty($question['chapter']))
+                                                        <span class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">{{ $question['chapter'] }}</span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </li>
                                     @endforeach
@@ -409,129 +448,106 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/60 print:hidden">
+                        <span class="text-sm text-slate-500 dark:text-slate-300">বর্তমান পেপার সাইজ: {{ $paperSize }}</span>
+                        <button type="button" data-question-pdf-trigger data-file-name="{{ Str::slug($summary['exam_name'] ?: 'question-paper') }}" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v4.125c0 .621-.504 1.125-1.125 1.125h-12.75a1.125 1.125 0 01-1.125-1.125V14.25m3.375-3.375L12 15.375m0 0l4.125-4.5M12 15.375V3.75" />
+                            </svg>
+                            PDF ডাউনলোড
+                        </button>
+                    </div>
                 </div>
 
-                <div class="qp-settings-panel no-print">
-                    <div class="qp-settings-card">
-                        <h4 class="qp-settings-title">কুইক সেটিংস</h4>
-                        <button type="button" class="qp-primary-btn">+ আরও প্রশ্ন যুক্ত করুন</button>
+                <div class="space-y-4 print:hidden">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <h4 class="text-sm font-semibold text-slate-800 dark:text-slate-100">কুইক সেটিংস</h4>
+                        <button type="button" class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-500/20 dark:text-emerald-200">+ আরও প্রশ্ন যুক্ত করুন</button>
                     </div>
 
-                    <div class="qp-settings-card">
-                        <p class="qp-settings-section">প্রশ্নে সংযুক্তি</p>
-                        <div class="space-y-2">
-                            <div class="qp-toggle-row">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">প্রশ্নে সংযুক্তি</p>
+                        <div class="mt-4 space-y-3">
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>উত্তরপত্র</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.attachAnswerSheet">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.attachAnswerSheet">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>OMR সংযুক্ত</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.attachOmrSheet">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.attachOmrSheet">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>গুরুত্বপূর্ণ প্রশ্ন</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.markImportant">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.markImportant">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>প্রশ্নের তথ্য</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showQuestionInfo">
-                                    <span></span>
-                                </label>
-                            </div>
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showQuestionInfo">
+                            </label>
                         </div>
                     </div>
 
-                    <div class="qp-settings-card">
-                        <p class="qp-settings-section">প্রশ্নের মেটাডাটা</p>
-                        <div class="space-y-2">
-                            <div class="qp-toggle-row">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">প্রশ্নের মেটাডাটা</p>
+                        <div class="mt-4 space-y-3">
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>সাব-বিষয়ের নাম</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showSubSubject">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showSubSubject">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>অধ্যায়ের নাম</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showChapter">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showChapter">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>সেট কোড</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showSetCode">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showSetCode">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>নির্দেশনা</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showInstructions">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showInstructions">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>বিশেষ ঘোষণা</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showNotice">
-                                    <span></span>
-                                </label>
-                            </div>
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showNotice">
+                            </label>
                         </div>
                     </div>
 
-                    <div class="qp-settings-card">
-                        <p class="qp-settings-section">ডকুমেন্ট কাস্টমাইজেশন</p>
-                        <div class="space-y-3">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">ডকুমেন্ট কাস্টমাইজেশন</p>
+                        <div class="mt-4 space-y-4">
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">টেক্সট এলাইনমেন্ট</p>
-                                <div class="flex gap-2">
+                                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">টেক্সট এলাইনমেন্ট</p>
+                                <div class="mt-2 flex gap-2">
                                     @foreach(['left' => 'L', 'center' => 'C', 'right' => 'R', 'justify' => 'J'] as $align => $label)
-                                        <button type="button" wire:click="setTextAlign('{{ $align }}')"
-                                                @class(['qp-icon-btn', 'qp-icon-btn--active' => $textAlign === $align])>{{ $label }}</button>
+                                        <button type="button" wire:click="setTextAlign('{{ $align }}')" @class(['inline-flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-semibold transition', 'border-indigo-500 bg-indigo-50 text-indigo-600 shadow-sm' => $textAlign === $align, 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700' => $textAlign !== $align])>{{ $label }}</button>
                                     @endforeach
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">পেপার সাইজ</p>
-                                <div class="grid grid-cols-2 gap-2">
+                                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">পেপার সাইজ</p>
+                                <div class="mt-2 grid grid-cols-2 gap-2">
                                     @foreach(['A4' => 'A4', 'Letter' => 'Letter', 'Legal' => 'Legal', 'A5' => 'A5'] as $size => $label)
-                                        <button type="button" wire:click="setPaperSize('{{ $size }}')"
-                                                @class(['qp-size-btn', 'qp-size-btn--active' => $paperSize === $size])>{{ $label }}</button>
+                                        <button type="button" wire:click="setPaperSize('{{ $size }}')" @class(['inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition', 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm' => $paperSize === $size, 'border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800' => $paperSize !== $size])>{{ $label }}</button>
                                     @endforeach
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">অপশন স্টাইল</p>
-                                <div class="grid grid-cols-4 gap-2">
-                                    <button type="button" wire:click="setOptionStyle('circle')"
-                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'circle'])>◎</button>
-                                    <button type="button" wire:click="setOptionStyle('dot')"
-                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'dot'])>•</button>
-                                    <button type="button" wire:click="setOptionStyle('parentheses')"
-                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'parentheses'])>( )</button>
-                                    <button type="button" wire:click="setOptionStyle('minimal')"
-                                            @class(['qp-style-btn', 'qp-style-btn--active' => $optionStyle === 'minimal'])>ক.</button>
+                                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">অপশন স্টাইল</p>
+                                <div class="mt-2 grid grid-cols-4 gap-2">
+                                    <button type="button" wire:click="setOptionStyle('circle')" @class(['inline-flex items-center justify-center rounded-lg border px-2 py-1 text-lg transition', 'border-cyan-600 bg-cyan-50 text-cyan-600 shadow-sm' => $optionStyle === 'circle', 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700' => $optionStyle !== 'circle'])>◎</button>
+                                    <button type="button" wire:click="setOptionStyle('dot')" @class(['inline-flex items-center justify-center rounded-lg border px-2 py-1 text-lg transition', 'border-emerald-600 bg-emerald-50 text-emerald-600 shadow-sm' => $optionStyle === 'dot', 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700' => $optionStyle !== 'dot'])>•</button>
+                                    <button type="button" wire:click="setOptionStyle('parentheses')" @class(['inline-flex items-center justify-center rounded-lg border px-2 py-1 text-base transition', 'border-sky-600 bg-sky-50 text-sky-600 shadow-sm' => $optionStyle === 'parentheses', 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700' => $optionStyle !== 'parentheses'])>( )</button>
+                                    <button type="button" wire:click="setOptionStyle('minimal')" @class(['inline-flex items-center justify-center rounded-lg border px-2 py-1 text-base transition', 'border-slate-700 bg-slate-100 text-slate-700 shadow-sm' => $optionStyle === 'minimal', 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700' => $optionStyle !== 'minimal'])>ক.</button>
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">ফন্ট পরিবর্তন</p>
-                                <select class="qp-select" wire:model.live="fontFamily" wire:change="setFontFamily($event.target.value)">
+                                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">ফন্ট পরিবর্তন</p>
+                                <select class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" wire:model.live="fontFamily" wire:change="setFontFamily($event.target.value)">
                                     <option value="Bangla">বাংলা</option>
                                     <option value="SolaimanLipi">সোলাইমান লিপি</option>
                                     <option value="Kalpurush">কালপুরুষ</option>
@@ -540,558 +556,80 @@
                             </div>
 
                             <div class="flex items-center justify-between">
-                                <span class="text-xs text-gray-500">ফন্ট সাইজ</span>
+                                <span class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">ফন্ট সাইজ</span>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" class="qp-icon-btn" wire:click="decreaseFontSize">-</button>
-                                    <span class="text-sm font-medium w-10 text-center">{{ $fontSize }}</span>
-                                    <button type="button" class="qp-icon-btn" wire:click="increaseFontSize">+</button>
+                                    <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-lg font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-800 dark:border-slate-600 dark:text-slate-200" wire:click="decreaseFontSize">-</button>
+                                    <span class="w-10 text-center text-sm font-medium text-slate-700 dark:text-slate-200">{{ $fontSize }}</span>
+                                    <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-lg font-semibold text-slate-600 hover:border-slate-300 hover:text-slate-800 dark:border-slate-600 dark:text-slate-200" wire:click="increaseFontSize">+</button>
                                 </div>
                             </div>
 
                             <div>
-                                <p class="text-xs text-gray-500 mb-1">কলাম</p>
-                                <div class="flex gap-2">
+                                <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">কলাম</p>
+                                <div class="mt-2 flex gap-2">
                                     @foreach([1, 2, 3] as $col)
-                                        <button type="button" wire:click="setColumnCount({{ $col }})"
-                                                @class(['qp-size-btn', 'qp-size-btn--active' => $columnCount === $col])>{{ $col }}</button>
+                                        <button type="button" wire:click="setColumnCount({{ $col }})" @class(['inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium transition', 'border-indigo-500 bg-indigo-50 text-indigo-600 shadow-sm' => $columnCount === $col, 'border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800' => $columnCount !== $col])>{{ $col }}</button>
                                     @endforeach
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="qp-settings-card">
-                        <p class="qp-settings-section">অতিরিক্ত সেকশন</p>
-                        <div class="space-y-2">
-                            <div class="qp-toggle-row">
+                    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                        <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">অতিরিক্ত সেকশন</p>
+                        <div class="mt-4 space-y-3">
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>শিক্ষার্থীর তথ্য</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showStudentInfo">
-                                    <span></span>
-                                </label>
-                            </div>
-                            <div class="qp-toggle-row">
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showStudentInfo">
+                            </label>
+                            <label class="flex items-center justify-between text-sm font-medium text-slate-600 dark:text-slate-300">
                                 <span>প্রাপ্ত নম্বর ঘর</span>
-                                <label class="qp-toggle">
-                                    <input type="checkbox" wire:model.live="previewOptions.showMarksBox">
-                                    <span></span>
-                                </label>
-                            </div>
+                                <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-800" wire:model.live="previewOptions.showMarksBox">
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="flex flex-wrap items-center gap-3 no-print">
-                <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg shadow">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h7.5m-7.5 3h7.5m-7.5 3h7.5M5.25 19.5h13.5A1.5 1.5 0 0020.25 18V6a1.5 1.5 0 00-1.5-1.5H5.25A1.5 1.5 0 003.75 6v12a1.5 1.5 0 001.5 1.5z" />
-                    </svg>
-                    প্রশ্ন প্রিন্ট করুন
-                </button>
-                <button type="button" class="inline-flex items-center gap-2 bg-white dark:bg-transparent border border-emerald-400 text-emerald-700 dark:text-emerald-200 px-4 py-2 rounded-lg">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-1.125 0h11.25m-10.125 3.75h9" />
-                    </svg>
-                    প্রশ্ন মুক্ত করুন
-                </button>
-            </div>
         </div>
     @endif
-</div>
 
-@push('styles')
-    <style>
-        .qp-summary-chip {
-            background-color: rgba(16, 185, 129, 0.08);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 9999px;
-            padding: 0.35rem 0.75rem;
-        }
 
-        .qp-designer-layout {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 1024px) {
-            .qp-designer-layout {
-                grid-template-columns: minmax(0, 1fr) 18rem;
-            }
-        }
-
-        .qp-preview-wrapper {
-            background: linear-gradient(135deg, rgba(236, 253, 245, 0.8), rgba(240, 253, 244, 0.8));
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            border-radius: 16px;
-            padding: 1.5rem;
-        }
-
-        .qp-preview-surface {
-            background: linear-gradient(145deg, rgba(248, 113, 113, 0.12), rgba(16, 185, 129, 0.12));
-            border-radius: 14px;
-            padding: 1.25rem;
-        }
-
-        .qp-paper {
-            position: relative;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.25);
-            padding: 2rem;
-            max-width: 900px;
-            margin: 0 auto;
-            color: #1f2937;
-            line-height: 1.6;
-            font-size: var(--qp-font-size, 14px);
-        }
-
-        .qp-font-bangla {
-            font-family: 'Noto Sans Bengali', 'SolaimanLipi', sans-serif;
-        }
-
-        .qp-font-solaiman {
-            font-family: 'SolaimanLipi', 'Noto Sans Bengali', sans-serif;
-        }
-
-        .qp-font-kalpurush {
-            font-family: 'Kalpurush', 'Noto Sans Bengali', sans-serif;
-        }
-
-        .qp-font-roman {
-            font-family: 'Times New Roman', serif;
-        }
-
-        .qp-paper-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 1.5rem;
-            border-bottom: 1px solid rgba(15, 118, 110, 0.2);
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .qp-paper-header-main {
-            text-align: center;
-            flex: 1;
-        }
-
-        .qp-paper-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-        }
-
-        .qp-paper-subtitle {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-top: 0.25rem;
-        }
-
-        .qp-paper-subject {
-            font-weight: 600;
-        }
-
-        .qp-paper-chapter {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        .qp-paper-header-side {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.75rem;
-        }
-
-        .qp-setcode-box {
-            display: inline-flex;
-            border: 1px solid #1f2937;
-            border-radius: 0.375rem;
-            overflow: hidden;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .qp-setcode-label {
-            padding: 0.25rem 0.5rem;
-            border-right: 1px solid #1f2937;
-        }
-
-        .qp-setcode-value {
-            padding: 0.25rem 0.75rem;
-        }
-
-        .qp-marks-box {
-            border: 1px dashed rgba(15, 118, 110, 0.5);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            font-size: 0.85rem;
-            text-align: center;
-            min-width: 140px;
-        }
-
-        .qp-marks-line {
-            display: block;
-            border-bottom: 1px solid rgba(15, 118, 110, 0.5);
-            margin-top: 0.25rem;
-        }
-
-        .qp-paper-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem 2rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-        }
-
-        .qp-paper-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .qp-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.125rem 0.75rem;
-            background-color: rgba(16, 185, 129, 0.12);
-            color: #047857;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .qp-badge-outline {
-            background-color: transparent;
-            border: 1px dashed rgba(4, 120, 87, 0.5);
-        }
-
-        .qp-badge-important {
-            background: rgba(239, 68, 68, 0.15);
-            color: #b91c1c;
-        }
-
-        .qp-paper-instruction {
-            background: rgba(252, 211, 77, 0.2);
-            border-left: 4px solid rgba(217, 119, 6, 0.6);
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .qp-paper-instruction-label {
-            font-weight: 700;
-            margin-right: 0.5rem;
-        }
-
-        .qp-paper-notice {
-            text-align: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .qp-student-info {
-            display: grid;
-            gap: 0.35rem;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .qp-question-area {
-            margin-top: 1rem;
-        }
-
-        .qp-question-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            column-count: var(--qp-column-count, 2);
-            column-gap: 2.25rem;
-        }
-
-        .qp-question-item {
-            break-inside: avoid-column;
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .qp-question-number {
-            font-weight: 700;
-            min-width: 1.5rem;
-        }
-
-        .qp-question-body {
-            flex: 1;
-        }
-
-        .qp-question-text {
-            font-size: 1em;
-        }
-
-        .qp-text-left {
-            text-align: left;
-        }
-
-        .qp-text-center {
-            text-align: center;
-        }
-
-        .qp-text-right {
-            text-align: right;
-        }
-
-        .qp-text-justify {
-            text-align: justify;
-        }
-
-        .qp-option-list {
-            margin: 0.75rem 0;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.5rem 1.25rem;
-        }
-
-        .qp-option-item {
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-start;
-        }
-
-        .qp-option-label {
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 1.6rem;
-        }
-
-        .qp-option-label--circle {
-            border: 1.5px solid rgba(14, 116, 144, 0.8);
-            border-radius: 9999px;
-            height: 1.6rem;
-        }
-
-        .qp-option-label--dot {
-            border-radius: 9999px;
-            height: 1.6rem;
-            background-color: rgba(16, 185, 129, 0.15);
-        }
-
-        .qp-option-label--parentheses::before {
-            content: '(';
-            margin-right: 0.15rem;
-        }
-
-        .qp-option-label--parentheses::after {
-            content: ')';
-            margin-left: 0.15rem;
-        }
-
-        .qp-option-label--minimal {
-            font-weight: 600;
-        }
-
-        .qp-question-chip {
-            display: inline-flex;
-            margin-top: 0.5rem;
-            padding: 0.15rem 0.6rem;
-            border-radius: 9999px;
-            background: rgba(59, 130, 246, 0.12);
-            color: #1d4ed8;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .qp-settings-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .qp-settings-card {
-            background: #ffffff;
-            border: 1px solid rgba(209, 213, 219, 0.8);
-            border-radius: 0.75rem;
-            padding: 1rem;
-            box-shadow: 0 10px 25px -15px rgba(15, 118, 110, 0.3);
-        }
-
-        .qp-settings-title {
-            font-size: 1rem;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 0.75rem;
-        }
-
-        .qp-settings-section {
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-
-        .qp-primary-btn {
-            width: 100%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            background: #059669;
-            color: #fff;
-            padding: 0.6rem 1rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: background 0.2s ease;
-        }
-
-        .qp-primary-btn:hover {
-            background: #047857;
-        }
-
-        .qp-toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-
-        .qp-toggle {
-            position: relative;
-            display: inline-flex;
-            width: 44px;
-            height: 24px;
-        }
-
-        .qp-toggle input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .qp-toggle span {
-            position: absolute;
-            cursor: pointer;
-            inset: 0;
-            background-color: #d1d5db;
-            border-radius: 9999px;
-            transition: all 0.2s ease;
-        }
-
-        .qp-toggle span::after {
-            content: '';
-            position: absolute;
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            top: 3px;
-            background-color: #ffffff;
-            border-radius: 50%;
-            transition: transform 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        }
-
-        .qp-toggle input:checked + span {
-            background-color: #10b981;
-        }
-
-        .qp-toggle input:checked + span::after {
-            transform: translateX(20px);
-        }
-
-        .qp-icon-btn {
-            width: 32px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-            border: 1px solid rgba(209, 213, 219, 0.8);
-            background: #ffffff;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .qp-icon-btn--active,
-        .qp-icon-btn:hover {
-            background: #10b981;
-            color: #ffffff;
-            border-color: #10b981;
-        }
-
-        .qp-size-btn,
-        .qp-style-btn {
-            padding: 0.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(209, 213, 219, 0.9);
-            background: #ffffff;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-
-        .qp-size-btn--active,
-        .qp-style-btn--active,
-        .qp-size-btn:hover,
-        .qp-style-btn:hover {
-            border-color: #10b981;
-            color: #047857;
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .qp-select {
-            width: 100%;
-            border: 1px solid rgba(209, 213, 219, 0.9);
-            border-radius: 0.75rem;
-            padding: 0.5rem 0.75rem;
-            background: #ffffff;
-        }
-
-        @media (max-width: 640px) {
-            .qp-option-list {
-                grid-template-columns: 1fr;
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-YcsIPJdX0K0qzxYxvt/XM4Jt9V7H5PHeTtNKgHdwNwp0UrEGouGZWlznImPi0tLxe3LjVf6P0M0MZ8WpS0QG2g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener('click', async (event) => {
+            const trigger = event.target.closest('[data-question-pdf-trigger]');
+            if (!trigger) {
+                return;
             }
 
-            .qp-paper-header {
-                flex-direction: column;
-                align-items: center;
+            const preview = document.getElementById('question-paper-preview');
+            if (!preview) {
+                return;
             }
 
-            .qp-paper-header-side {
-                align-items: center;
-            }
-        }
+            const format = (preview.dataset.paperSize || 'a4').toLowerCase();
+            const fileName = `${trigger.dataset.fileName || preview.dataset.fileName || 'question-paper'}.pdf`;
+            const marginMap = { a4: 0.5, letter: 0.5, legal: 0.5, a5: 0.35 };
+            const margin = marginMap[format] ?? 0.5;
 
-        @media print {
-            body {
-                background: #ffffff !important;
-            }
+            trigger.disabled = true;
+            trigger.classList.add('opacity-70', 'pointer-events-none');
 
-            .no-print {
-                display: none !important;
+            try {
+                await html2pdf().set({
+                    margin,
+                    filename: fileName,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                    jsPDF: { unit: 'in', format, orientation: 'portrait' },
+                }).from(preview).save();
+            } catch (error) {
+                console.error('PDF generation failed', error);
+            } finally {
+                trigger.disabled = false;
+                trigger.classList.remove('opacity-70', 'pointer-events-none');
             }
-
-            .qp-preview-wrapper,
-            .qp-preview-surface,
-            .qp-paper {
-                box-shadow: none !important;
-                border: none !important;
-                background: #ffffff;
-            }
-
-            .qp-question-list {
-                column-gap: 18mm;
-            }
-
-            @page {
-                size: A4;
-                margin: 15mm;
-            }
-        }
-    </style>
+        });
+    </script>
 @endpush
