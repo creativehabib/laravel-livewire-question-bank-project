@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\User;
+use App\Notifications\SuspendedLoginAttempt;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -38,7 +40,40 @@ class LoginForm extends Form
             ]);
         }
 
+        $user = Auth::user();
+
+        if ($user instanceof User && $user->isSuspended()) {
+            $this->handleSuspendedUser($user);
+        }
+
         RateLimiter::clear($this->throttleKey());
+    }
+
+    protected function handleSuspendedUser(User $user): void
+    {
+        $until = $user->suspended_until;
+
+        Auth::logout();
+        RateLimiter::clear($this->throttleKey());
+
+        if ($until) {
+            $user->notify(new SuspendedLoginAttempt($until));
+
+            $timezone = config('app.timezone');
+            $formattedUntil = $until->copy()->timezone($timezone)->toDayDateTimeString();
+            $duration = now()->diffForHumans($until, true);
+
+            throw ValidationException::withMessages([
+                'form.email' => __('Your account is suspended until :date. You can log in again in :duration.', [
+                    'date' => $formattedUntil,
+                    'duration' => $duration,
+                ]),
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            'form.email' => __('Your account is currently suspended.'),
+        ]);
     }
 
     /**

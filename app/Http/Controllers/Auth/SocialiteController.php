@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Enums\Role;
 use App\Models\Setting;
 use App\Models\User;
+use App\Notifications\SuspendedLoginAttempt;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +77,10 @@ class SocialiteController
 
         $request->session()->forget(self::REGISTRATION_SESSION_KEY);
 
+        if ($user->isSuspended()) {
+            return $this->denySuspendedLogin($user);
+        }
+
         Auth::login($user, true);
 
         return redirect()->route('dashboard');
@@ -130,6 +135,11 @@ class SocialiteController
 
         if ($existingUser) {
             $request->session()->forget(self::REGISTRATION_SESSION_KEY);
+
+            if ($existingUser->isSuspended()) {
+                return $this->denySuspendedLogin($existingUser);
+            }
+
             Auth::login($existingUser, true);
 
             return redirect()->route('dashboard');
@@ -164,9 +174,35 @@ class SocialiteController
 
         $request->session()->forget(self::REGISTRATION_SESSION_KEY);
 
+        if ($user->isSuspended()) {
+            return $this->denySuspendedLogin($user);
+        }
+
         Auth::login($user, true);
 
         return redirect()->route('dashboard');
+    }
+
+    protected function denySuspendedLogin(User $user): RedirectResponse
+    {
+        $until = $user->suspended_until;
+
+        if ($until) {
+            $user->notify(new SuspendedLoginAttempt($until));
+
+            $timezone = config('app.timezone');
+            $formattedUntil = $until->copy()->timezone($timezone)->toDayDateTimeString();
+            $duration = now()->diffForHumans($until, true);
+            $message = __('Your account is suspended until :date. You can log in again in :duration.', [
+                'date' => $formattedUntil,
+                'duration' => $duration,
+            ]);
+        } else {
+            $message = __('Your account is currently suspended.');
+        }
+
+        return redirect()->route('login')
+            ->with('status', $message);
     }
 
     protected function pendingRegistration(Request $request, string $provider): ?array
