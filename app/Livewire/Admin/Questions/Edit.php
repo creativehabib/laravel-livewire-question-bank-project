@@ -11,7 +11,7 @@ class Edit extends Component
     use AuthorizesRequests;
 
     public Question $question;
-    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $description, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
 
     public function mount(Question $question)
     {
@@ -24,6 +24,7 @@ class Edit extends Component
         $this->sub_subject_id = $question->sub_subject_id;
         $this->chapter_id = $question->chapter_id;
         $this->title = $question->title;
+        $this->description = $question->description;
         $this->difficulty = $question->difficulty;
         $this->question_type = $question->question_type ?? 'mcq';
         $this->marks = $question->marks ?? 1;
@@ -33,7 +34,7 @@ class Edit extends Component
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
         $this->dispatch('reset-selects');
     }
 
@@ -62,6 +63,7 @@ class Edit extends Component
             'sub_subject_id' => 'nullable|exists:sub_subjects,id',
             'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
+            'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
             'question_type' => 'required|in:mcq,cq,short',
             'marks' => 'required|numeric|min:0',
@@ -80,6 +82,7 @@ class Edit extends Component
             'sub_subject_id' => $this->sub_subject_id ?: null,
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
+            'description' => $this->description,
             'difficulty' => $this->difficulty,
             'question_type' => $this->question_type,
             'marks' => $this->marks,

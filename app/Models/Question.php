@@ -18,6 +18,7 @@ class Question extends Model
         'sub_subject_id',
         'chapter_id',
         'title',
+        'description',
         'difficulty',
         'question_type',
         'marks',

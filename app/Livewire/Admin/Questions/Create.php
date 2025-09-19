@@ -10,7 +10,7 @@ class Create extends Component
 {
     use AuthorizesRequests;
 
-    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $description, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
     public $options = [
         ['option_text' => '', 'is_correct' => false],
         ['option_text' => '', 'is_correct' => false],
@@ -25,7 +25,7 @@ class Create extends Component
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
         $this->difficulty = 'easy';
         $this->question_type = 'mcq';
         $this->marks = 1;
@@ -90,6 +90,7 @@ class Create extends Component
             'sub_subject_id' => 'nullable|exists:sub_subjects,id',
             'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
+            'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
             'question_type' => 'required|in:mcq,cq,short',
             'marks' => 'required|numeric|min:0',
@@ -108,6 +109,7 @@ class Create extends Component
             'sub_subject_id' => $this->sub_subject_id ?: null,
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
+            'description' => $this->description,
             'difficulty' => $this->difficulty,
             'question_type' => $this->question_type,
             'marks' => $this->marks,
