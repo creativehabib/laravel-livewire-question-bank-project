@@ -274,30 +274,11 @@
         @endphp
 
         <div class="space-y-6">
-            <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6 space-y-4">
-                <div class="flex items-center gap-3 text-emerald-700 dark:text-emerald-200 no-print">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m5.25 2.25a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <div>
-                        <h3 class="text-lg font-semibold">প্রশ্নপত্র প্রস্তুত হয়েছে!</h3>
-                        <p class="text-sm">সিলেক্ট করা প্রশ্নগুলো দিয়ে নতুন প্রশ্নপত্র তৈরি হয়েছে। প্রয়োজনে ডাউনলোড বা শেয়ার করুন।</p>
-                    </div>
-                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-700 dark:text-gray-200 no-print">
-                    <div class="qp-summary-chip"><span class="font-medium">পরীক্ষা:</span> {{ $summary['exam_name'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">বিষয়:</span> {{ $summary['subject'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">সাব-বিষয়:</span> {{ $summary['sub_subject'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">অধ্যায়:</span> {{ $summary['chapter'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">প্রশ্নের টাইপ:</span> {{ $summary['type'] }}</div>
-                    <div class="qp-summary-chip"><span class="font-medium">মোট প্রশ্ন:</span> {{ $summary['total_questions'] }}</div>
-                </div>
-            </div>
 
             <div class="qp-designer-layout">
-                <div class="qp-preview-wrapper bg-gray-100 rounded-2xl p-4 md:p-6 print:bg-transparent print:p-0">
-                    <div class="qp-preview-surface bg-white rounded-2xl shadow-xl print:shadow-none">
+                <div class="qp-preview-wrapper bg-gray-100 print:bg-transparent print:p-0">
+                    <div class="qp-preview-surface  rounded-2xl print:shadow-none">
                         <div class="qp-paper {{ $fontClass }}" data-paper-size="{{ $paperSize }}" style="--qp-font-size: {{ $fontSize }}px; --qp-column-count: {{ $columnCount }};">
                             <div class="qp-paper-header">
                                 <div class="qp-paper-header-main">
@@ -649,11 +630,9 @@
         }
 
         .qp-preview-wrapper {
-            box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.08);
         }
 
         .qp-preview-surface {
-            padding: 1.5rem;
         }
 
         .qp-paper {
@@ -1090,7 +1069,6 @@
             }
 
             .qp-preview-surface {
-                padding: 1rem;
             }
         }
 
