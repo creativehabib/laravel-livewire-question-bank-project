@@ -4,13 +4,13 @@ namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, SubSubject, Chapter, Question, Option, Tag};
+use App\Models\{Subject, SubSubject, Chapter, Question, Tag};
 
 class Create extends Component
 {
     use AuthorizesRequests;
 
-    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
     public $options = [
         ['option_text' => '', 'is_correct' => false],
         ['option_text' => '', 'is_correct' => false],
@@ -25,8 +25,10 @@ class Create extends Component
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'tagIds', 'options');
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
         $this->difficulty = 'easy';
+        $this->question_type = 'mcq';
+        $this->marks = 1;
         $this->options = [
             ['option_text' => '', 'is_correct' => false],
             ['option_text' => '', 'is_correct' => false],
@@ -35,6 +37,22 @@ class Create extends Component
         ];
 
         $this->dispatch('reset-selects');
+    }
+
+    public function updatedQuestionType($value): void
+    {
+        if ($value === 'mcq' && empty($this->options)) {
+            $this->options = [
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+            ];
+        }
+
+        if ($value !== 'mcq') {
+            $this->options = [];
+        }
     }
 
     public function updatedSubjectId($value)
@@ -67,15 +85,23 @@ class Create extends Component
     {
         $this->authorize('create', Question::class);
 
-        $this->validate([
+        $rules = [
             'subject_id' => 'required|exists:subjects,id',
             'sub_subject_id' => 'nullable|exists:sub_subjects,id',
             'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
-            'options.*.option_text' => 'required|string',
-            'options' => 'array|min:2',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'question_type' => 'required|in:mcq,cq,short',
+            'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
-        ]);
+        ];
+
+        if ($this->question_type === 'mcq') {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*.option_text'] = 'required|string';
+        }
+
+        $this->validate($rules);
 
         $question = Question::create([
             'subject_id' => $this->subject_id,
@@ -83,6 +109,8 @@ class Create extends Component
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
+            'question_type' => $this->question_type,
+            'marks' => $this->marks,
             'user_id' => auth()->id(),
         ]);
 
@@ -96,8 +124,10 @@ class Create extends Component
             $question->tags()->sync($tagIds);
         }
 
-        foreach ($this->options as $opt) {
-            $question->options()->create($opt);
+        if ($this->question_type === 'mcq') {
+            foreach ($this->options as $opt) {
+                $question->options()->create($opt);
+            }
         }
 
         $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';

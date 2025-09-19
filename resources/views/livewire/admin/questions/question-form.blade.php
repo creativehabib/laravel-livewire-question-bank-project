@@ -1,4 +1,4 @@
-<div x-data>
+<div x-data="{ questionType: @entangle('question_type') }">
     <form wire:submit.prevent="save" class="space-y-4">
         {{-- Subject --}}
         <div>
@@ -33,20 +33,41 @@
             </select>
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {{-- Difficulty --}}
+            <div>
+                <label>Difficulty</label>
+                <select wire:model="difficulty" class="border p-2 rounded w-full">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                @error('difficulty')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
+            </div>
+
+            {{-- Question Type --}}
+            <div>
+                <label>Question Type</label>
+                <select wire:model="question_type" class="border p-2 rounded w-full">
+                    <option value="mcq">MCQ</option>
+                    <option value="cq">CQ</option>
+                    <option value="short">Short</option>
+                </select>
+                @error('question_type')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
+            </div>
+
+            {{-- Marks --}}
+            <div>
+                <label>Marks</label>
+                <input type="number" step="0.5" min="0" wire:model="marks" class="border p-2 rounded w-full" />
+                @error('marks')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
+            </div>
+        </div>
+
         {{-- Main Question --}}
         <div wire:ignore>
             <label>Question</label>
             <div id="editor" class="border min-h-32 p-2 rounded"></div>
-        </div>
-
-        {{-- Difficulty --}}
-        <div>
-            <label>Difficulty</label>
-            <select wire:model="difficulty" class="border p-2 rounded">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-            </select>
         </div>
 
         {{-- Tags --}}
@@ -60,7 +81,7 @@
         </div>
 
         {{-- Options --}}
-        <div class="space-y-2">
+        <div class="space-y-2" x-show="questionType === 'mcq'">
             <label>Options</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 @foreach($options as $i => $opt)
@@ -74,6 +95,8 @@
                     </div>
                 @endforeach
             </div>
+            @error('options')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
+            @error('options.*.option_text')<span class="text-sm text-red-600">{{ $message }}</span>@enderror
         </div>
 
         <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">
@@ -143,5 +166,6 @@
             document.addEventListener('DOMContentLoaded', initEditors);
         }
         document.addEventListener('livewire:navigated', initEditors);
+        document.addEventListener('livewire:update', initEditors);
     </script>
 @endpush

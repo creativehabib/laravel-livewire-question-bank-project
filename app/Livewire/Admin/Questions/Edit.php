@@ -11,7 +11,7 @@ class Edit extends Component
     use AuthorizesRequests;
 
     public Question $question;
-    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty, $tagIds = [], $options = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
 
     public function mount(Question $question)
     {
@@ -25,28 +25,55 @@ class Edit extends Component
         $this->chapter_id = $question->chapter_id;
         $this->title = $question->title;
         $this->difficulty = $question->difficulty;
+        $this->question_type = $question->question_type ?? 'mcq';
+        $this->marks = $question->marks ?? 1;
         $this->tagIds = $question->tags()->pluck('tags.id')->toArray();
         $this->options = $question->options->toArray();
     }
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'tagIds', 'options');
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'question_type', 'marks', 'tagIds', 'options');
         $this->dispatch('reset-selects');
+    }
+
+    public function updatedQuestionType($value): void
+    {
+        if ($value === 'mcq' && empty($this->options)) {
+            $this->options = [
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+            ];
+        }
+
+        if ($value !== 'mcq') {
+            $this->options = [];
+        }
     }
 
     public function save()
     {
         $this->authorize('update', $this->question);
 
-        $this->validate([
+        $rules = [
             'subject_id' => 'required|exists:subjects,id',
             'sub_subject_id' => 'nullable|exists:sub_subjects,id',
             'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
-            'options.*.option_text' => 'required|string',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'question_type' => 'required|in:mcq,cq,short',
+            'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
-        ]);
+        ];
+
+        if ($this->question_type === 'mcq') {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*.option_text'] = 'required|string';
+        }
+
+        $this->validate($rules);
 
         $this->question->update([
             'subject_id' => $this->subject_id,
@@ -54,6 +81,8 @@ class Edit extends Component
             'chapter_id' => $this->chapter_id ?: null,
             'title' => $this->title,
             'difficulty' => $this->difficulty,
+            'question_type' => $this->question_type,
+            'marks' => $this->marks,
         ]);
 
         $tagIds = collect($this->tagIds)->map(function ($tag) {
@@ -65,8 +94,10 @@ class Edit extends Component
         $this->question->tags()->sync($tagIds);
 
         $this->question->options()->delete();
-        foreach ($this->options as $opt) {
-            $this->question->options()->create($opt);
+        if ($this->question_type === 'mcq') {
+            foreach ($this->options as $opt) {
+                $this->question->options()->create($opt);
+            }
         }
 
         $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';
