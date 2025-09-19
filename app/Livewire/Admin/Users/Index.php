@@ -108,6 +108,12 @@ class Index extends Component
 
     public function openSuspendModal(int $userId): void
     {
+        if (auth()->id() === $userId) {
+            $this->dispatch('userSuspensionUpdated', message: 'You cannot suspend your own account.', type: 'error');
+
+            return;
+        }
+
         $this->suspendingUser = User::findOrFail($userId);
         $this->suspendForm['until'] = $this->suspendingUser->suspended_until
             ? $this->suspendingUser->suspended_until->format('Y-m-d\\TH:i')
@@ -121,6 +127,12 @@ class Index extends Component
     public function saveSuspension(): void
     {
         if (! $this->suspendingUser) {
+            return;
+        }
+
+        if ($this->suspendingUser->is(auth()->user())) {
+            $this->dispatch('userSuspensionUpdated', message: 'You cannot suspend your own account.', type: 'error');
+
             return;
         }
 
