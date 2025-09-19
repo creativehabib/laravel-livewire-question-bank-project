@@ -1,4 +1,4 @@
-<header class="flex print:hidden justify-between items-center bg-whitedark:bg-gray-800 p-4 rounded-xl shadow-sm">
+<header class="flex print:hidden justify-between items-center bg-white sticky top-0 right-0 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
     <div class="flex items-center print:hidden gap-4">
         <button id="sidebarToggle" class="md:hidden text-gray-500 dark:text-gray-400 text-2xl">☰</button>
         <h1 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>

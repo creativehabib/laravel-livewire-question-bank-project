@@ -19,11 +19,11 @@
     @stack('styles')
 </head>
 <body class="font-sans antialiased">
-    <div class="min-h-screen flex bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
         <livewire:admin.partials.sidebar />
         {{-- Main Content --}}
+        <livewire:admin.partials.header />
         <div id="mainContent" class="flex-1 md:ml-64 print:p-0 print:space-y-0 p-4 md:p-8 space-y-6 transition-all duration-200">
-            <livewire:admin.partials.header />
             {{ $slot }}
         </div>
 
