@@ -11,7 +11,7 @@ class QuestionForm extends Component
     use AuthorizesRequests;
 
     public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে
-    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $tagIds = [];
+    public $subject_id, $sub_subject_id, $chapter_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
     public $options = [];
 
     public function mount($id = null)
@@ -31,6 +31,8 @@ class QuestionForm extends Component
             $this->chapter_id = $q->chapter_id;
             $this->title = $q->title;
             $this->difficulty = $q->difficulty;
+            $this->question_type = $q->question_type ?? 'mcq';
+            $this->marks = $q->marks ?? 1;
             $this->tagIds = $q->tags()->pluck('tags.id')->toArray();
             $this->options = $q->options->toArray();
         } else {
@@ -41,6 +43,22 @@ class QuestionForm extends Component
                 ['option_text' => '', 'is_correct' => false],
                 ['option_text' => '', 'is_correct' => false],
             ];
+        }
+    }
+
+    public function updatedQuestionType($value)
+    {
+        if ($value === 'mcq' && empty($this->options)) {
+            $this->options = [
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+                ['option_text' => '', 'is_correct' => false],
+            ];
+        }
+
+        if ($value !== 'mcq') {
+            $this->options = [];
         }
     }
 
@@ -57,15 +75,23 @@ class QuestionForm extends Component
 
     public function save()
     {
-        $data = $this->validate([
+        $rules = [
             'subject_id' => 'required|exists:subjects,id',
             'sub_subject_id' => 'nullable|exists:sub_subjects,id',
             'chapter_id' => 'required_with:sub_subject_id|nullable|exists:chapters,id',
             'title' => 'required|string',
-            'difficulty' => 'required',
+            'difficulty' => 'required|in:easy,medium,hard',
+            'question_type' => 'required|in:mcq,cq,short',
+            'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
-            'options.*.option_text' => 'required|string',
-        ]);
+        ];
+
+        if ($this->question_type === 'mcq') {
+            $rules['options'] = 'required|array|min:2';
+            $rules['options.*.option_text'] = 'required|string';
+        }
+
+        $data = $this->validate($rules);
         $tagIds = collect($this->tagIds)->map(function ($tag) {
             if (is_numeric($tag)) {
                 return (int) $tag;
@@ -82,10 +108,14 @@ class QuestionForm extends Component
                 'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
+                'question_type' => $this->question_type,
+                'marks' => $this->marks,
             ]);
             $q->tags()->sync($tagIds);
             $q->options()->delete();
-            $q->options()->createMany($this->options);
+            if ($this->question_type === 'mcq') {
+                $q->options()->createMany($this->options);
+            }
         } else {
             $this->authorize('create', Question::class);
             $q = Question::create([
@@ -94,10 +124,14 @@ class QuestionForm extends Component
                 'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
+                'question_type' => $this->question_type,
+                'marks' => $this->marks,
                 'user_id' => auth()->id(),
             ]);
             $q->tags()->sync($tagIds);
-            $q->options()->createMany($this->options);
+            if ($this->question_type === 'mcq') {
+                $q->options()->createMany($this->options);
+            }
         }
 
         session()->flash('success', 'Question saved successfully.');

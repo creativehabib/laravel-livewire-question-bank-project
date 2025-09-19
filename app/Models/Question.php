@@ -14,11 +14,21 @@ class Question extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'subject_id', 'sub_subject_id', 'chapter_id', 'title', 'difficulty', 'slug', 'views', 'user_id',
+        'subject_id',
+        'sub_subject_id',
+        'chapter_id',
+        'title',
+        'difficulty',
+        'question_type',
+        'marks',
+        'slug',
+        'views',
+        'user_id',
     ];
 
     protected $casts = [
         'views' => 'integer',
+        'marks' => 'float',
     ];
 
     protected static function boot()

@@ -33,6 +33,8 @@
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Created By</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Subject</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Chapter</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Type</th>
+                <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Marks</th>
                 <th class="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-300">Actions</th>
             </tr>
             </thead>
@@ -44,6 +46,8 @@
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->user->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->subject->name }}</td>
                     <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->chapter?->name }}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ strtoupper($q->question_type ?? 'MCQ') }}</td>
+                    <td class="px-4 py-2 text-gray-700 dark:text-gray-300">{{ $q->marks }}</td>
                     <td class="px-4 py-2 space-x-2">
                         <a wire:navigate href="{{ route(auth()->user()->isAdmin() ? 'admin.questions.edit' : 'teacher.questions.edit', $q) }}"
                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">Edit</a>
@@ -54,7 +58,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No questions found.</td>
+                    <td colspan="8" class="px-4 py-6 text-center text-gray-500 dark:text-gray-400">No questions found.</td>
                 </tr>
             @endforelse
             </tbody>
