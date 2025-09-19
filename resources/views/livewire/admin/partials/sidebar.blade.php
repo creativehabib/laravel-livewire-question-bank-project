@@ -1,5 +1,5 @@
 <aside id="sidebar"
-       class="fixed inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0
+       class="fixed print:hidden inset-y-0 left-0 w-64 transform -translate-x-full md:translate-x-0
               transition-all duration-300 ease-in-out
               bg-white dark:bg-gray-800 shadow-lg flex flex-col z-50">
 

@@ -1,5 +1,5 @@
-<div class="space-y-6">
-    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+<div class="">
+    <div class="bg-white print:hidden dark:bg-gray-800 shadow rounded-lg p-6">
         <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">প্রশ্ন ক্রিয়েট</h1>
         <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
             নিচের ফর্ম পূরণ করে পরীক্ষার জন্য প্রয়োজনীয় শর্ত নির্বাচন করুন এবং নমুনা প্রশ্ন তৈরি করুন।
@@ -193,7 +193,7 @@
     </div>
 
     @if($showGenerationResults)
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="bg-white print:hidden dark:bg-gray-800 shadow rounded-lg p-6">
             <div class="flex items-center justify-between mb-4">
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">নমুনা প্রশ্ন</h2>
@@ -273,7 +273,7 @@
             $textAlignClass = 'qp-text-' . $textAlign;
         @endphp
 
-        <div class="space-y-6">
+        <div class="">
 
 
             <div class="qp-designer-layout">

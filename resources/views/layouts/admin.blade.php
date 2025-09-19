@@ -22,13 +22,13 @@
     <div class="min-h-screen flex bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
         <livewire:admin.partials.sidebar />
         {{-- Main Content --}}
-        <div id="mainContent" class="flex-1 md:ml-64 p-4 md:p-8 space-y-6 transition-all duration-200">
+        <div id="mainContent" class="flex-1 md:ml-64 print:p-0 print:space-y-0 p-4 md:p-8 space-y-6 transition-all duration-200">
             <livewire:admin.partials.header />
             {{ $slot }}
         </div>
 
         {{-- Mobile Sidebar Overlay --}}
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden"></div>
+        <div id="sidebar-overlay" class="fixed print:hidden inset-0 bg-black bg-opacity-50 hidden z-40 md:hidden"></div>
     </div>
     @auth
         <livewire:auth.role-prompt />
