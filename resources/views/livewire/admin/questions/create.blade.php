@@ -10,6 +10,7 @@
                         <option value="{{ $s->id }}" @selected($s->id == $subject_id)>{{ $s->name }}</option>
                     @endforeach
                 </select>
+                @error('subject_id')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
             </div>
 
             {{-- Sub-Subject (Optional) --}}
@@ -21,6 +22,7 @@
                         <option value="{{ $ss->id }}" @selected($ss->id == $sub_subject_id)>{{ $ss->name }}</option>
                     @endforeach
                 </select>
+                @error('sub_subject_id')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
             </div>
 
             {{-- Chapter (Required if Sub-Subject) --}}
@@ -32,6 +34,7 @@
                         <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option>
                     @endforeach
                 </select>
+                @error('chapter_id')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
             </div>
         </div>
 
@@ -64,6 +67,13 @@
                 <input type="number" step="0.5" min="0" wire:model="marks" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500" />
                 @error('marks')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
             </div>
+        </div>
+
+        {{-- Question Description (Optional) --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (Optional)</label>
+            <textarea wire:model.defer="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+            @error('description')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
         </div>
 
         {{-- Main Question --}}
