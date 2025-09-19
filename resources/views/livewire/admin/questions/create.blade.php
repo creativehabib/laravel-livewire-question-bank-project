@@ -72,7 +72,9 @@
         {{-- Question Description (Optional) --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description (Optional)</label>
-            <textarea wire:model.defer="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+            <div wire:ignore>
+                <div id="description_editor" class="border border-gray-300 dark:border-gray-600 min-h-24 p-2 dark:bg-gray-700 dark:text-gray-100">{!! $description !!}</div>
+            </div>
             @error('description')<span class="text-sm text-red-600 dark:text-red-400">{{ $message }}</span>@enderror
         </div>
 
@@ -128,6 +130,8 @@
         function initEditors() {
             const main = document.getElementById('editor');
 
+            const descriptionEl = document.getElementById('description_editor');
+
             if (main && !main.classList.contains('ql-container')) {
                 quillEditors = {};
                 window.quillEditors = quillEditors;
@@ -160,6 +164,30 @@
                 mainEditor.on('text-change', function () {
                     @this.set('title', mainEditor.root.innerHTML);
                 });
+
+                // --- Description Editor ---
+                if (descriptionEl && !descriptionEl.classList.contains('ql-container')) {
+                    let descriptionEditor = new Quill('#description_editor', {
+                        theme: 'snow',
+                        modules: {
+                            formula: true,
+                            toolbar: {
+                                container: toolbarOptions,
+                                handlers: {
+                                    customMath: function () {
+                                        openMathPopup('description');
+                                    }
+                                }
+                            }
+                        },
+                        placeholder: 'Add an optional description...'
+                    });
+                    quillEditors['description'] = descriptionEditor;
+
+                    descriptionEditor.on('text-change', function () {
+                        @this.set('description', descriptionEditor.root.innerHTML);
+                    });
+                }
 
                 // --- Options Editors ---
                 document.querySelectorAll('[id^="opt_editor_"]').forEach(el => {
