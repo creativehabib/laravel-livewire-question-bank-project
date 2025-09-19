@@ -309,11 +309,9 @@
                                     @endif
                                 </div>
                             </div>
-
-                            <div class="qp-paper-meta">
-                                <div>সময়— <span>{{ $summary['duration'] ?: '........' }}</span></div>
-                                <div>পূর্ণমান— <span>{{ $summary['total_marks'] ?: '........' }}</span></div>
-                                <div>প্রশ্ন সংখ্যা— <span>{{ $summary['total_questions'] }}</span></div>
+                            <div class="flex justify-between relative border-b">
+                                <div class="flex items-center editable-effect" contenteditable="true">সময়—<span class="mx-1">{{ $summary['duration'] ?: '৩০ মিনিট' }}</span></div>
+                                <div contenteditable="true" class="editable-effect">পূর্ণমান—<span class="mx-1">{{ $summary['total_marks'] ?: $summary['total_questions']}}</span></div>
                             </div>
 
                             @if($previewOptions['showQuestionInfo'])
@@ -343,8 +341,8 @@
                             @endif
 
                             @if($previewOptions['showInstructions'] && ! empty($summary['instruction_text']))
-                                <div class="qp-paper-instruction">
-                                    <span class="qp-paper-instruction-label">দ্রষ্টব্যঃ</span>
+                                <div class="italic text-center text-sm my-1">
+                                    <span class="">দ্রষ্টব্যঃ</span>
                                     <span>{!! nl2br(e($summary['instruction_text'])) !!}</span>
                                 </div>
                             @endif
@@ -666,7 +664,6 @@
             display: flex;
             justify-content: space-between;
             gap: 1.5rem;
-            border-bottom: 1px solid rgba(15, 118, 110, 0.2);
             padding-bottom: 1rem;
             margin-bottom: 1rem;
         }
@@ -773,19 +770,7 @@
             color: #b91c1c;
         }
 
-        .qp-paper-instruction {
-            background: rgba(252, 211, 77, 0.2);
-            border-left: 4px solid rgba(217, 119, 6, 0.6);
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
 
-        .qp-paper-instruction-label {
-            font-weight: 700;
-            margin-right: 0.5rem;
-        }
 
         .qp-paper-notice {
             text-align: center;
