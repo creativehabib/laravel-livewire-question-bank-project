@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('question_set_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('question_set_id')->constrained('question_sets')->nullOnDelete();
-            $table->foreignId('question_id')->constrained('questions')->nullOnDelete();
+            $table->foreignId('question_set_id')->nullable()->constrained('question_sets')->nullOnDelete();
+            $table->foreignId('question_id')->nullable()->constrained('questions')->nullOnDelete();
             $table->unsignedInteger('order')->default(0);
             $table->unique(['question_set_id', 'question_id']);
             $table->timestamps();
