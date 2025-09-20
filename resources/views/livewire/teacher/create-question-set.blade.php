@@ -36,7 +36,7 @@
             <form wire:submit.prevent="saveQuestionSet" class="space-y-6">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">প্রোগ্রাম/পরীক্ষার নাম লিখুন *</label>
-                    <input type="text" wire:model.defer="name" id="name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <input type="text" wire:model.defer="name" id="name" placeholder="প্রোগ্রাম/পরীক্ষার নাম লিখুন" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                     @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 

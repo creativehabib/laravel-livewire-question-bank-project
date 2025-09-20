@@ -26,7 +26,7 @@
 
         <p class="text-gray-600 mb-6">নিচের বাটনে ক্লিক করে ডেটাবেজ থেকে প্রশ্ন যুক্ত করুন</p>
 
-        <a href="{{ route('questions.view', $questionSet->id) }}" class="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-700 transition-colors duration-300 text-lg shadow-md">
+        <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="inline-block bg-emerald-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-emerald-700 transition-colors duration-300 text-lg shadow-md">
             প্রশ্ন যুক্ত করুন
         </a>
     </div>
