@@ -1,4 +1,4 @@
-<div class="w-full max-w-4xl mx-auto my-12 bg-white rounded-xl shadow-2xl overflow-hidden">
+<div class="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden transition-all duration-500">
     <div class="bg-gray-200 px-4 py-3 flex items-center">
         <div class="flex space-x-2">
             <div class="w-3 h-3 rounded-full bg-red-500"></div>
