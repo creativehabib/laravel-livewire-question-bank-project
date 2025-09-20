@@ -3,6 +3,7 @@
 namespace App\Livewire\Teacher;
 
 use Livewire\Component;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\{Subject, SubSubject, Chapter, Question};
 
 class QuestionGenerator extends Component
@@ -57,12 +58,16 @@ class QuestionGenerator extends Component
     /** @var array<int, array<string, mixed>> */
     public array $generatedQuestions = [];
 
+    public string $sortOption = 'random';
+
     /** @var array<int> */
     public array $selectedQuestionIds = [];
 
     public ?array $questionPaperSummary = null;
 
     public bool $showGenerationResults = false;
+
+    public bool $showPreview = false;
 
     public ?array $notification = null;
 
@@ -80,6 +85,7 @@ class QuestionGenerator extends Component
         'totalMarks' => 'nullable|string|max:50',
         'instructionText' => 'nullable|string',
         'noticeText' => 'nullable|string',
+        'sortOption' => 'nullable|string|in:random,newest,oldest,difficulty_high,difficulty_low',
     ];
 
     protected array $validationAttributes = [
@@ -98,6 +104,13 @@ class QuestionGenerator extends Component
         'instructionText' => 'নির্দেশনা',
         'noticeText' => 'ঘোষণা',
     ];
+
+    public function mount(): void
+    {
+        if (! $this->programName && auth()->user()?->institution_name) {
+            $this->programName = (string) auth()->user()->institution_name;
+        }
+    }
 
     public function updatedSubjectId($value): void
     {
@@ -163,6 +176,8 @@ class QuestionGenerator extends Component
     {
         $this->validate();
 
+        $this->showPreview = false;
+
         $baseQuery = Question::query()
             ->with(['chapter.subSubject', 'subject', 'tags'])
             ->where('subject_id', $this->subjectId);
@@ -178,6 +193,8 @@ class QuestionGenerator extends Component
         $typeKeywords = $this->questionTypeKeywords($this->questionType);
         $queryWithType = clone $baseQuery;
 
+        $queryWithType = $this->applySorting($queryWithType);
+
         if (! empty($typeKeywords)) {
             $queryWithType->whereHas('tags', function ($tagQuery) use ($typeKeywords) {
                 $tagQuery->where(function ($inner) use ($typeKeywords) {
@@ -188,11 +205,12 @@ class QuestionGenerator extends Component
             });
         }
 
-        $questions = $queryWithType->inRandomOrder()->take($this->questionCount * 2)->get();
+        $questions = $queryWithType->take($this->questionCount * 2)->get();
 
         $usedFallback = false;
         if ($questions->isEmpty() && ! empty($typeKeywords)) {
-            $questions = (clone $baseQuery)->inRandomOrder()->take($this->questionCount * 2)->get();
+            $fallbackQuery = $this->applySorting(clone $baseQuery);
+            $questions = $fallbackQuery->take($this->questionCount * 2)->get();
             $usedFallback = $questions->isNotEmpty();
         }
 
@@ -214,10 +232,12 @@ class QuestionGenerator extends Component
                 'chapter' => optional($question->chapter)->name,
                 'subject' => optional($question->subject)->name,
                 'difficulty' => $question->difficulty,
+                'created_at' => optional($question->created_at)->getTimestamp() ?? 0,
                 'tags' => $question->tags->pluck('name')->all(),
             ])
             ->all();
 
+        $this->sortGeneratedQuestions();
         $this->selectedQuestionIds = [];
         $this->showGenerationResults = true;
         $this->questionPaperSummary = null;
@@ -294,6 +314,19 @@ class QuestionGenerator extends Component
             'type' => 'success',
             'message' => __('প্রশ্নপত্র সফলভাবে প্রস্তুত হয়েছে!'),
         ];
+
+        $this->showPreview = false;
+    }
+
+    public function updatedSortOption(string $value): void
+    {
+        if (! array_key_exists($value, $this->sortOptions())) {
+            $this->sortOption = 'random';
+        }
+
+        if (! empty($this->generatedQuestions)) {
+            $this->sortGeneratedQuestions();
+        }
     }
 
     public function setTextAlign(string $alignment): void
@@ -358,6 +391,7 @@ class QuestionGenerator extends Component
             'typeOptions' => $this->questionTypeOptions(),
             'subSubjects' => $this->subSubjects,
             'chapters' => $this->chapters,
+            'sortOptions' => $this->sortOptions(),
         ])->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]);
     }
 
@@ -389,5 +423,59 @@ class QuestionGenerator extends Component
     protected function questionTypeLabel(string $type): string
     {
         return $this->questionTypeOptions()[$type] ?? $type;
+    }
+
+    /**
+     * @param  Builder<Question>  $query
+     * @return Builder<Question>
+     */
+    protected function applySorting(Builder $query): Builder
+    {
+        return match ($this->sortOption) {
+            'newest' => $query->orderByDesc('created_at'),
+            'oldest' => $query->orderBy('created_at'),
+            'difficulty_high' => $query->orderByDesc('difficulty'),
+            'difficulty_low' => $query->orderBy('difficulty'),
+            default => $query->inRandomOrder(),
+        };
+    }
+
+    protected function sortGeneratedQuestions(): void
+    {
+        $questions = $this->generatedQuestions;
+
+        switch ($this->sortOption) {
+            case 'newest':
+                usort($questions, fn ($a, $b) => ($b['created_at'] ?? 0) <=> ($a['created_at'] ?? 0));
+                break;
+            case 'oldest':
+                usort($questions, fn ($a, $b) => ($a['created_at'] ?? 0) <=> ($b['created_at'] ?? 0));
+                break;
+            case 'difficulty_high':
+                usort($questions, fn ($a, $b) => ((float) ($b['difficulty'] ?? 0)) <=> ((float) ($a['difficulty'] ?? 0)));
+                break;
+            case 'difficulty_low':
+                usort($questions, fn ($a, $b) => ((float) ($a['difficulty'] ?? 0)) <=> ((float) ($b['difficulty'] ?? 0)));
+                break;
+            default:
+                shuffle($questions);
+                break;
+        }
+
+        $this->generatedQuestions = array_values($questions);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function sortOptions(): array
+    {
+        return [
+            'random' => __('র‌্যান্ডম'),
+            'newest' => __('সর্বশেষ'),
+            'oldest' => __('পুরনো'),
+            'difficulty_high' => __('কঠিন থেকে সহজ'),
+            'difficulty_low' => __('সহজ থেকে কঠিন'),
+        ];
     }
 }
