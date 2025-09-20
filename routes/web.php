@@ -1,5 +1,6 @@
-<?php
+1<?php
 
+use App\Livewire\Teacher\CreateQuestionSet;
 use App\Models\Media;
 use Illuminate\Support\Facades\Route;
 use App\Enums\Role;
@@ -126,6 +127,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teacher/questions/create', Create::class)->name('teacher.questions.create');
     Route::get('/teacher/questions/{question}/edit', Edit::class)->name('teacher.questions.edit');
     Route::get('/teacher/question-create', TeacherQuestionGenerator::class)->name('teacher.questions.generate');
+    Route::get('/teacher/create-question-set', CreateQuestionSet::class)->name('teacher.create-question-set');
 });
 include __DIR__.'/auth.php';
 
