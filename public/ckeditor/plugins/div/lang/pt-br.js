@@ -5,7 +5,7 @@ CKEditor 4 LTS ("Long Term Support") is available under the terms of the Extende
 CKEDITOR.plugins.setLang( 'div', 'pt-br', {
 	IdInputLabel: 'Id',
 	advisoryTitleInputLabel: 'Título Consulta',
-	cssClassInputLabel: 'Classes de CSS',
+	cssClassInputLabel: 'Subject de CSS',
 	edit: 'Editar Div',
 	inlineStyleInputLabel: 'Estilo Inline',
 	langDirLTRLabel: 'Esquerda para Direita (LTR)',

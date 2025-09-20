@@ -1689,7 +1689,7 @@ CKEDITOR.config.image2_captionedClass = 'image';
  * CSS classes applied to aligned images. Useful to take control over the way
  * the images are aligned, i.e. to customize output HTML and integrate external stylesheets.
  *
- * Classes should be defined in an array of three elements, containing left, center, and right
+ * Subject should be defined in an array of three elements, containing left, center, and right
  * alignment classes, respectively. For example:
  *
  *		config.image2_alignClasses = [ 'align-left', 'align-center', 'align-right' ];

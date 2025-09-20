@@ -19,7 +19,7 @@ CKEDITOR.plugins.setLang( 'link', 'km', {
 	anchorId: 'តាម ID ធាតុ',
 	anchorName: 'តាម​ឈ្មោះ​យុថ្កា',
 	charset: 'លេខកូតអក្សររបស់ឈ្នាប់',
-	cssClasses: 'Stylesheet Classes',
+	cssClasses: 'Stylesheet Subject',
 	download: 'Force Download', // MISSING
 	displayText: 'Display Text', // MISSING
 	emailAddress: 'អាសយដ្ឋាន​អ៊ីមែល',

@@ -19,7 +19,7 @@ CKEDITOR.plugins.setLang( 'link', 'fr', {
 	anchorId: 'Par ID d\'élément',
 	anchorName: 'Par nom d\'ancre',
 	charset: 'Encodage de la ressource liée',
-	cssClasses: 'Classes de style',
+	cssClasses: 'Subject de style',
 	download: 'Forcer le téléchargement',
 	displayText: 'Afficher le texte',
 	emailAddress: 'Adresse électronique',

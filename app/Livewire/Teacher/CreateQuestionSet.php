@@ -4,7 +4,6 @@ namespace App\Livewire\Teacher;
 
 use App\Models\SubSubject;
 use Livewire\Component;
-use App\Models\Classes;
 use App\Models\Subject;
 use App\Models\Chapter;
 use App\Models\QuestionSet;
@@ -42,7 +41,7 @@ class CreateQuestionSet extends Component
     // This runs when the 'selectedSubject' property changes
     public function updatedSelectedSubject($subject_id)
     {
-        $this->chapters = Chapter::where('subject_id', $subject_id)->get();
+        $this->chapters = Chapter::where('sub_subject_id', $subject_id)->get();
         $this->selectedChapter = null; // Reset chapter
     }
 
@@ -51,8 +50,8 @@ class CreateQuestionSet extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'selectedClass' => 'required|exists:classes,id',
-            'selectedSubject' => 'required|exists:subjects,id',
+            'selectedClass' => 'required|exists:subjects,id',
+            'selectedSubject' => 'required|exists:sub_subjects,id',
             'selectedChapter' => 'required|exists:chapters,id',
             'type' => 'required|in:mcq,cq,combine',
             'quantity' => 'required|integer|min:1',
@@ -60,24 +59,21 @@ class CreateQuestionSet extends Component
 
         // Prepare the generation criteria JSON data
         $criteria = [
-            'subject_id' => $this->selectedSubject,
+            'subject_id' => $this->selectedClass,
+            'sub_subject_id' => $this->selectedSubject,
             'chapter_id' => $this->selectedChapter,
+            'type' => $this->type,
             'quantity' => $this->quantity
         ];
 
         // Create the record in the 'question_sets' table
-        QuestionSet::create([
+        $newQuestionSet = QuestionSet::create([
             'name' => $this->name,
-            'class_id' => $this->selectedClass,
-            'user_id' => auth()->id(), // Currently logged-in user
-            'type' => $this->type,
+            'user_id' => auth()->id(),
             'generation_criteria' => $criteria,
         ]);
 
-        session()->flash('success', 'প্রশ্নপত্র সফলভাবে তৈরি করা হয়েছে!');
-
-        $this->reset(); // Reset all public properties
-        $this->mount(); // Reload initial data
+        return redirect()->route('qset.generated', ['qset' => $newQuestionSet->id]);
     }
 
     public function render()

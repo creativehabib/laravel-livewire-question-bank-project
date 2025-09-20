@@ -83,8 +83,8 @@
                 <x-heroicon-o-question-mark-circle class="w-5 h-5"/>
                 <span class="sidebar-text">Questions</span>
             </a>
-            <a wire:navigate href="{{ route('teacher.questions.generate') }}"
-               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->routeIs('teacher.questions.generate') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
+            <a wire:navigate href="{{ route('teacher.questions.create') }}"
+               class="nav-link flex items-center gap-3 px-4 py-2.5 rounded-lg {{ request()->routeIs('teacher.questions.create') ? 'bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-semibold' : '' }}">
                 <x-heroicon-o-sparkles class="w-5 h-5"/>
                 <span class="sidebar-text">প্রশ্ন ক্রিয়েট</span>
             </a>

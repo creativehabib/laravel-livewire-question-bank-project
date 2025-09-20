@@ -14,11 +14,7 @@ return new class extends Migration
         Schema::create('question_sets', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('subject_id')->constrained('subjects');
-            $table->foreignId('sub_subject_id')->constrained('sub_subjects');
-            $table->foreignId('chapter_id')->constrained('chapters');
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->enum('type', ['mcq', 'cq', 'combine'])->default('mcq');
+            $table->foreignId('user_id')->constrained('users');
             $table->json('generation_criteria')->nullable();
             $table->timestamps();
         });
