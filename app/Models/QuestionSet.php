@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class QuestionSet extends Model
 {
-    protected $guarded = ['id'];
+    protected $guarded = [];
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that should be cast.
@@ -84,4 +88,19 @@ class QuestionSet extends Model
         return $query->inRandomOrder()->limit($quantity)->get();
     }
 
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot() // (৩) নতুন ডেটা তৈরির সময় স্বয়ংক্রিয়ভাবে UUID সেট করার জন্য
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->{$model->getKeyName()})) {
+                $model->{$model->getKeyName()} = (string) Str::uuid();
+            }
+        });
+    }
 }
