@@ -19,10 +19,10 @@
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class=" p-2">
-                    <button class="bg-emerald-600 hover:opacity-90 px-2 py-1 text-white ">+ আরও প্রশ্ন যুক্ত করুন</button>
+                    <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="bg-emerald-600 hover:opacity-90 px-2 py-1 text-white ">+ আরও প্রশ্ন যুক্ত করুন</a>
                 </div>
             </div>
-            <div class="bg-red-100  w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
+            <div class=" w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
                 <div class="relative py-2 print:py-0">
                     <h1 class="text-xl font-bold text-center">{{ $instituteName }}</h1>
                     <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline hover:outline-dashed hover:outline-gray-400 editable-effect" data-listener-added_19a1dacd="true">{{ $questionSet->name }}</p>
