@@ -4,7 +4,7 @@
             <p class="bg-gray-200 px-2 py-1.5 rounded">
                 <span class="hidden md:inline-block">Selected:</span> {{ count($selectedQuestions) }} / {{ $this->availableQuestions->count() }}
             </p>
-            <a class="flex gap-1 items-center bg-gray-200 rounded hover:bg-gray-300 px-3 py-1.5" href="#">
+            <a class="flex gap-1 items-center bg-gray-200 rounded hover:bg-gray-300 px-3 py-1.5" href="{{ route('questions.paper', ['qset' => $questionSet->id]) }}">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 576 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64c-7.1 0-13.9-1.2-20.3-3.3c-5.5-1.8-11.9 1.6-11.7 7.4c.3 6.9 1.3 13.8 3.2 20.7c13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-11.1-41.5-47.8-69.4-88.6-71.1c-5.8-.2-9.2 6.1-7.4 11.7c2.1 6.4 3.3 13.2 3.3 20.3z"></path></svg>
                 <span>View</span>
             </a>
@@ -17,12 +17,24 @@
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">{{ session('success') }}</div>
         @endif
 
-        <div class="flex gap-2 justify-between my-2">
-            <p class="p-2 rounded border line-clamp-1 truncate">টাইটেল - {{ $questionSet->name }}</p>
-            <button wire:click="toggleSelectAll" class="shrink-0 border px-2 rounded hover:border-green-500 flex items-center gap-1">
-                Select All <span class="ml-1 text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-semibold">NEW</span>
-            </button>
-        </div>
+        <div class="flex gap-2 justify-between my-4">
+          <p class="p-2 rounded border line-clamp-1 truncate">টাইটেল - {{ $questionSet->name }}</p>
+
+          {{-- কন্ডিশন চেক করে বাটন দেখানো হচ্ছে --}}
+          @if (count($selectedQuestions) === $this->availableQuestions->count() && $this->availableQuestions->count() > 0)
+              {{-- যখন সব প্রশ্ন সিলেক্ট করা থাকবে --}}
+              <button wire:click="toggleSelectAll" class="shrink-0 border px-3 py-1 rounded border-red-500 text-red-600 flex items-center gap-1 font-semibold text-sm transition-all duration-150">
+                  <span>Deselect All</span>
+                  <span class="ml-1 text-[10px] bg-red-500 text-white px-1.5 py-0.5 rounded-full font-semibold">NEW</span>
+              </button>
+          @else
+              {{-- যখন সব প্রশ্ন সিলেক্ট করা থাকবে না --}}
+              <button wire:click="toggleSelectAll" class="shrink-0 border px-2 rounded border-green-500 flex items-center gap-1 text-sm transition-all duration-150">
+                  <span>Select All</span>
+                  <span class="ml-1 text-[10px] bg-green-500 text-white px-1.5 py-0.5 rounded-full font-semibold">NEW</span>
+              </button>
+          @endif
+      </div>
         <div class="text-center bg-yellow-50 p-1 rounded mb-6">প্রশ্নে ভুল পেলে রিপোর্ট করে প্রশ্নব্যাংক সমৃদ্ধ করুন ।</div>
 
         <div class="relative">
@@ -49,7 +61,7 @@
                             <div class="grid gap-1 grid-cols-2 mt-2">
                                 @foreach ($question->options as $option)
                                 <div class="p-2 flex items-center gap-1 rounded-lg bg-gray-100">
-                                    <div class="flex items-center justify-center h-5 w-5 border rounded-full p-0.5 {{ $option->is_correct ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-400' }}">{{ mb_chr(2453 + $loop->index) }}</div>
+                                    <div class="flex items-center justify-center h-5 w-5 border rounded-full p-0.5 {{ $option->is_correct ? 'bg-gray-700 text-white border-gray-700' : 'border-gray-600' }}">{{ mb_chr(2453 + $loop->index) }}</div>
                                     <div>{!! $option->option_text !!}</div>
                                 </div>
                                 @endforeach

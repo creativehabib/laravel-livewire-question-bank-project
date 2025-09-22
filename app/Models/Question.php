@@ -32,6 +32,12 @@ class Question extends Model
         'marks' => 'float',
     ];
 
+    public function questionSets()
+    {
+        return $this->belongsToMany(QuestionSet::class, 'question_set_items')
+            ->withPivot('order');
+    }
+
     protected static function boot()
     {
         parent::boot();

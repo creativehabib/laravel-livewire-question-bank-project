@@ -21,6 +21,13 @@ class QuestionSet extends Model
         'generation_criteria' => 'array',
     ];
 
+    public function questions()
+    {
+        return $this->belongsToMany(Question::class, 'question_set_items')
+            ->withPivot('order') // পিভট টেবিলের order কলামটি অ্যাক্সেস করার জন্য
+            ->orderBy('pivot_order'); // order অনুযায়ী প্রশ্নগুলো সাজানোর জন্য
+    }
+
     public function getRelatedSubject()
     {
         $subjectId = $this->generation_criteria['subject_id'] ?? null;
@@ -37,6 +44,20 @@ class QuestionSet extends Model
     {
         $chapterId = $this->generation_criteria['chapter_id'] ?? null;
         return $chapterId ? Chapter::find($chapterId) : null;
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    } 
+
+    public function subSubject()
+    {
+        return $this->belongsTo(SubSubject::class);
+    }
+    public function chapters()
+    {
+        return $this->belongsTo(Chapter::class, 'chapter_id');
     }
 
     public function user()

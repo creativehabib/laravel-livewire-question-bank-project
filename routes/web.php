@@ -2,6 +2,7 @@
 
 use App\Livewire\Teacher\CreateQuestionSet;
 use App\Livewire\Teacher\GeneratedQuestionSetPage;
+use App\Livewire\Teacher\QuestionPaper;
 use App\Livewire\Teacher\ViewQuestions;
 use App\Models\Media;
 use Illuminate\Support\Facades\Route;
@@ -132,6 +133,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teacher/create-question', CreateQuestionSet::class)->name('teacher.questions.create');
     Route::get('/teacher/create-question/generated-qset/{qset}', GeneratedQuestionSetPage::class)->name('qset.generated');
     Route::get('/teacher/view-questions', ViewQuestions::class)->name('questions.view');
+    Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');
 });
 include __DIR__.'/auth.php';
 

@@ -11,7 +11,7 @@ class ViewQuestions extends Component
 {
     // UI State Properties
     public $showExplanationFor = null;
-    
+
     public QuestionSet $questionSet;
     public $availableQuestions;
     public $selectedQuestions = [];
@@ -20,7 +20,7 @@ class ViewQuestions extends Component
     public $searchKeyword = '';
     public $specialFilters = [];
     public $selectedTopics = [];
-    
+
     public $allTopics = []; // To hold topics for the filter sidebar
 
     public function mount(Request $request)
@@ -30,7 +30,7 @@ class ViewQuestions extends Component
         // ১. QuestionSet লোড করুন এবং এর সাথে যুক্ত প্রশ্নগুলোও নিয়ে আসুন (Eager Loading)
         $this->questionSet = QuestionSet::findOrFail($qsetId);
 
-
+        $this->selectedQuestions = $this->questionSet->questions->pluck('id')->map(fn ($id) => (string) $id)->toArray();
         // ৩. generation_criteria থেকে শর্তগুলো বের করুন
         $criteria = $this->questionSet->generation_criteria;
         $type = $criteria['type'] ?? 'mcq';
@@ -42,7 +42,7 @@ class ViewQuestions extends Component
         // ৪. শর্ত অনুযায়ী প্রশ্ন খুঁজুন এবং availableQuestions প্রোপার্টিতে রাখুন
         $this->availableQuestions = Question::query()
             ->with('options','tags')
-            ->when($type, fn ($q) => $q->where('question_type', $type)) // 'question_type' হলে সেটি দিন
+            ->when($type, fn ($q) => $q->where('question_type', $type))
             ->when($subjectId, fn ($q) => $q->where('subject_id', $subjectId))
             ->when($subSubjectId, fn ($q) => $q->where('sub_subject_id', $subSubjectId))
             ->when($chapterId, fn ($q) => $q->where('chapter_id', $chapterId))
@@ -90,13 +90,19 @@ class ViewQuestions extends Component
         }
     }
 
-    /**
-     * "Save" বাটনে ক্লিক করলে এই মেথডটি কাজ করবে
-     */
     public function saveSelection()
     {
-        // sync() মেথডটি পিভট টেবিলে শুধুমাত্র নির্বাচিত প্রশ্নগুলো রাখবে
-        $this->questionSet->questions()->sync($this->selectedQuestions);
+        // ১. sync করার জন্য ডেটাটিকে সঠিক ফরম্যাটে সাজিয়ে নিন
+        $dataToSync = [];
+        $order = 1;
+
+        foreach ($this->selectedQuestions as $questionId) {
+            $dataToSync[$questionId] = ['order' => $order++];
+        }
+
+        // ২. sync() মেথডে নতুন ফরম্যাটের ডেটা পাস করুন
+        // এটি question_set_items টেবিলে question_id এর সাথে order ও সেভ করবে
+        $this->questionSet->questions()->sync($dataToSync);
 
         session()->flash('success', count($this->selectedQuestions) . 'টি প্রশ্ন সফলভাবে সেভ করা হয়েছে!');
     }
