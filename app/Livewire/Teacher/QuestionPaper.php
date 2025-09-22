@@ -16,6 +16,21 @@ class QuestionPaper extends Component
     public $subSubject;
     public $chapter;
 
+    public array $previewOptions = [
+        'attachAnswerSheet' => false,
+        'attachOmrSheet' => false,
+        'markImportant' => false,
+        'showQuestionInfo' => true,
+        'showSubSubject' => true,
+        'showChapter' => true,
+        'showSetCode' => true,
+        'showStudentInfo' => false,
+        'showMarksBox' => false,
+        'showInstructions' => true,
+        'showNotice' => true,
+        'showExamName' => false,
+    ];
+
     public function mount(Request $request)
     {
         $qsetId = $request->query('qset');

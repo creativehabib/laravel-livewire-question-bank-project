@@ -15,7 +15,7 @@
                 </svg><span>ডাউনলোড</span></button>
         </div>
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
-        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm]" style="font-family: Bangla;">
+        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm]" style="font-family: Shurjo;">
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class=" p-2">
@@ -25,27 +25,37 @@
             <div class=" w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
                 <div class="relative py-2 print:py-0">
                     <h1 class="text-xl font-bold text-center">{{ $instituteName }}</h1>
-                    <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline hover:outline-dashed hover:outline-gray-400 editable-effect" data-listener-added_19a1dacd="true">{{ $questionSet->name }}</p>
+                    @if($previewOptions['showExamName'])
+                        <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline-dashed hover:outline-gray-400 editable-effect" data-listener-added_19a1dacd="true">{{ $questionSet->name }}</p>
+                    @endif
                     <div class="relative">
                         <p contenteditable="true" class="text-center text-lg">{{ $subject->name }}</p>
+                        @if($previewOptions['showSubSubject'] && ! empty($subSubject->name))
                         <p contenteditable="true" class="text-center">{{ $subSubject->name }}</p>
-                        <p contenteditable="true" class="text-center">{{ $chapter->name }}</p>
-                        <div class="absolute -top-1 right-0 flex">
-                            <p class="border-y border-l  pl-1 border-black" contenteditable="true">সেট -</p>
-                            <p contenteditable="true" class="border-y border-r  px-1 border-black font-bold">ক</p>
-                        </div>
+                        @endif
+                        @if($previewOptions['showChapter'])
+                            <p contenteditable="true" class="text-center">{{ $chapter->name }}</p>
+                        @endif
+                        @if($previewOptions['showSetCode'])
+                            <div class="absolute -top-1 right-0 flex">
+                                <p class="border-y border-l  pl-1 border-black" contenteditable="true">সেট -</p>
+                                <p contenteditable="true" class="border-y border-r  px-1 border-black font-bold">ক</p>
+                            </div>
+                        @endif
                     </div>
                     <div class="flex justify-between relative b">
                         <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">৪০ মিনিট</span></div>
                         <div contenteditable="true">পূর্ণমান—<span class="mx-1">{{ $questionSet->questions->count('marks') }}</span></div>
                     </div>
                     <hr>
-                    <div class="text-center text-sm my-1 editable-effect" contenteditable="true"><span><i><span class="bangla-bold">দ্রষ্টব্যঃ</span> সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমুহ হতে সঠিক উত্তরের বৃত্তটি</i> (
-                        <svg stroke="currentColor" fill="currentColor"
-                        stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-                        </svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
-                    </div>
+                    @if($previewOptions['showInstructions'])
+                        <div class="text-center text-sm my-1 editable-effect" contenteditable="true"><span><i><span class="bangla-bold">দ্রষ্টব্যঃ</span> সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমুহ হতে সঠিক উত্তরের বৃত্তটি</i> (
+                            <svg stroke="currentColor" fill="currentColor"
+                            stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+                            </svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
+                        </div>
+                    @endif
                     <div contenteditable="true" class="bangla-bold text-center text-sm mt-1 font-bold editable-effect">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা ।</div>
                 </div>
                 <div style="font-size: 14px;">
@@ -62,7 +72,7 @@
                                 <div class="relative grid grid-cols-2 ml-7 group">
                                     @foreach ($question->options as $option)
                                     <div class="option flex flex-1 items-baseline mb-0.5">
-                                        <div class="h-4 w-4 {{ $option->is_correct ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
+                                        <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet']) {{ $option->is_correct ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
                                         <div contenteditable="false" class="false">{!! $option->option_text !!}</div>
                                     </div>
                                     @endforeach
@@ -92,8 +102,8 @@
                         <div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">উত্তরপত্র</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" value="">
-                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.attachAnswerSheet">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer dark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div>
@@ -139,31 +149,31 @@
                         <div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked="">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSubSubject">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">অধ্যায়ের নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked="">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showChapter">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">সেট কোড </span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked="">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSetCode">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">প্রোগ্রাম/পরিক্ষার নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" value="">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showExamName">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">নির্দেশনা</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked="">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showInstructions">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
@@ -234,7 +244,7 @@
                             <div class="bg-gray-100 my-1 p-2">
                                 <div class="rounded  justify-between items-center">
                                     <p class="bangla mb-1 text-center">ফন্ট পরিবর্তন</p>
-                                    <select id="font-selector">
+                                    <select id="font-selector" class="w-full rounded-md border border-gray-300">
                                         <option value="Bangla">বাংলা</option>
                                         <option value="SolaimanLipi">সোলাইমান লিপি</option>
                                         <option value="Kalpurush">কালপুরুষ</option>

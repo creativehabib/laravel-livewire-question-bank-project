@@ -386,7 +386,7 @@ class QuestionGenerator extends Component
 
     public function render()
     {
-        return view('livewire.teacher.question-generator', [
+        return view('livewire.teacher.question-generator-copy', [
             'subjects' => Subject::orderBy('name')->get(['id', 'name']),
             'typeOptions' => $this->questionTypeOptions(),
             'subSubjects' => $this->subSubjects,
