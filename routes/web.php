@@ -130,7 +130,7 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('/teacher/questions/create', Create::class)->name('teacher.questions.create');
     Route::get('/teacher/questions/{question}/edit', Edit::class)->name('teacher.questions.edit');
     Route::get('/teacher/question-create', TeacherQuestionGenerator::class)->name('teacher.questions.generate');
-    Route::get('/teacher/create-question', CreateQuestionSet::class)->name('teacher.questions.create');
+    Route::get('/teacher/question-set-create', CreateQuestionSet::class)->name('questions.set.create');
     Route::get('/teacher/create-question/generated-qset/{qset}', GeneratedQuestionSetPage::class)->name('qset.generated');
     Route::get('/teacher/view-questions', ViewQuestions::class)->name('questions.view');
     Route::get('/teacher/questions-paper', QuestionPaper::class)->name('questions.paper');

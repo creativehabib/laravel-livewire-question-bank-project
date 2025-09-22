@@ -12,7 +12,7 @@
                 <span class="flex items-center gap-1"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"></path></svg> Save</span>
             </button>
         </div>
-        
+
         @if (session()->has('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">{{ session('success') }}</div>
         @endif
@@ -39,7 +39,7 @@
 
         <div class="relative">
             @forelse ($this->availableQuestions as $question)
-                <div wire:click="toggleSelection('{{ $question->id }}')" 
+                <div wire:click="toggleSelection('{{ $question->id }}')"
                      class="bg-white rounded-lg border my-2.5 transition-all duration-150 cursor-pointer {{ in_array($question->id, $selectedQuestions) ? 'border-green-500 border-x-8' : 'border-gray-200' }}">
                     <div class="p-2">
                         <div class="flex items-center justify-between mb-1">
@@ -84,7 +84,7 @@
 
     <div>
         <div class="fixed inset-0 min-h-screen z-[998] bg-black/50 hidden"></div>
-        <div class="hidden bg-white fixed top-0 right-0 z-[1000] overflow-y-auto lg:z-0 py-5 lg:py-0 lg:sticky lg:block lg:top-16 h-full w-80  print:hidden h-screen overflow-y-scroll sidebar">
+        <div class="hidden bg-white fixed top-0 right-0 z-[1000] overflow-y-auto lg:z-0 py-5 lg:py-0 lg:sticky lg:block lg:top-16 w-80  print:hidden h-screen overflow-y-scroll sidebar">
           <div class="px-3 lg:px-1 bangla ">
             <div class="border rounded-t text-lg font-bold py-2 text-center flex justify-center items-center gap-2">এডভান্সড ফিল্টার মেনু</div>
             <div class="my-2.5">
@@ -242,7 +242,7 @@
               <div class="border-t text-gray-700">
                 <div class="p-2">
                   <div class="p-2">
-                    <select>
+                    <select class="w-full rounded-md border border-gray-400">
                       <option value="">Year</option>
                       <option value="2024">2024</option>
                       <option value="2023">2023</option>
@@ -325,7 +325,7 @@
               <div class="border-t text-gray-700">
                 <div class="p-2">
                   <div class="p-2">
-                    <select>
+                    <select class="w-full rounded-md border border-gray-400">
                       <option value="">Year</option>
                       <option value="2023">2023</option>
                       <option value="2022">2022</option>

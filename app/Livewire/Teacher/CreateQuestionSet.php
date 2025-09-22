@@ -78,7 +78,7 @@ class CreateQuestionSet extends Component
 
     public function render()
     {
-        return view('livewire.teacher.create-question-set')
+        return view('livewire.teacher.question-set-create')
             ->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]); // Assuming you have a main layout file
     }
 }
