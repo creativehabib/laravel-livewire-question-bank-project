@@ -5,6 +5,7 @@ namespace App\Livewire\Teacher;
 use Livewire\Component;
 use App\Models\QuestionSet;
 use Illuminate\Http\Request;
+use App\Support\Fonts;
 
 class QuestionPaper extends Component
 {
@@ -15,6 +16,7 @@ class QuestionPaper extends Component
     public $subject;
     public $subSubject;
     public $chapters;
+    public string $fontFamily = 'Bangla';
 
     public array $previewOptions = [
         'attachAnswerSheet' => false,
@@ -49,7 +51,15 @@ class QuestionPaper extends Component
 
     public function render()
     {
-        return view('livewire.teacher.question-paper')
-               ->layout('layouts.admin');
+        return view('livewire.teacher.question-paper', [
+            'fontOptions' => Fonts::options(),
+        ])->layout('layouts.admin');
+    }
+
+    public function updatedFontFamily(string $value): void
+    {
+        if (! in_array($value, Fonts::keys(), true)) {
+            $this->fontFamily = 'Bangla';
+        }
     }
 }

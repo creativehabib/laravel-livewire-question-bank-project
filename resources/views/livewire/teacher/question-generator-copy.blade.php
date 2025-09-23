@@ -265,8 +265,10 @@
             $summary = $questionPaperSummary;
             $fontClassMap = [
                 'Bangla' => 'qp-font-bangla',
+                'HindSiliguri' => 'qp-font-hind-siliguri',
                 'SolaimanLipi' => 'qp-font-solaiman',
                 'Kalpurush' => 'qp-font-kalpurush',
+                'Shurjo' => 'qp-font-shurjo',
                 'roman' => 'qp-font-roman',
             ];
             $fontClass = $fontClassMap[$fontFamily] ?? 'qp-font-bangla';
@@ -541,13 +543,12 @@
                                                 </div>
                                             </div>
                                             <div class="bg-gray-100 my-1 p-2">
-                                                <div class="rounded  justify-between items-center">
+                                                <div class="rounded justify-between items-center">
                                                     <p class="bangla mb-1 text-center">ফন্ট পরিবর্তন</p>
-                                                    <select id="font-selector">
-                                                        <option value="Bangla">বাংলা</option>
-                                                        <option value="SolaimanLipi">সোলাইমান লিপি</option>
-                                                        <option value="Kalpurush">কালপুরুষ</option>
-                                                        <option value="roman">Times New Roman</option>
+                                                    <select id="font-selector" wire:model.live="fontFamily" class="w-full rounded-md border border-gray-300">
+                                                        @foreach($fontOptions as $value => $label)
+                                                            <option value="{{ $value }}">{{ $label }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>

@@ -9,7 +9,7 @@
 @tailwind utilities;
 
 body {
-    font-family: 'Shurjo', 'Roboto', sans-serif;
+    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
     font-size: 1rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -56,4 +56,45 @@ body {
 .ts-control{
     padding-top: .5rem;
     padding-bottom: .5rem;
+}
+
+.qp-font-bangla,
+.bangla {
+    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+}
+
+.qp-font-hind-siliguri {
+    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+}
+
+.qp-font-solaiman {
+    font-family: 'SolaimanLipi', 'Hind Siliguri', 'Kalpurush', 'Shurjo', 'Roboto', sans-serif;
+}
+
+.qp-font-kalpurush {
+    font-family: 'Kalpurush', 'Hind Siliguri', 'Shurjo', 'SolaimanLipi', 'Roboto', sans-serif;
+}
+
+.qp-font-shurjo {
+    font-family: 'Shurjo', 'Hind Siliguri', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+}
+
+.qp-font-roman {
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.qp-text-left {
+    text-align: left;
+}
+
+.qp-text-center {
+    text-align: center;
+}
+
+.qp-text-right {
+    text-align: right;
+}
+
+.qp-text-justify {
+    text-align: justify;
 }

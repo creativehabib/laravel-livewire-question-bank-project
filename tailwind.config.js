@@ -12,7 +12,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Shurjo', 'Roboto', ...defaultTheme.fontFamily.sans],
+                sans: ['Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', ...defaultTheme.fontFamily.sans],
             },
         },
     },
