@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Student;
 
-use Livewire\Component;
 use App\Models\ExamResult;
+use Illuminate\Support\Carbon;
+use Livewire\Component;
 
 class Dashboard extends Component
 {
@@ -22,10 +23,18 @@ class Dashboard extends Component
 
         $weekly = ExamResult::where('user_id', $user->id)
             ->where('created_at', '>=', now()->subWeeks(5)->startOfWeek())
-            ->selectRaw('YEARWEEK(created_at, 1) as week, COUNT(*) as total')
-            ->groupBy('week')
-            ->orderBy('week')
-            ->get();
+            ->get()
+            ->groupBy(fn ($result) => $result->created_at->copy()->startOfWeek()->format('Y-m-d'))
+            ->sortKeys()
+            ->map(function ($group, string $weekStart) {
+                $weekStartDate = Carbon::parse($weekStart);
+
+                return [
+                    'week' => (int) $weekStartDate->format('oW'),
+                    'total' => $group->count(),
+                ];
+            })
+            ->values();
 
         return view('livewire.student.dashboard', [
             'latest' => $latest,
