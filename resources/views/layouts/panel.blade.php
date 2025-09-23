@@ -15,6 +15,7 @@
 
     {{-- Vite Assets --}}
     @vite(['resources/css/app.css','resources/js/app.js'])
+    @include('components.settings.font-loader')
 
     {{-- Livewire Styles --}}
     @livewireStyles

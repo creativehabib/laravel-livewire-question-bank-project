@@ -145,6 +145,34 @@
                 <div class="text-red-600 text-sm">{{ $message }}</div>
             @enderror
         </div>
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-semibold mb-2">Font settings</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Customize the font family used across the website. Provide a comma separated font stack (e.g. <code class="bg-gray-100 dark:bg-gray-800 px-1 rounded">'Inter', 'Hind Siliguri', sans-serif</code>). Leave the heading font blank to reuse the body font.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Body font stack</label>
+                    <textarea rows="2" wire:model.defer="font_body" class="input-field"></textarea>
+                    @error('font_body')
+                        <div class="text-red-600 text-sm">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Heading font stack</label>
+                    <textarea rows="2" wire:model.defer="font_heading" class="input-field" placeholder="Optional"></textarea>
+                    @error('font_heading')
+                        <div class="text-red-600 text-sm">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Font stylesheet URL</label>
+                    <input type="url" wire:model.defer="font_import_url" class="input-field" placeholder="https://fonts.googleapis.com/css2?...">
+                    @error('font_import_url')
+                        <div class="text-red-600 text-sm">{{ $message }}</div>
+                    @enderror
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Optional: provide a hosted stylesheet link (such as Google Fonts) so the selected fonts load automatically.</p>
+                </div>
+            </div>
+        </div>
         <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded">Save</button>
     </form>
 </div>

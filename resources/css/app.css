@@ -8,8 +8,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --app-font-body: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    --app-font-heading: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    --tw-font-sans: var(--app-font-body);
+}
+
 body {
-    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    font-family: var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
     font-size: 1rem;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -18,6 +24,15 @@ body {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
 
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--app-font-heading, var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif));
 }
 .table-bordered {
     border-collapse: collapse;
@@ -60,7 +75,7 @@ body {
 
 .qp-font-bangla,
 .bangla {
-    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    font-family: var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
 }
 
 .qp-font-hind-siliguri {

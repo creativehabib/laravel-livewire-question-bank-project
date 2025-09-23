@@ -14,6 +14,7 @@
     </script>
     {{-- Vite Assets (app.css এবং app.js এখান থেকে লোড হবে) --}}
     @vite(['resources/css/app.css','resources/js/app.js'])
+    @include('components.settings.font-loader')
 
     @livewireStyles
     @stack('styles')

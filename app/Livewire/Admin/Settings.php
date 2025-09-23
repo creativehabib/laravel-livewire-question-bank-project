@@ -11,6 +11,7 @@ use Livewire\WithFileUploads;
 class Settings extends Component
 {
     use WithFileUploads;
+    private const DEFAULT_FONT_STACK = "'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif";
     public $chat_retention_value;
     public $chat_retention_unit = 'days';
     public $chat_message_max_length;
@@ -34,6 +35,9 @@ class Settings extends Component
     public $registration_enabled = true;
     public $manual_registration_enabled = true;
     public $manual_login_enabled = true;
+    public $font_body;
+    public $font_heading;
+    public $font_import_url;
 
     protected $rules = [
         'chat_retention_value' => 'required|integer|min:1',
@@ -57,6 +61,9 @@ class Settings extends Component
         'registration_enabled' => 'boolean',
         'manual_registration_enabled' => 'boolean',
         'manual_login_enabled' => 'boolean',
+        'font_body' => ['required', 'string', 'max:255', 'regex:/^[^;{}<>]+$/'],
+        'font_heading' => ['nullable', 'string', 'max:255', 'regex:/^[^;{}<>]*$/'],
+        'font_import_url' => 'nullable|url|max:255',
     ];
 
     public function mount(): void
@@ -91,11 +98,19 @@ class Settings extends Component
         $this->registration_enabled = (bool) Setting::get('registration_enabled', true);
         $this->manual_registration_enabled = (bool) Setting::get('manual_registration_enabled', true);
         $this->manual_login_enabled = (bool) Setting::get('manual_login_enabled', true);
+        $this->font_body = trim((string) Setting::get('frontend_font_body', self::DEFAULT_FONT_STACK));
+        $headingDefault = $this->font_body ?: self::DEFAULT_FONT_STACK;
+        $this->font_heading = trim((string) Setting::get('frontend_font_heading', $headingDefault));
+        $this->font_import_url = trim((string) Setting::get('frontend_font_import_url', '')) ?: null;
     }
 
     public function save(): void
     {
         $this->validate();
+        $this->font_body = trim($this->font_body);
+        $headingFont = trim((string) $this->font_heading);
+        $this->font_heading = $headingFont !== '' ? $headingFont : $this->font_body;
+        $this->font_import_url = $this->font_import_url ? trim($this->font_import_url) : null;
         $hours = $this->chat_retention_value * ($this->chat_retention_unit === 'days' ? 24 : 1);
         Setting::set('chat_retention_hours', $hours);
         Setting::set('chat_message_max_length', $this->chat_message_max_length);
@@ -121,6 +136,9 @@ class Settings extends Component
         Setting::set('registration_enabled', $this->registration_enabled ? 1 : 0);
         Setting::set('manual_registration_enabled', $this->manual_registration_enabled ? 1 : 0);
         Setting::set('manual_login_enabled', $this->manual_login_enabled ? 1 : 0);
+        Setting::set('frontend_font_body', $this->font_body ?: self::DEFAULT_FONT_STACK);
+        Setting::set('frontend_font_heading', $this->font_heading ?: $this->font_body ?: self::DEFAULT_FONT_STACK);
+        Setting::set('frontend_font_import_url', $this->font_import_url);
         config(['app.timezone' => $this->timezone]);
         date_default_timezone_set($this->timezone);
         session()->flash('status', 'Settings updated');
