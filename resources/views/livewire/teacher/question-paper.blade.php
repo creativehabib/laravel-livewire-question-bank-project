@@ -31,10 +31,10 @@
                     <div class="relative">
                         <p contenteditable="true" class="text-center text-lg">{{ $subject->name }}</p>
                         @if($previewOptions['showSubSubject'] && ! empty($subSubject->name))
-                        <p contenteditable="true" class="text-center">{{ $subSubject->name }}</p>
+                            <p contenteditable="true" class="text-center">{{ $subSubject->name }}</p>
                         @endif
-                        @if($previewOptions['showChapter'])
-                            <p contenteditable="true" class="text-center">{{ $chapter->name }}</p>
+                        @if($previewOptions['showChapter'] && $chapters->isNotEmpty())
+                            <p class="text-center text-sm">({{ $chapters->pluck('name')->implode(', ') }})</p>
                         @endif
                         @if($previewOptions['showSetCode'])
                             <div class="absolute -top-1 right-0 flex">
@@ -44,14 +44,14 @@
                         @endif
                     </div>
                     <div class="flex justify-between relative b">
-                        <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">৪০ মিনিট</span></div>
+                        <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">{{ round($questionSet->questions->count('id') * 84 / 60) }} মিনিট</span></div>
                         <div contenteditable="true">পূর্ণমান—<span class="mx-1">{{ $questionSet->questions->count('marks') }}</span></div>
                     </div>
                     <hr>
                     @if($previewOptions['showInstructions'])
                         <div class="text-center text-sm my-1 editable-effect" contenteditable="true"><span><i><span class="bangla-bold">দ্রষ্টব্যঃ</span> সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমুহ হতে সঠিক উত্তরের বৃত্তটি</i> (
                             <svg stroke="currentColor" fill="currentColor"
-                            stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                                 stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
                             </svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
                         </div>
@@ -62,23 +62,23 @@
                     <div style="text-align: justify;">
                         <div class="relative flex-1 columns-1 lg:columns-2 print:columns-2" style="column-rule: 1px solid rgba(0, 0, 0, 0.2);">
                             @forelse ($questionSet->questions as $question)
-                            <div class="false bg-white relative p-0.5 hover:bg-gray-50 rounded group">
-                                <div class=" flex items-baseline gap-x-2"><span contenteditable="true">{{ $loop->iteration }}.</span>
-                                    <div class="flex flex-wrap justify-between items-center w-full">
-                                        <div contenteditable="false" class="false bangla-bold">{!! $question->title !!}</div>
+                                <div class="false bg-white relative p-0.5 hover:bg-gray-50 rounded group">
+                                    <div class=" flex items-baseline gap-x-2"><span contenteditable="true">{{ $loop->iteration }}.</span>
+                                        <div class="flex flex-wrap justify-between items-center w-full">
+                                            <div contenteditable="false" class="false bangla-bold">{!! $question->title !!}</div>
+                                        </div>
                                     </div>
+                                    @if($question->options->isNotEmpty())
+                                        <div class="relative grid grid-cols-2 ml-7 group">
+                                            @foreach ($question->options as $option)
+                                                <div class="option flex flex-1 items-baseline mb-0.5">
+                                                    <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet']) {{ $option->is_correct ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
+                                                    <div contenteditable="false" class="false">{!! $option->option_text !!}</div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 </div>
-                                @if($question->options->isNotEmpty())
-                                <div class="relative grid grid-cols-2 ml-7 group">
-                                    @foreach ($question->options as $option)
-                                    <div class="option flex flex-1 items-baseline mb-0.5">
-                                        <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet']) {{ $option->is_correct ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
-                                        <div contenteditable="false" class="false">{!! $option->option_text !!}</div>
-                                    </div>
-                                    @endforeach
-                                </div>
-                                @endif
-                            </div>
                             @empty
                                 <div class="text-center text-gray-500 py-8">
                                     এই প্রশ্নপত্রে এখনো কোনো প্রশ্ন যুক্ত করা হয়নি।

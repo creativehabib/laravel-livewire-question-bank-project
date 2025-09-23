@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class QuestionSet extends Model
@@ -40,16 +41,21 @@ class QuestionSet extends Model
         return $subSubjectId ? SubSubject::find($subSubjectId) : null;
     }
 
-    public function getRelatedChapter()
+
+
+    public function getRelatedChapters(): Collection
     {
-        $chapterId = $this->generation_criteria['chapter_id'] ?? null;
-        return $chapterId ? Chapter::find($chapterId) : null;
+        $chapterIds = $this->generation_criteria['chapter_ids'] ?? [];
+        if (empty($chapterIds)) {
+            return collect();
+        }
+        return Chapter::whereIn('id', $chapterIds)->get();
     }
 
     public function subject()
     {
         return $this->belongsTo(Subject::class);
-    } 
+    }
 
     public function subSubject()
     {

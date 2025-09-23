@@ -4,7 +4,7 @@
         <h1 class="text-3xl font-bold text-gray-800">{{ $questionSet->user->institution_name ?? 'N/A'}}</h1>
         <p class="text-lg text-gray-600 mt-1">{{ $subject->name ?? 'N/A'}}</p>
         <p class="text-lg text-gray-600">{{ $subSubject->name ?? 'N/A'}}</p>
-        <p class="text-lg text-gray-600">{{ $chapter->name ?? 'N/A'}}</p>
+        <p class="text-lg text-gray-600">{{ $chapters->pluck('name')->implode(', ') ?? 'N/A' }}</p>
     </div>
 
     <div class="flex justify-between items-center text-md text-gray-700 font-medium mb-4 pb-4 border-b">

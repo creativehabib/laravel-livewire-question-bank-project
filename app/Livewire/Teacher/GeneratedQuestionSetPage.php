@@ -11,7 +11,7 @@ class GeneratedQuestionSetPage extends Component
 
     public $subject;
     public $subSubject;
-    public $chapter;
+    public $chapters;
 
     // URL থেকে পাওয়া আইডি দিয়ে কম্পোনেন্ট মাউন্ট হবে
     public function mount($qset)
@@ -20,7 +20,7 @@ class GeneratedQuestionSetPage extends Component
         $this->questionSet = QuestionSet::with('user')->findOrFail($qset);
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
-        $this->chapter = $this->questionSet->getRelatedChapter();
+        $this->chapters = $this->questionSet->getRelatedChapters();
     }
 
     public function render()

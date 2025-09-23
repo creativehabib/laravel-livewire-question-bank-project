@@ -43,30 +43,49 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="class" class="block text-sm font-medium text-gray-700">শ্রেণি</label>
-                        <select wire:model="selectedClass" id="class" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- শ্রেণি নির্বাচন করুন --</option>
+                        <select wire:model.live="selectedClass" id="class" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="">শ্রেণি নির্বাচন করুন</option>
                             @foreach($classes as $class)
                                 <option value="{{ $class->id }}">{{ $class->name }}</option>
                             @endforeach
                         </select>
+                        @error('selectedClass') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <label for="subject" class="block text-sm font-medium text-gray-700">বিষয়</label>
-                        <select wire:model="selectedSubject" id="subject" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- বিষয় নির্বাচন করুন --</option>
+                        <select wire:model.live="selectedSubject" id="subject" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                            <option value="">বিষয় নির্বাচন করুন</option>
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                             @endforeach
                         </select>
+                        @error('selectedSubject') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
+
                     <div>
-                        <label for="chapter" class="block text-sm font-medium text-gray-700">অধ্যায়</label>
-                        <select wire:model.defer="selectedChapter" id="chapter" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                            <option value="">-- অধ্যায় নির্বাচন করুন --</option>
-                            @foreach($chapters as $chapter)
-                                <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
-                            @endforeach
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                            অধ্যায় নির্বাচন করুন (এক বা একাধিক)
+                        </label>
+
+                        @if(!empty($chapters))
+                            <div class="mt-2 space-y-2 border rounded-md p-3 max-h-40 overflow-y-auto">
+                                @foreach($chapters as $chapter)
+                                    <label class="flex items-center">
+                                        <input type="checkbox"
+                                               wire:model="selectedChapters"
+                                               value="{{ $chapter->id }}"
+                                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ $chapter->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-500 mt-2">অনুগ্রহ করে প্রথমে বিষয় এবং উপ-বিষয় নির্বাচন করুন।</p>
+                        @endif
+
+                        @error('selectedChapters')
+                        <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 

@@ -19,7 +19,10 @@ body {
     -ms-text-size-adjust: 100%;
 
 }
-
+.table-bordered {
+    border-collapse: collapse;
+    width: 100%;
+}
 #editor .ql-formula {
     pointer-events: auto !important;
     cursor: pointer;

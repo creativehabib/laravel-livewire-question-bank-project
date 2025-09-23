@@ -14,7 +14,7 @@ class QuestionPaper extends Component
     public $instituteName;
     public $subject;
     public $subSubject;
-    public $chapter;
+    public $chapters;
 
     public array $previewOptions = [
         'attachAnswerSheet' => false,
@@ -22,7 +22,7 @@ class QuestionPaper extends Component
         'markImportant' => false,
         'showQuestionInfo' => true,
         'showSubSubject' => true,
-        'showChapter' => true,
+        'showChapter' => false,
         'showSetCode' => true,
         'showStudentInfo' => false,
         'showMarksBox' => false,
@@ -43,7 +43,7 @@ class QuestionPaper extends Component
                             ->findOrFail($qsetId);
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
-        $this->chapter = $this->questionSet->getRelatedChapter();
+        $this->chapters = $this->questionSet->getRelatedChapters();
         $this->instituteName = $this->questionSet->user->institution_name;
     }
 
