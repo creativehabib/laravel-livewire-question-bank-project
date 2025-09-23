@@ -12,6 +12,9 @@
             ? round(($topSubject->questions_count / $totalQuestionsForPercentage) * 100)
             : 0;
         $topSubjects = $subjects->sortByDesc('questions_count')->take(3);
+        $activityMonths = $activityTimeline->count();
+        $totalQuestionsInTimeline = $activityTimeline->sum('questions');
+        $totalQuestionSetsInTimeline = $activityTimeline->sum('question_sets');
     @endphp
 
     <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-violet-600 to-emerald-500 p-8 text-white shadow-xl dark:from-slate-950 dark:via-indigo-900 dark:to-emerald-800">
@@ -232,6 +235,32 @@
 
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
+            <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                <div
+                    class="flex flex-col gap-2 border-b border-gray-100 px-6 py-5 dark:border-gray-800 md:flex-row md:items-center md:justify-between"
+                >
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">মাসিক কার্যক্রম বিশ্লেষণ</h2>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            শেষ {{ $activityMonths }} মাসে প্রশ্ন ও প্রশ্ন সেট তৈরির প্রবণতা পর্যবেক্ষণ করুন।
+                        </p>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 md:text-right">
+                        <p>
+                            মোট প্রশ্ন:
+                            <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $totalQuestionsInTimeline }}</span>
+                        </p>
+                        <p>
+                            মোট প্রশ্ন সেট:
+                            <span class="font-semibold text-gray-900 dark:text-gray-100">{{ $totalQuestionSetsInTimeline }}</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="px-4 pb-6 pt-2 md:px-6">
+                    <div id="activityChart" class="h-72"></div>
+                </div>
+            </div>
+
             <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
                 <div class="flex flex-col gap-2 border-b border-gray-100 px-6 py-5 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -674,15 +703,15 @@
 @push('scripts')
     <script>
         document.addEventListener('livewire:load', () => {
-            const chartElement = document.querySelector('#subjectChart');
+            const subjectChartData = {
+                categories: @json($subjects->pluck('name')),
+                series: @json($subjects->pluck('questions_count')),
+            };
 
-            if (!chartElement) {
-                return;
-            }
-
-            const chartData = {
-                categories: {!! json_encode($subjects->pluck('name')) !!},
-                series: {!! json_encode($subjects->pluck('questions_count')) !!},
+            const activityChartData = {
+                categories: @json($activityTimeline->pluck('label')),
+                questions: @json($activityTimeline->pluck('questions')),
+                questionSets: @json($activityTimeline->pluck('question_sets')),
             };
 
             const resolveMode = () => (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
@@ -690,9 +719,52 @@
                 axis: mode === 'dark' ? '#9CA3AF' : '#6B7280',
                 text: mode === 'dark' ? '#E5E7EB' : '#111827',
                 grid: mode === 'dark' ? '#374151' : '#E5E7EB',
+                background: mode === 'dark' ? '#111827' : '#FFFFFF',
             });
 
-            const baseOptions = mode => {
+            const charts = [];
+            const noDataText = 'ডেটা প্রদর্শনের জন্য তথ্য নেই';
+
+            const registerChart = (selector, optionsFactory) => {
+                const element = typeof selector === 'string' ? document.querySelector(selector) : selector;
+
+                if (!element) {
+                    return;
+                }
+
+                if (element.__apexChartInstance) {
+                    element.__apexChartInstance.destroy();
+                    element.__apexChartInstance = null;
+                }
+
+                const existingIndex = charts.findIndex(entry => entry.element === element);
+                if (existingIndex !== -1) {
+                    charts[existingIndex].chart.destroy();
+                    charts.splice(existingIndex, 1);
+                }
+
+                const chart = new ApexCharts(element, optionsFactory(resolveMode()));
+                chart.render();
+                element.__apexChartInstance = chart;
+
+                charts.push({ element, chart, optionsFactory });
+            };
+
+            const updateChartsTheme = mode => {
+                for (let index = charts.length - 1; index >= 0; index--) {
+                    const entry = charts[index];
+
+                    if (!document.body.contains(entry.element)) {
+                        entry.chart.destroy();
+                        charts.splice(index, 1);
+                        continue;
+                    }
+
+                    entry.chart.updateOptions(entry.optionsFactory(mode));
+                }
+            };
+
+            registerChart('#subjectChart', mode => {
                 const palette = resolveThemePalette(mode);
 
                 return {
@@ -702,9 +774,14 @@
                         toolbar: { show: false },
                         fontFamily: 'inherit',
                     },
-                    series: [{ name: 'Questions', data: chartData.series }],
+                    series: [
+                        {
+                            name: 'প্রশ্ন সংখ্যা',
+                            data: subjectChartData.series,
+                        },
+                    ],
                     xaxis: {
-                        categories: chartData.categories,
+                        categories: subjectChartData.categories,
                         labels: {
                             style: {
                                 colors: palette.axis,
@@ -755,48 +832,119 @@
                     theme: {
                         mode,
                     },
+                    noData: {
+                        text: noDataText,
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: palette.text,
+                            fontFamily: 'inherit',
+                        },
+                    },
                 };
-            };
+            });
 
-            if (chartElement.__subjectChartInstance) {
-                chartElement.__subjectChartInstance.destroy();
-                chartElement.__subjectChartInstance = null;
-            }
-
-            let chartInstance = new ApexCharts(chartElement, baseOptions(resolveMode()));
-            chartInstance.render();
-            chartElement.__subjectChartInstance = chartInstance;
-
-            const updateTheme = mode => {
-                if (!chartInstance) {
-                    return;
-                }
-
+            registerChart('#activityChart', mode => {
                 const palette = resolveThemePalette(mode);
 
-                chartInstance.updateOptions({
-                    xaxis: { labels: { style: { colors: palette.axis } } },
-                    yaxis: { labels: { style: { colors: palette.axis } } },
-                    dataLabels: { style: { colors: [palette.text] } },
-                    grid: { borderColor: palette.grid },
-                    tooltip: { theme: mode },
-                    theme: { mode },
-                });
-            };
+                return {
+                    chart: {
+                        type: 'area',
+                        height: 320,
+                        toolbar: { show: false },
+                        fontFamily: 'inherit',
+                    },
+                    series: [
+                        {
+                            name: 'প্রশ্ন',
+                            data: activityChartData.questions,
+                        },
+                        {
+                            name: 'প্রশ্ন সেট',
+                            data: activityChartData.questionSets,
+                        },
+                    ],
+                    xaxis: {
+                        categories: activityChartData.categories,
+                        labels: {
+                            style: {
+                                colors: palette.axis,
+                            },
+                        },
+                        axisBorder: { show: false },
+                        axisTicks: { show: false },
+                    },
+                    yaxis: {
+                        min: 0,
+                        labels: {
+                            style: {
+                                colors: palette.axis,
+                            },
+                        },
+                    },
+                    dataLabels: {
+                        enabled: false,
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3,
+                    },
+                    fill: {
+                        type: 'gradient',
+                        gradient: {
+                            shadeIntensity: 0.35,
+                            opacityFrom: 0.9,
+                            opacityTo: 0.25,
+                            stops: [0, 90, 100],
+                        },
+                    },
+                    colors: ['#6366F1', '#22C55E'],
+                    markers: {
+                        size: 4,
+                        strokeColors: palette.background,
+                        strokeWidth: 2,
+                    },
+                    grid: {
+                        borderColor: palette.grid,
+                        strokeDashArray: 6,
+                        xaxis: { lines: { show: false } },
+                    },
+                    legend: {
+                        labels: {
+                            colors: palette.text,
+                        },
+                    },
+                    tooltip: {
+                        theme: mode,
+                    },
+                    theme: {
+                        mode,
+                    },
+                    noData: {
+                        text: noDataText,
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: palette.text,
+                            fontFamily: 'inherit',
+                        },
+                    },
+                };
+            });
 
             const themeListener = event => {
                 const mode = event.detail?.mode ?? resolveMode();
-                updateTheme(mode);
+                updateChartsTheme(mode);
             };
 
-            if (window.__subjectChartThemeListener) {
-                window.removeEventListener('theme-changed', window.__subjectChartThemeListener);
+            if (window.__teacherDashboardThemeListener) {
+                window.removeEventListener('theme-changed', window.__teacherDashboardThemeListener);
             }
 
-            window.__subjectChartThemeListener = themeListener;
+            window.__teacherDashboardThemeListener = themeListener;
             window.addEventListener('theme-changed', themeListener);
 
-            document.addEventListener('livewire:navigated', () => updateTheme(resolveMode()));
+            document.addEventListener('livewire:navigated', () => updateChartsTheme(resolveMode()));
         });
     </script>
 @endpush
