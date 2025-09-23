@@ -764,173 +764,177 @@
                 }
             };
 
-            registerChart('#subjectChart', mode => {
-                const palette = resolveThemePalette(mode);
+            const initializeCharts = () => {
+                registerChart('#subjectChart', mode => {
+                    const palette = resolveThemePalette(mode);
 
-                return {
-                    chart: {
-                        type: 'bar',
-                        height: 320,
-                        toolbar: { show: false },
-                        fontFamily: 'inherit',
-                    },
-                    series: [
-                        {
-                            name: 'প্রশ্ন সংখ্যা',
-                            data: subjectChartData.series,
-                        },
-                    ],
-                    xaxis: {
-                        categories: subjectChartData.categories,
-                        labels: {
-                            style: {
-                                colors: palette.axis,
-                            },
-                        },
-                        axisBorder: { show: false },
-                        axisTicks: { show: false },
-                    },
-                    yaxis: {
-                        labels: {
-                            style: {
-                                colors: palette.axis,
-                            },
-                        },
-                    },
-                    plotOptions: {
-                        bar: {
-                            columnWidth: '45%',
-                            borderRadius: 6,
-                            distributed: true,
-                        },
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        style: {
-                            colors: [palette.text],
-                            fontSize: '12px',
-                        },
-                    },
-                    colors: ['#6366F1', '#8B5CF6', '#22C55E', '#F97316', '#EC4899', '#0EA5E9'],
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shadeIntensity: 0.4,
-                            opacityFrom: 0.95,
-                            opacityTo: 0.85,
-                            stops: [0, 80, 100],
-                        },
-                    },
-                    grid: {
-                        borderColor: palette.grid,
-                        strokeDashArray: 6,
-                        xaxis: { lines: { show: false } },
-                    },
-                    tooltip: {
-                        theme: mode,
-                    },
-                    theme: {
-                        mode,
-                    },
-                    noData: {
-                        text: noDataText,
-                        align: 'center',
-                        verticalAlign: 'middle',
-                        style: {
-                            color: palette.text,
+                    return {
+                        chart: {
+                            type: 'bar',
+                            height: 320,
+                            toolbar: { show: false },
                             fontFamily: 'inherit',
                         },
-                    },
-                };
-            });
-
-            registerChart('#activityChart', mode => {
-                const palette = resolveThemePalette(mode);
-
-                return {
-                    chart: {
-                        type: 'area',
-                        height: 320,
-                        toolbar: { show: false },
-                        fontFamily: 'inherit',
-                    },
-                    series: [
-                        {
-                            name: 'প্রশ্ন',
-                            data: activityChartData.questions,
+                        series: [
+                            {
+                                name: 'প্রশ্ন সংখ্যা',
+                                data: subjectChartData.series,
+                            },
+                        ],
+                        xaxis: {
+                            categories: subjectChartData.categories,
+                            labels: {
+                                style: {
+                                    colors: palette.axis,
+                                },
+                            },
+                            axisBorder: { show: false },
+                            axisTicks: { show: false },
                         },
-                        {
-                            name: 'প্রশ্ন সেট',
-                            data: activityChartData.questionSets,
-                        },
-                    ],
-                    xaxis: {
-                        categories: activityChartData.categories,
-                        labels: {
-                            style: {
-                                colors: palette.axis,
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    colors: palette.axis,
+                                },
                             },
                         },
-                        axisBorder: { show: false },
-                        axisTicks: { show: false },
-                    },
-                    yaxis: {
-                        min: 0,
-                        labels: {
-                            style: {
-                                colors: palette.axis,
+                        plotOptions: {
+                            bar: {
+                                columnWidth: '45%',
+                                borderRadius: 6,
+                                distributed: true,
                             },
                         },
-                    },
-                    dataLabels: {
-                        enabled: false,
-                    },
-                    stroke: {
-                        curve: 'smooth',
-                        width: 3,
-                    },
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shadeIntensity: 0.35,
-                            opacityFrom: 0.9,
-                            opacityTo: 0.25,
-                            stops: [0, 90, 100],
+                        dataLabels: {
+                            enabled: true,
+                            style: {
+                                colors: [palette.text],
+                                fontSize: '12px',
+                            },
                         },
-                    },
-                    colors: ['#6366F1', '#22C55E'],
-                    markers: {
-                        size: 4,
-                        strokeColors: palette.background,
-                        strokeWidth: 2,
-                    },
-                    grid: {
-                        borderColor: palette.grid,
-                        strokeDashArray: 6,
-                        xaxis: { lines: { show: false } },
-                    },
-                    legend: {
-                        labels: {
-                            colors: palette.text,
+                        colors: ['#6366F1', '#8B5CF6', '#22C55E', '#F97316', '#EC4899', '#0EA5E9'],
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shadeIntensity: 0.4,
+                                opacityFrom: 0.95,
+                                opacityTo: 0.85,
+                                stops: [0, 80, 100],
+                            },
                         },
-                    },
-                    tooltip: {
-                        theme: mode,
-                    },
-                    theme: {
-                        mode,
-                    },
-                    noData: {
-                        text: noDataText,
-                        align: 'center',
-                        verticalAlign: 'middle',
-                        style: {
-                            color: palette.text,
+                        grid: {
+                            borderColor: palette.grid,
+                            strokeDashArray: 6,
+                            xaxis: { lines: { show: false } },
+                        },
+                        tooltip: {
+                            theme: mode,
+                        },
+                        theme: {
+                            mode,
+                        },
+                        noData: {
+                            text: noDataText,
+                            align: 'center',
+                            verticalAlign: 'middle',
+                            style: {
+                                color: palette.text,
+                                fontFamily: 'inherit',
+                            },
+                        },
+                    };
+                });
+
+                registerChart('#activityChart', mode => {
+                    const palette = resolveThemePalette(mode);
+
+                    return {
+                        chart: {
+                            type: 'area',
+                            height: 320,
+                            toolbar: { show: false },
                             fontFamily: 'inherit',
                         },
-                    },
-                };
-            });
+                        series: [
+                            {
+                                name: 'প্রশ্ন',
+                                data: activityChartData.questions,
+                            },
+                            {
+                                name: 'প্রশ্ন সেট',
+                                data: activityChartData.questionSets,
+                            },
+                        ],
+                        xaxis: {
+                            categories: activityChartData.categories,
+                            labels: {
+                                style: {
+                                    colors: palette.axis,
+                                },
+                            },
+                            axisBorder: { show: false },
+                            axisTicks: { show: false },
+                        },
+                        yaxis: {
+                            min: 0,
+                            labels: {
+                                style: {
+                                    colors: palette.axis,
+                                },
+                            },
+                        },
+                        dataLabels: {
+                            enabled: false,
+                        },
+                        stroke: {
+                            curve: 'smooth',
+                            width: 3,
+                        },
+                        fill: {
+                            type: 'gradient',
+                            gradient: {
+                                shadeIntensity: 0.35,
+                                opacityFrom: 0.9,
+                                opacityTo: 0.25,
+                                stops: [0, 90, 100],
+                            },
+                        },
+                        colors: ['#6366F1', '#22C55E'],
+                        markers: {
+                            size: 4,
+                            strokeColors: palette.background,
+                            strokeWidth: 2,
+                        },
+                        grid: {
+                            borderColor: palette.grid,
+                            strokeDashArray: 6,
+                            xaxis: { lines: { show: false } },
+                        },
+                        legend: {
+                            labels: {
+                                colors: palette.text,
+                            },
+                        },
+                        tooltip: {
+                            theme: mode,
+                        },
+                        theme: {
+                            mode,
+                        },
+                        noData: {
+                            text: noDataText,
+                            align: 'center',
+                            verticalAlign: 'middle',
+                            style: {
+                                color: palette.text,
+                                fontFamily: 'inherit',
+                            },
+                        },
+                    };
+                });
+            };
+
+            initializeCharts();
 
             const themeListener = event => {
                 const mode = event.detail?.mode ?? resolveMode();
@@ -944,7 +948,17 @@
             window.__teacherDashboardThemeListener = themeListener;
             window.addEventListener('theme-changed', themeListener);
 
-            document.addEventListener('livewire:navigated', () => updateChartsTheme(resolveMode()));
+            const navigatedListener = () => {
+                initializeCharts();
+                updateChartsTheme(resolveMode());
+            };
+
+            if (window.__teacherDashboardNavigatedListener) {
+                document.removeEventListener('livewire:navigated', window.__teacherDashboardNavigatedListener);
+            }
+
+            window.__teacherDashboardNavigatedListener = navigatedListener;
+            document.addEventListener('livewire:navigated', navigatedListener);
         });
     </script>
 @endpush
