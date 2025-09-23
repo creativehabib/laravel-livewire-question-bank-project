@@ -34,25 +34,46 @@ if (userMenuButton && userMenu) {
  */
 function initializeApp() {
     // --- Dark mode persistence ---
-    function applyThemeFromStorage() {
-        if (localStorage.getItem('theme') === 'dark') {
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedTheme = localStorage.getItem('theme');
+
+    function applyTheme(mode) {
+        if (mode === 'dark') {
             document.documentElement.classList.add('dark');
-            const toggle = document.getElementById('darkToggle');
-            if (toggle) toggle.checked = true;
         } else {
             document.documentElement.classList.remove('dark');
-            const toggle = document.getElementById('darkToggle');
-            if (toggle) toggle.checked = false;
+            mode = 'light';
         }
+
+        const darkToggle = document.getElementById('darkToggle');
+        if (darkToggle) {
+            darkToggle.checked = mode === 'dark';
+        }
+
+        localStorage.setItem('theme', mode);
+        window.dispatchEvent(new CustomEvent('theme-changed', { detail: { mode } }));
     }
-    applyThemeFromStorage();
+
+    function toggleTheme() {
+        const mode = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+        applyTheme(mode);
+    }
+
+    const initialMode = storedTheme ? storedTheme : (prefersDark ? 'dark' : 'light');
+    applyTheme(initialMode === 'dark' ? 'dark' : 'light');
+
     const darkToggle = document.getElementById('darkToggle');
     if (darkToggle) {
         darkToggle.onchange = () => {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+            applyTheme(darkToggle.checked ? 'dark' : 'light');
         };
     }
+
+    document.querySelectorAll('[data-trigger-theme-toggle]').forEach(trigger => {
+        trigger.onclick = () => toggleTheme();
+    });
+
+    window.toggleTheme = toggleTheme;
 
     // --- Sidebar Logic ---
     const sidebar = document.getElementById('sidebar');
