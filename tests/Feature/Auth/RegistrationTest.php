@@ -38,7 +38,7 @@ class RegistrationTest extends TestCase
         $user = User::where('email', 'test@example.com')->first();
 
         $this->assertNotNull($user);
-        $this->assertNull($user->role_confirmed_at);
+        $this->assertNotNull($user->role_confirmed_at);
         $this->assertEquals(Role::STUDENT, $user->role);
     }
 

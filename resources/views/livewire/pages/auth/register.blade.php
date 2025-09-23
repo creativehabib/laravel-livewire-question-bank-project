@@ -45,7 +45,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['role'] = Role::STUDENT;
-        $validated['role_confirmed_at'] = null;
+        $validated['role_confirmed_at'] = now();
 
         event(new Registered($user = User::create($validated)));
 
