@@ -121,14 +121,16 @@ class SocialiteController
             return redirect()->route('login')->with('status', __('Please start the :provider sign in process again.', ['provider' => ucfirst($provider)]));
         }
 
+        $teacherRole = Role::TEACHER->value;
+
         $validated = $request->validate([
-            'role' => ['required', Rule::in([Role::TEACHER->value, Role::STUDENT->value])],
-            'institution_name' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
-            'division' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
-            'district' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
-            'thana' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:255'],
-            'phone' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:30'],
-            'address' => ['required_if:role,'.Role::TEACHER->value, 'string', 'max:1000'],
+            'role' => ['required', Rule::in([$teacherRole, Role::STUDENT->value])],
+            'institution_name' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:255'],
+            'division' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:255'],
+            'district' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:255'],
+            'thana' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:255'],
+            'phone' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:30'],
+            'address' => ['exclude_unless:role,'.$teacherRole, 'required', 'string', 'max:1000'],
         ]);
 
         $existingUser = User::where('email', $pending['email'])->first();
