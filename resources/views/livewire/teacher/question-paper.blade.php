@@ -1,5 +1,17 @@
+@php
+    $fontClassMap = [
+        'Bangla' => 'qp-font-bangla',
+        'HindSiliguri' => 'qp-font-hind-siliguri',
+        'SolaimanLipi' => 'qp-font-solaiman',
+        'Kalpurush' => 'qp-font-kalpurush',
+        'Shurjo' => 'qp-font-shurjo',
+        'roman' => 'qp-font-roman',
+    ];
+    $fontClass = $fontClassMap[$fontFamily] ?? 'qp-font-bangla';
+@endphp
+
 <div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
-    <div class="bangla flex flex-col lg:flex-row justify-center  gap-5  print:gap-0 mx-4 print:mx-0">
+    <div class="bangla flex flex-col lg:flex-row justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
         <div class="print:hidden  flex gap-x-2 justify-between sticky top-12 lg:hidden  p-2 text-center z-10 bg-white">
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
@@ -15,7 +27,7 @@
                 </svg><span>ডাউনলোড</span></button>
         </div>
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
-        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm]" style="font-family: Shurjo;">
+        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm] {{ $fontClass }}">
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class=" p-2">
@@ -242,13 +254,12 @@
                                 </div>
                             </div>
                             <div class="bg-gray-100 my-1 p-2">
-                                <div class="rounded  justify-between items-center">
+                                <div class="rounded justify-between items-center">
                                     <p class="bangla mb-1 text-center">ফন্ট পরিবর্তন</p>
-                                    <select id="font-selector" class="w-full rounded-md border border-gray-300">
-                                        <option value="Bangla">বাংলা</option>
-                                        <option value="SolaimanLipi">সোলাইমান লিপি</option>
-                                        <option value="Kalpurush">কালপুরুষ</option>
-                                        <option value="roman">Times New Roman</option>
+                                    <select id="font-selector" wire:model.live="fontFamily" class="w-full rounded-md border border-gray-300">
+                                        @foreach($fontOptions as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

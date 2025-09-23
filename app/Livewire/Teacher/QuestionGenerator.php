@@ -5,6 +5,7 @@ namespace App\Livewire\Teacher;
 use Livewire\Component;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\{Subject, SubSubject, Chapter, Question};
+use App\Support\Fonts;
 
 class QuestionGenerator extends Component
 {
@@ -359,7 +360,7 @@ class QuestionGenerator extends Component
 
     public function setFontFamily(string $font): void
     {
-        if (! in_array($font, ['Bangla', 'SolaimanLipi', 'Kalpurush', 'roman'], true)) {
+        if (! in_array($font, $this->allowedFontFamilies(), true)) {
             return;
         }
 
@@ -392,7 +393,31 @@ class QuestionGenerator extends Component
             'subSubjects' => $this->subSubjects,
             'chapters' => $this->chapters,
             'sortOptions' => $this->sortOptions(),
+            'fontOptions' => $this->fontFamilyOptions(),
         ])->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function fontFamilyOptions(): array
+    {
+        return Fonts::options();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function allowedFontFamilies(): array
+    {
+        return Fonts::keys();
+    }
+
+    public function updatedFontFamily(string $value): void
+    {
+        if (! in_array($value, $this->allowedFontFamilies(), true)) {
+            $this->fontFamily = 'Bangla';
+        }
     }
 
     /**

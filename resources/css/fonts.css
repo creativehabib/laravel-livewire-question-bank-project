@@ -1,3 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+
+/* Kalpurush */
+@font-face {
+  font-family: 'Kalpurush';
+  src: url('https://fonts.maateen.me/kalpurush/font.woff2') format('woff2'),
+       url('https://fonts.maateen.me/kalpurush/Kalpurush.woff2') format('woff2'),
+       url('https://fonts.maateen.me/kalpurush/Kalpurush.woff') format('woff'),
+       url('https://fonts.maateen.me/kalpurush/Kalpurush.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* SolaimanLipi */
+@font-face {
+  font-family: 'SolaimanLipi';
+  src: url('https://fonts.maateen.me/solaiman-lipi/font.woff2') format('woff2'),
+       url('https://fonts.maateen.me/solaiman-lipi/SolaimanLipi.woff2') format('woff2'),
+       url('https://fonts.maateen.me/solaiman-lipi/SolaimanLipi.woff') format('woff'),
+       url('https://fonts.maateen.me/solaiman-lipi/SolaimanLipi.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Roboto */
 @font-face {
   font-family: 'Roboto';
