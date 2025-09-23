@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'MCQ Bank' }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('components.settings.font-loader')
 </head>
 <body class="font-sans antialiased text-gray-900 bg-gray-100">
     <header class="bg-white shadow">
