@@ -147,18 +147,18 @@ class SocialiteController
 
         $role = Role::from($validated['role']);
 
-        $teacherData = [
-            'institution_name' => $validated['institution_name'] ?? null,
-            'division' => $validated['division'] ?? null,
-            'district' => $validated['district'] ?? null,
-            'thana' => $validated['thana'] ?? null,
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
-            'teacher_profile_completed_at' => null,
-        ];
+        $teacherData = [];
 
         if ($role === Role::TEACHER) {
-            $teacherData['teacher_profile_completed_at'] = now();
+            $teacherData = [
+                'institution_name' => $validated['institution_name'],
+                'division' => $validated['division'],
+                'district' => $validated['district'],
+                'thana' => $validated['thana'],
+                'phone' => $validated['phone'],
+                'address' => $validated['address'],
+                'teacher_profile_completed_at' => now(),
+            ];
         }
 
         $user = User::create([
