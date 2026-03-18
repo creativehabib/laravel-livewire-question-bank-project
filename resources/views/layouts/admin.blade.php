@@ -24,7 +24,7 @@
     @livewireStyles
     @stack('styles')
 </head>
-<body class="bg-[#f8f9fa] font-sans antialiased text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+<body class="app-shell font-sans antialiased">
 
 <div class="flex min-h-screen w-full">
     {{-- Sidebar --}}
