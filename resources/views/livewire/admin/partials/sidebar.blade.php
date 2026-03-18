@@ -18,13 +18,17 @@
         || request()->is('admin/job-categories*')
         || request()->is('admin/job-companies*');
 
-    // স্টাইলিং ক্লাসগুলো
-    $primaryLinkClasses = 'nav-link flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-gray-500 transition-all duration-200 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white';
-    $activeLinkClasses = 'bg-[#f0f2f5] text-gray-900 font-semibold dark:bg-gray-800 dark:text-white';
+    // ✅ উন্নত কালার কম্বিনেশন: Slate এবং Indigo
+    $primaryLinkClasses = 'nav-link flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-slate-500 transition-all duration-200 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-white';
+
+    // অ্যাকটিভ লিংকের জন্য সফট ইন্ডিগো ব্যাকগ্রাউন্ড
+    $activeLinkClasses = 'bg-indigo-50 text-indigo-700 font-semibold dark:bg-indigo-500/15 dark:text-indigo-300';
 
     $submenuPanelClasses = 'mt-1 space-y-1 pl-11 pr-4';
-    $submenuLinkClasses = 'nav-link flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-500 transition-all duration-200 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white';
-    $submenuActiveClasses = 'text-gray-900 font-semibold dark:text-white';
+    $submenuLinkClasses = 'nav-link flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-500 transition-all duration-200 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white';
+
+    // সাবমেনু অ্যাকটিভ কালার
+    $submenuActiveClasses = 'text-indigo-600 font-semibold dark:text-indigo-400';
 @endphp
 
 <aside id="sidebar"
@@ -41,14 +45,14 @@
                }
            }
        }"
-       class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full transform flex-col border-r border-gray-100 bg-white transition-transform duration-300 ease-in-out print:hidden dark:border-gray-800 dark:bg-gray-900 md:translate-x-0">
+       class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full transform flex-col border-r border-slate-200 bg-white transition-transform duration-300 ease-in-out print:hidden dark:border-slate-700/60 dark:bg-slate-800 md:translate-x-0">
 
     <div class="flex items-center gap-3 px-6 py-5">
-        <button id="sidebarCollapse" class="hidden text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white md:block">
+        <button id="sidebarCollapse" class="hidden text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white md:block focus:outline-none">
             <x-heroicon-s-bars-3 class="h-6 w-6" />
         </button>
 
-        <span class="text-lg font-bold text-gray-900 dark:text-white sidebar-text">Question Banks</span>
+        <span class="text-lg font-bold text-slate-900 dark:text-white sidebar-text tracking-tight">Question Banks</span>
     </div>
 
     <nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1.5">
@@ -117,7 +121,7 @@
         @endif
 
         @if($user->isAdmin())
-            <div class="my-4 border-t border-gray-100 dark:border-gray-800"></div>
+            <div class="my-4 border-t border-slate-200 dark:border-slate-700/60"></div>
 
             <a wire:navigate href="{{ route('admin.users.index') }}"
                class="{{ $primaryLinkClasses }} {{ request()->is('admin/users*') ? $activeLinkClasses : '' }}">
@@ -159,29 +163,29 @@
         @endif
     </nav>
 
-    <div class="px-4 py-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+    <div class="px-4 py-4 border-t border-slate-200 dark:border-slate-700/60 space-y-2">
 
-        <div data-sidebar-theme-panel class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800/50">
+        <div data-sidebar-theme-panel class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-900/50">
             <div data-sidebar-theme-icon-group class="flex items-center gap-3">
-                <x-heroicon-s-sun x-show="!isDark" class="h-5 w-5 text-gray-500" />
+                <x-heroicon-s-sun x-show="!isDark" class="h-5 w-5 text-amber-500" />
 
                 <x-heroicon-s-moon x-show="isDark" x-cloak class="h-5 w-5 text-indigo-400" />
 
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-300 sidebar-text">
+                <span class="text-sm font-medium text-slate-600 dark:text-slate-300 sidebar-text">
                     <span x-show="!isDark">Light Mode</span>
                     <span x-show="isDark" x-cloak>Dark Mode</span>
                 </span>
             </div>
 
-            <button @click="toggleTheme()" type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-200 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 dark:bg-indigo-600" role="switch" :aria-checked="isDark.toString()">
+            <button @click="toggleTheme()" type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-600" role="switch" :aria-checked="isDark.toString()">
                 <span class="sr-only">Toggle dark mode</span>
-                <span aria-hidden="true" :class="isDark ? 'translate-x-5' : 'translate-x-0'" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                <span aria-hidden="true" :class="isDark ? 'translate-x-5 bg-white' : 'translate-x-0 bg-white'" class="pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out"></span>
             </button>
         </div>
 
         <form method="POST" action="{{ route('logout') }}" class="block">
             @csrf
-            <button data-sidebar-action type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10">
+            <button data-sidebar-action type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400">
                 <x-heroicon-s-arrow-right-start-on-rectangle class="h-5 w-5 flex-shrink-0" />
                 <span class="sidebar-text">Logout</span>
             </button>
