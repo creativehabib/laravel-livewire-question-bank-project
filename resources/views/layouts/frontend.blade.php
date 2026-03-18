@@ -7,17 +7,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('components.settings.font-loader')
 </head>
-<body class="app-shell font-sans antialiased">
-    <header class="app-panel sticky top-0 z-30 border-b border-white/50 shadow-none">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
-            <a href="/" class="app-heading text-xl font-bold">MCQ Bank</a>
-            <nav class="flex items-center gap-4 text-sm font-medium">
+<body class="font-sans antialiased text-gray-900 bg-gray-100">
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold">MCQ Bank</a>
+            <nav class="space-x-4">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="app-link text-sm font-medium">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="text-sm text-gray-700 hover:text-gray-900">Dashboard</a>
                 @else
-                    <a href="{{ route('login') }}" class="app-link text-sm font-medium">Login</a>
+                    <a href="{{ route('login') }}" class="text-sm text-gray-700 hover:text-gray-900">Login</a>
                     @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="app-link text-sm font-medium">Register</a>
+                        <a href="{{ route('register') }}" class="text-sm text-gray-700 hover:text-gray-900">Register</a>
                     @endif
                 @endauth
             </nav>
@@ -26,7 +26,7 @@
     <main>
         @yield('content')
     </main>
-    <footer class="app-panel mx-4 mt-12 rounded-[1.75rem] border px-6 py-6 text-center text-sm sm:mx-6 lg:mx-8">
+    <footer class="bg-white border-t mt-12 py-6 text-center text-sm text-gray-500">
         &copy; {{ date('Y') }} MCQ Bank. All rights reserved.
     </footer>
     {{-- MathJax Configuration --}}

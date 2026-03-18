@@ -12,8 +12,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['var(--app-font-body)', 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', ...defaultTheme.fontFamily.sans],
-                heading: ['var(--app-font-heading)', 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', ...defaultTheme.fontFamily.sans],
+                sans: ['var(--app-font-body)', 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', ...defaultTheme.fontFamily.sans],
+                heading: ['var(--app-font-heading)', 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', ...defaultTheme.fontFamily.sans],
             },
         },
     },

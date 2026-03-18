@@ -17,8 +17,8 @@
     @include('components.settings.font-loader')
     @livewireStyles
 </head>
-<body class="app-shell">
-<div class="min-h-screen app-shell">
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+<div class="min-h-screen bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
     <livewire:admin.partials.sidebar />
 
     <div id="mainContent" data-sidebar-content class="space-y-6 p-4 print:space-y-0 print:p-0 md:ml-64 md:p-8">

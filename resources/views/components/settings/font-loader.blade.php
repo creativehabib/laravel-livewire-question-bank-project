@@ -1,5 +1,5 @@
 @php
-    $defaultStack = "'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif";
+    $defaultStack = "'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif";
     $fontBody = trim((string) \App\Models\Setting::get('frontend_font_body', $defaultStack));
     $fontHeading = trim((string) \App\Models\Setting::get('frontend_font_heading', $fontBody ?: $defaultStack));
     $fontImportUrl = trim((string) \App\Models\Setting::get('frontend_font_import_url', ''));

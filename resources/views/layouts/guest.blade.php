@@ -11,15 +11,15 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @include('components.settings.font-loader')
     </head>
-    <body class="app-shell font-sans antialiased">
-        <div class="min-h-screen flex flex-col items-center justify-center px-4 pt-6 sm:px-6 sm:pt-0">
+    <body class="font-sans text-gray-900 antialiased">
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/" wire:navigate>
-                    <x-application-logo class="h-20 w-20 fill-current text-indigo-500 dark:text-indigo-300" />
+                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
                 </a>
             </div>
 
-            <div class="app-panel w-full overflow-hidden rounded-[1.75rem] px-6 py-6 shadow-none sm:mt-6 sm:max-w-md">
+            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 {{ $slot }}
             </div>
         </div>
