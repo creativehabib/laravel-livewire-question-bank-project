@@ -9,21 +9,63 @@
 @tailwind utilities;
 
 :root {
-    --app-font-body: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
-    --app-font-heading: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    color-scheme: light;
+    --app-font-body: 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    --app-font-heading: 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
     --tw-font-sans: var(--app-font-body);
+    --app-color-bg: #f4f7fb;
+    --app-color-bg-accent: rgba(99, 102, 241, 0.16);
+    --app-color-surface: rgba(255, 255, 255, 0.82);
+    --app-color-surface-strong: #ffffff;
+    --app-color-surface-muted: #eef3fb;
+    --app-color-border: rgba(148, 163, 184, 0.28);
+    --app-color-text: #142033;
+    --app-color-text-soft: #334155;
+    --app-color-muted: #64748b;
+    --app-color-accent: #4f46e5;
+    --app-color-accent-strong: #4338ca;
+    --app-color-accent-soft: rgba(79, 70, 229, 0.12);
+    --app-shadow: 0 20px 45px -28px rgba(15, 23, 42, 0.35);
+    --app-shadow-soft: 0 12px 32px -24px rgba(15, 23, 42, 0.25);
+}
+
+.dark {
+    color-scheme: dark;
+    --app-color-bg: #020617;
+    --app-color-bg-accent: rgba(129, 140, 248, 0.14);
+    --app-color-surface: rgba(15, 23, 42, 0.76);
+    --app-color-surface-strong: #0f172a;
+    --app-color-surface-muted: rgba(30, 41, 59, 0.84);
+    --app-color-border: rgba(148, 163, 184, 0.16);
+    --app-color-text: #e2e8f0;
+    --app-color-text-soft: #cbd5e1;
+    --app-color-muted: #94a3b8;
+    --app-color-accent: #818cf8;
+    --app-color-accent-strong: #a5b4fc;
+    --app-color-accent-soft: rgba(99, 102, 241, 0.18);
+    --app-shadow: 0 24px 55px -34px rgba(15, 23, 42, 0.9);
+    --app-shadow-soft: 0 18px 40px -30px rgba(15, 23, 42, 0.75);
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
-    font-family: var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
+    font-family: var(--app-font-body, 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-
+    background-color: var(--app-color-bg);
+    background-image:
+        radial-gradient(circle at top left, var(--app-color-bg-accent), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 22%);
+    color: var(--app-color-text);
 }
 
 h1,
@@ -32,66 +74,189 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: var(--app-font-heading, var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif));
+    font-family: var(--app-font-heading, var(--app-font-body, 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif));
+    color: var(--app-color-text);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
 }
+
+p,
+li,
+dd,
+dt,
+label,
+small {
+    color: var(--app-color-text-soft);
+}
+
+strong {
+    color: var(--app-color-text);
+}
+
+::selection {
+    background: var(--app-color-accent);
+    color: #fff;
+}
+
+@layer base {
+    a {
+        @apply transition-colors duration-200;
+    }
+
+    input,
+    select,
+    textarea {
+        @apply rounded-xl border shadow-sm;
+        background-color: var(--app-color-surface-strong);
+        border-color: var(--app-color-border);
+        color: var(--app-color-text);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--app-color-muted);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        border-color: var(--app-color-accent);
+        box-shadow: 0 0 0 4px var(--app-color-accent-soft);
+    }
+}
+
+@layer components {
+    .app-shell {
+        background-color: var(--app-color-bg);
+        color: var(--app-color-text);
+        background-image:
+            radial-gradient(circle at top left, var(--app-color-bg-accent), transparent 28%),
+            radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.08), transparent 22%);
+    }
+
+    .app-panel {
+        background: var(--app-color-surface);
+        border: 1px solid var(--app-color-border);
+        box-shadow: var(--app-shadow);
+        backdrop-filter: blur(18px);
+    }
+
+    .app-card {
+        background: linear-gradient(180deg, color-mix(in srgb, var(--app-color-surface-strong) 82%, transparent), var(--app-color-surface));
+        border: 1px solid var(--app-color-border);
+        box-shadow: var(--app-shadow-soft);
+    }
+
+    .app-muted {
+        color: var(--app-color-muted);
+    }
+
+    .app-link {
+        color: var(--app-color-accent);
+    }
+
+    .app-link:hover {
+        color: var(--app-color-accent-strong);
+    }
+
+    .app-heading {
+        font-family: var(--app-font-heading);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.15;
+        color: var(--app-color-text);
+    }
+}
+
 .table-bordered {
     border-collapse: collapse;
     width: 100%;
 }
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid var(--app-color-border);
+}
+
 #editor .ql-formula {
     pointer-events: auto !important;
     cursor: pointer;
 }
+
 .ql-customMath {
     font-size: 0.7rem;
     font-weight: bold;
 }
 
 .backdrop-glass {
-    @apply backdrop-blur-md bg-white/80 dark:bg-gray-800/80 shadow-lg;
+    @apply shadow-lg backdrop-blur-md;
+    background: var(--app-color-surface);
+    border: 1px solid var(--app-color-border);
 }
 
 /* Tom Select dark/light styling */
 .ts-control {
-    @apply border rounded-md px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600;
-}
-.ts-control .item {
-    @apply bg-indigo-500 dark:bg-indigo-600 text-white rounded px-1 mr-1;
-}
-.ts-dropdown {
-    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg;
-}
-.ts-dropdown .option {
-    @apply px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700;
+    @apply rounded-xl border px-2 py-1;
+    background: var(--app-color-surface-strong);
+    color: var(--app-color-text);
+    border-color: var(--app-color-border);
 }
 
-.input-field{
-    @apply w-full px-3 py-2 border rounded text-sm border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200;
+.ts-control .item {
+    background: var(--app-color-accent);
+    color: white;
+    @apply mr-1 rounded px-1;
 }
-.ts-control{
+
+.ts-dropdown {
+    @apply rounded-xl border shadow-lg;
+    background: var(--app-color-surface-strong);
+    color: var(--app-color-text);
+    border-color: var(--app-color-border);
+}
+
+.ts-dropdown .option {
+    @apply px-3 py-2;
+}
+
+.ts-dropdown .option:hover,
+.ts-dropdown .active {
+    background: var(--app-color-accent-soft);
+    color: var(--app-color-text);
+}
+
+.input-field {
+    @apply w-full rounded-xl border px-3 py-2 text-sm;
+    background: var(--app-color-surface-strong);
+    border-color: var(--app-color-border);
+    color: var(--app-color-text);
+}
+
+.ts-control {
     padding-top: .5rem;
     padding-bottom: .5rem;
 }
 
 .qp-font-bangla,
 .bangla {
-    font-family: var(--app-font-body, 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
+    font-family: var(--app-font-body, 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif);
 }
 
 .qp-font-hind-siliguri {
-    font-family: 'Hind Siliguri', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    font-family: 'Hind Siliguri', 'Inter', 'Shurjo', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
 }
 
 .qp-font-solaiman {
-    font-family: 'SolaimanLipi', 'Hind Siliguri', 'Kalpurush', 'Shurjo', 'Roboto', sans-serif;
+    font-family: 'SolaimanLipi', 'Hind Siliguri', 'Inter', 'Kalpurush', 'Shurjo', 'Roboto', sans-serif;
 }
 
 .qp-font-kalpurush {
-    font-family: 'Kalpurush', 'Hind Siliguri', 'Shurjo', 'SolaimanLipi', 'Roboto', sans-serif;
+    font-family: 'Kalpurush', 'Hind Siliguri', 'Inter', 'Shurjo', 'SolaimanLipi', 'Roboto', sans-serif;
 }
 
 .qp-font-shurjo {
-    font-family: 'Shurjo', 'Hind Siliguri', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
+    font-family: 'Shurjo', 'Hind Siliguri', 'Inter', 'Kalpurush', 'SolaimanLipi', 'Roboto', sans-serif;
 }
 
 .qp-font-roman {
