@@ -48,7 +48,7 @@
             <x-heroicon-s-bars-3 class="h-6 w-6" />
         </button>
 
-        <span class="text-lg font-bold text-gray-900 dark:text-white sidebar-text">ফাইনাল ম্যানেজার</span>
+        <span class="text-lg font-bold text-gray-900 dark:text-white sidebar-text">Question Banks</span>
     </div>
 
     <nav class="flex-1 overflow-y-auto px-4 py-4 space-y-1.5">
