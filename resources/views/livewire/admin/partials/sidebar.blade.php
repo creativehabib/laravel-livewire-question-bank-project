@@ -166,18 +166,26 @@
     <div class="px-4 py-4 border-t border-slate-200 dark:border-slate-700/60 space-y-2">
 
         <div data-sidebar-theme-panel class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-900/50">
-            <div data-sidebar-theme-icon-group class="flex items-center gap-3">
-                <x-heroicon-s-sun x-show="!isDark" class="h-5 w-5 text-amber-500" />
+            <button
+                @click="toggleTheme()"
+                type="button"
+                data-sidebar-theme-trigger
+                class="flex w-full items-center gap-3 rounded-lg text-left text-sm font-medium text-slate-600 transition-colors hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-slate-300 dark:hover:text-white"
+                :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+                :title="isDark ? 'Dark mode enabled' : 'Light mode enabled'"
+            >
+                <span data-sidebar-theme-icon-group class="flex items-center gap-3">
+                    <x-heroicon-s-sun x-show="!isDark" class="h-5 w-5 text-amber-500" />
+                    <x-heroicon-s-moon x-show="isDark" x-cloak class="h-5 w-5 text-indigo-400" />
+                </span>
 
-                <x-heroicon-s-moon x-show="isDark" x-cloak class="h-5 w-5 text-indigo-400" />
-
-                <span class="text-sm font-medium text-slate-600 dark:text-slate-300 sidebar-text">
+                <span data-sidebar-theme-label class="text-sm font-medium text-slate-600 dark:text-slate-300 sidebar-text">
                     <span x-show="!isDark">Light Mode</span>
                     <span x-show="isDark" x-cloak>Dark Mode</span>
                 </span>
-            </div>
+            </button>
 
-            <button @click="toggleTheme()" type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-600" role="switch" :aria-checked="isDark.toString()">
+            <button @click="toggleTheme()" type="button" data-sidebar-theme-switch class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-indigo-600" role="switch" :aria-checked="isDark.toString()">
                 <span class="sr-only">Toggle dark mode</span>
                 <span aria-hidden="true" :class="isDark ? 'translate-x-5 bg-white' : 'translate-x-0 bg-white'" class="pointer-events-none inline-block h-5 w-5 transform rounded-full shadow ring-0 transition duration-200 ease-in-out"></span>
             </button>
