@@ -21,7 +21,7 @@
 <div class="min-h-screen bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
     <livewire:admin.partials.sidebar />
 
-    <div id="mainContent" class="space-y-6 p-4 print:space-y-0 print:p-0 md:ml-64 md:p-8">
+    <div id="mainContent" data-sidebar-content class="space-y-6 p-4 print:space-y-0 print:p-0 md:ml-64 md:p-8">
         <livewire:admin.partials.header />
         {{ $slot }}
     </div>
