@@ -19,11 +19,11 @@
     @livewireStyles
     @stack('styles')
 </head>
-<body>
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<body class="bg-[#efefef] dark:bg-gray-950">
+    <div class="min-h-screen bg-[#efefef] dark:bg-gray-950 text-gray-800 dark:text-gray-200">
         <livewire:admin.partials.sidebar />
         {{-- Main Content --}}
-        <div id="mainContent" class="md:ml-64 print:p-0 print:space-y-0 p-4 md:p-8 space-y-6">
+        <div id="mainContent" class="md:ml-64 print:p-0 print:space-y-0 p-4 md:p-6 lg:p-8 space-y-6">
             <livewire:admin.partials.header />
             {{--main area--}}
             {{ $slot }}
@@ -44,7 +44,7 @@
         const currentPath = window.location.pathname;
         document.querySelectorAll('.nav-link').forEach(link => {
             if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active-link','bg-indigo-50','dark:bg-gray-700','text-indigo-600','dark:text-indigo-400','font-semibold');
+                link.classList.add('active-link','bg-[#dfe3e8]','text-gray-950','dark:bg-gray-800','dark:text-white','font-semibold');
                 const parentSubmenu = link.closest('.submenu');
                 if (parentSubmenu && !sidebar.classList.contains('w-20')) {
                     const submenuItems = parentSubmenu.querySelector('.submenu-items');
@@ -53,7 +53,7 @@
                     arrow.classList.add('rotate-180');
                 }
             } else {
-                link.classList.add('hover:bg-gray-100','dark:hover:bg-gray-700','text-gray-600','dark:text-gray-300');
+                link.classList.add('text-gray-700','dark:text-gray-200');
             }
         });
     </script>
