@@ -31,7 +31,7 @@
     <livewire:admin.partials.sidebar />
 
     {{-- Main Content Wrapper --}}
-    <div class="flex flex-1 flex-col min-w-0 w-full transition-all duration-300 md:ml-64">
+    <div data-sidebar-content class="flex flex-1 flex-col min-w-0 w-full transition-all duration-300 md:ml-64">
 
         {{-- Header --}}
         <livewire:admin.partials.header />
