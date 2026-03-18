@@ -123,7 +123,9 @@ function initializeApp() {
         const navLinks = document.querySelectorAll('.nav-link, .submenu-toggle');
         const submenus = document.querySelectorAll('.submenu');
         const themePanels = document.querySelectorAll('[data-sidebar-theme-panel]');
-        const themeIconGroups = document.querySelectorAll('[data-sidebar-theme-icon-group]');
+        const themeLabels = document.querySelectorAll('[data-sidebar-theme-label]');
+        const themeSwitches = document.querySelectorAll('[data-sidebar-theme-switch]');
+        const themeTriggers = document.querySelectorAll('[data-sidebar-theme-trigger]');
         const sidebarActions = document.querySelectorAll('[data-sidebar-action]');
 
         if (collapsed) {
@@ -137,7 +139,12 @@ function initializeApp() {
                 panel.classList.remove('justify-between', 'px-4');
                 panel.classList.add('justify-center', 'px-2');
             });
-            themeIconGroups.forEach((group) => group.classList.add('hidden'));
+            themeLabels.forEach((label) => label.classList.add('hidden'));
+            themeSwitches.forEach((toggle) => toggle.classList.add('hidden'));
+            themeTriggers.forEach((trigger) => {
+                trigger.classList.remove('w-full');
+                trigger.classList.add('justify-center');
+            });
             sidebarActions.forEach((action) => action.classList.add('justify-center'));
             submenus.forEach((menu) => {
                 const items = menu.querySelector('.submenu-items');
@@ -160,7 +167,12 @@ function initializeApp() {
                 panel.classList.remove('justify-center', 'px-2');
                 panel.classList.add('justify-between', 'px-4');
             });
-            themeIconGroups.forEach((group) => group.classList.remove('hidden'));
+            themeLabels.forEach((label) => label.classList.remove('hidden'));
+            themeSwitches.forEach((toggle) => toggle.classList.remove('hidden'));
+            themeTriggers.forEach((trigger) => {
+                trigger.classList.add('w-full');
+                trigger.classList.remove('justify-center');
+            });
             sidebarActions.forEach((action) => action.classList.remove('justify-center'));
             submenus.forEach((menu) => {
                 const items = menu.querySelector('.submenu-items');
