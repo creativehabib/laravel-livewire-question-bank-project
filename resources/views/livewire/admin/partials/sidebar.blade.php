@@ -161,8 +161,8 @@
 
     <div class="px-4 py-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
 
-        <div class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800/50">
-            <div class="flex items-center gap-3">
+        <div data-sidebar-theme-panel class="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3 dark:bg-gray-800/50">
+            <div data-sidebar-theme-icon-group class="flex items-center gap-3">
                 <x-heroicon-s-sun x-show="!isDark" class="h-5 w-5 text-gray-500" />
 
                 <x-heroicon-s-moon x-show="isDark" x-cloak class="h-5 w-5 text-indigo-400" />
@@ -181,7 +181,7 @@
 
         <form method="POST" action="{{ route('logout') }}" class="block">
             @csrf
-            <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10">
+            <button data-sidebar-action type="submit" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10">
                 <x-heroicon-s-arrow-right-start-on-rectangle class="h-5 w-5 flex-shrink-0" />
                 <span class="sidebar-text">Logout</span>
             </button>

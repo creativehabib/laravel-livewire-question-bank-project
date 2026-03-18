@@ -122,6 +122,9 @@ function initializeApp() {
         const sidebarTextEls = document.querySelectorAll('.sidebar-text');
         const navLinks = document.querySelectorAll('.nav-link, .submenu-toggle');
         const submenus = document.querySelectorAll('.submenu');
+        const themePanels = document.querySelectorAll('[data-sidebar-theme-panel]');
+        const themeIconGroups = document.querySelectorAll('[data-sidebar-theme-icon-group]');
+        const sidebarActions = document.querySelectorAll('[data-sidebar-action]');
 
         if (collapsed) {
             sidebar.classList.remove('w-64');
@@ -130,6 +133,12 @@ function initializeApp() {
             sidebarContent.classList.add('md:ml-20');
             sidebarTextEls.forEach((el) => el.classList.add('hidden'));
             navLinks.forEach((link) => link.classList.add('justify-center'));
+            themePanels.forEach((panel) => {
+                panel.classList.remove('justify-between', 'px-4');
+                panel.classList.add('justify-center', 'px-2');
+            });
+            themeIconGroups.forEach((group) => group.classList.add('hidden'));
+            sidebarActions.forEach((action) => action.classList.add('justify-center'));
             submenus.forEach((menu) => {
                 const items = menu.querySelector('.submenu-items');
                 const arrow = menu.querySelector('.arrow');
@@ -147,6 +156,12 @@ function initializeApp() {
             sidebarContent.classList.add('md:ml-64');
             sidebarTextEls.forEach((el) => el.classList.remove('hidden'));
             navLinks.forEach((link) => link.classList.remove('justify-center'));
+            themePanels.forEach((panel) => {
+                panel.classList.remove('justify-center', 'px-2');
+                panel.classList.add('justify-between', 'px-4');
+            });
+            themeIconGroups.forEach((group) => group.classList.remove('hidden'));
+            sidebarActions.forEach((action) => action.classList.remove('justify-center'));
             submenus.forEach((menu) => {
                 const items = menu.querySelector('.submenu-items');
                 const arrow = menu.querySelector('.arrow');
