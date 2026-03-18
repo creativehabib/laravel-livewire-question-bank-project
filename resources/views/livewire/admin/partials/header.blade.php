@@ -1,3 +1,10 @@
+@php
+    $user = auth()->user();
+    $roleLabel = $user->role?->value
+        ? \Illuminate\Support\Str::headline($user->role->value)
+        : 'User';
+@endphp
+
 <header class="flex print:hidden items-center justify-between rounded-[26px] border border-black/5 bg-white px-4 py-3 shadow-[0_18px_45px_-32px_rgba(15,23,42,0.55)] dark:border-white/10 dark:bg-gray-900/95 sm:px-6">
     <div class="flex items-center print:hidden gap-3">
         <button id="sidebarToggle" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-black/10 bg-white text-gray-700 shadow-sm transition hover:bg-gray-100 dark:border-white/10 dark:bg-gray-800 dark:text-gray-200 md:hidden">
@@ -20,16 +27,16 @@
         </div>
         <div class="relative">
             <button id="userMenuButton" class="flex items-center gap-3 rounded-2xl border border-black/5 bg-[#f7f7f8] px-2.5 py-2 shadow-sm transition hover:bg-gray-100 dark:border-white/10 dark:bg-gray-800 dark:hover:bg-gray-700">
-                @if (auth()->user()->avatar_url)
-                    <img class="h-10 w-10 rounded-2xl object-cover" src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}">
+                @if ($user->avatar_url)
+                    <img class="h-10 w-10 rounded-2xl object-cover" src="{{ $user->avatar_url }}" alt="{{ $user->name }}">
                 @else
                     <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-200 text-sm font-semibold text-gray-700 dark:bg-gray-700 dark:text-gray-100">
-                        {{ auth()->user()->initials }}
+                        {{ $user->initials }}
                     </span>
                 @endif
                 <span class="hidden text-left sm:block">
-                    <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ auth()->user()->name }}</span>
-                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ ucfirst(auth()->user()->role ?? 'user') }}</span>
+                    <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</span>
+                    <span class="block text-xs text-gray-500 dark:text-gray-400">{{ $roleLabel }}</span>
                 </span>
             </button>
             <div id="userMenu" class="absolute right-0 z-10 mt-3 hidden w-52 rounded-2xl border border-black/5 bg-white py-2 shadow-2xl dark:border-white/10 dark:bg-gray-800">
