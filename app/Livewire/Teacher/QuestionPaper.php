@@ -10,13 +10,27 @@ use App\Support\Fonts;
 class QuestionPaper extends Component
 {
     public QuestionSet $questionSet;
+    public $questions;
 
-    // হেডার তথ্য রাখার জন্য প্রোপার্টি
+    // Header Info
     public $instituteName;
     public $subject;
     public $subSubject;
     public $chapters;
+
+    // Formatting & Layout Properties
     public string $fontFamily = 'Bangla';
+    public int $fontSize = 14;
+    public string $textAlign = 'justify';
+    public int $columnCount = 2;
+    public string $paperSize = 'A4';
+    public string $optionStyle = 'circle';
+    public string $setCode = 'ক';
+
+    // Watermark Properties (ছবি অনুযায়ী)
+    public int $watermarkOpacity = 20;
+    public int $watermarkSize = 30;
+    public string $watermarkText = 'অনলাইন ডিজিটাল স্কুল';
 
     public array $previewOptions = [
         'attachAnswerSheet' => false,
@@ -31,22 +45,49 @@ class QuestionPaper extends Component
         'showInstructions' => true,
         'showNotice' => true,
         'showExamName' => false,
+        'showColumnDivider' => true,
+        'showWatermark' => false, // Watermark toggle
     ];
 
     public function mount(Request $request)
     {
         $qsetId = $request->query('qset');
 
-        // questions.options লোড করা হলো যাতে MCQ অপশনও সহজে চলে আসে
         $this->questionSet = QuestionSet::with(['questions' => function ($query) {
-            $query->orderBy('pivot_order', 'asc')->with('options');
-        }, 'user'])
-            ->findOrFail($qsetId);
+            $query->orderBy('pivot_order', 'asc');
+        }, 'user'])->findOrFail($qsetId);
+
+        // প্রশ্নগুলো আলাদা ভ্যারিয়েবলে স্টোর করা হলো যাতে শাফল করলে UI রি-রেন্ডার হয়
+        $this->questions = $this->questionSet->questions;
 
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
         $this->chapters = $this->questionSet->getRelatedChapters();
-        $this->instituteName = $this->questionSet->user->institution_name;
+        $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
+
+        // ডিফল্ট ওয়াটারমার্ক টেক্সট
+        if(empty($this->watermarkText)) {
+            $this->watermarkText = $this->instituteName;
+        }
+    }
+
+    // --- Customization Methods ---
+    public function setTextAlign($align) { $this->textAlign = $align; }
+    public function setColumnCount($count) { $this->columnCount = $count; }
+    public function setPaperSize($size) { $this->paperSize = $size; }
+    public function setOptionStyle($style) { $this->optionStyle = $style; }
+    public function increaseFontSize() { if($this->fontSize < 24) $this->fontSize++; }
+    public function decreaseFontSize() { if($this->fontSize > 10) $this->fontSize--; }
+
+    // --- Shuffle & Set Code ---
+    public function shuffleQuestions()
+    {
+        // প্রশ্নগুলো এলোমেলো (Shuffle) করা হলো
+        $this->questions = collect($this->questions)->shuffle();
+
+        // র‍্যান্ডম সেট কোড (ক, খ, গ, ঘ)
+        $codes = ['ক', 'খ', 'গ', 'ঘ'];
+        $this->setCode = $codes[array_rand($codes)];
     }
 
     public function render()
