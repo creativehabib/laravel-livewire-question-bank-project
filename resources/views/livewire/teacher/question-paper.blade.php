@@ -56,8 +56,8 @@
                         @endif
                     </div>
                     <div class="flex justify-between relative b">
-                        <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">{{ round($questionSet->questions->count('id') * 84 / 60) }} মিনিট</span></div>
-                        <div contenteditable="true">পূর্ণমান—<span class="mx-1">{{ $questionSet->questions->count('marks') }}</span></div>
+                        <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">{{ round($questionSet->questions->count('id') * 84 / 60) }} মিনিট</span></div>
+                        <div contenteditable="true">পূর্ণমান—<span class="mx-1">{{ $questionSet->questions->sum('marks') }}</span></div>
                     </div>
                     <hr>
                     @if($previewOptions['showInstructions'])
@@ -65,37 +65,88 @@
                             <svg stroke="currentColor" fill="currentColor"
                                  stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
-                            </svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
+                            </svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
                         </div>
                     @endif
-                    <div contenteditable="true" class="bangla-bold text-center text-sm mt-1 font-bold editable-effect">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা ।</div>
+                    <div contenteditable="true" class="bangla-bold text-center text-sm mt-1 font-bold editable-effect">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা ।</div>
                 </div>
                 <div style="font-size: 14px;">
                     <div style="text-align: justify;">
                         <div class="relative flex-1 columns-1 lg:columns-2 print:columns-2" style="column-rule: 1px solid rgba(0, 0, 0, 0.2);">
                             @forelse ($questionSet->questions as $question)
                                 <div class="false bg-white relative p-0.5 hover:bg-gray-50 rounded group">
-                                    <div class=" flex items-baseline gap-x-2"><span contenteditable="true">{{ $loop->iteration }}.</span>
-                                        <div class="flex flex-wrap justify-between items-center w-full">
-                                            <div contenteditable="false" class="false bangla-bold">{!! $question->title !!}</div>
+                                    <div class=" flex items-baseline justify-between gap-x-2">
+                                        <div class="flex items-baseline gap-x-2 w-full">
+                                            <span contenteditable="true">{{ $loop->iteration }}.</span>
+                                            <div class="flex flex-wrap justify-between items-center w-full">
+                                                <div contenteditable="false" class="false bangla-bold">{!! $question->title !!}</div>
+                                            </div>
                                         </div>
+
+                                        {{-- শুধুমাত্র Short Question বা MCQ এর ক্ষেত্রে টগল অন থাকলে মান শো করবে --}}
+                                        @if($question->question_type !== 'cq' && $question->marks > 0 && ($previewOptions['showMarksBox'] ?? false))
+                                            <span class="font-bold ml-2 shrink-0">[{{ $question->marks }}]</span>
+                                        @endif
                                     </div>
-                                    @if($question->options->isNotEmpty())
-                                        <div class="relative grid grid-cols-2 ml-7 group">
-                                            @foreach ($question->options as $option)
+
+                                    {{-- ============================================== --}}
+                                    {{-- MCQ (বহুনির্বাচনী) অপশন শো করার লজিক (Updated) --}}
+                                    {{-- ============================================== --}}
+                                    @php
+                                        $mcqOptions = [];
+                                        if ($question->question_type === 'mcq') {
+                                            if (!empty($question->extra_content)) {
+                                                $parsed = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
+                                                if (is_array($parsed)) $mcqOptions = $parsed;
+                                            } elseif ($question->options && $question->options->isNotEmpty()) {
+                                                $mcqOptions = $question->options->toArray(); // পুরানো ডাটার জন্য Backward Compatibility
+                                            }
+                                        }
+                                    @endphp
+
+                                    @if($question->question_type === 'mcq' && !empty($mcqOptions))
+                                        <div class="relative grid grid-cols-2 ml-7 group mt-1">
+                                            @foreach ($mcqOptions as $option)
                                                 <div class="option flex flex-1 items-baseline mb-0.5">
-                                                    <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet']) {{ $option->is_correct ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
-                                                    <div contenteditable="false" class="false">{!! $option->option_text !!}</div>
+                                                    <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet'] ?? false) {{ (!empty($option['is_correct']) && $option['is_correct']) ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
+                                                    <div contenteditable="false" class="false">{!! $option['option_text'] ?? '' !!}</div>
                                                 </div>
                                             @endforeach
                                         </div>
                                     @endif
+
+                                    {{-- ============================================== --}}
+                                    {{-- CQ (সৃজনশীল) অপশন এবং মার্কস শো করার লজিক     --}}
+                                    {{-- ============================================== --}}
+                                    @if($question->question_type === 'cq' && !empty($question->extra_content))
+                                        @php
+                                            $cqParts = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
+                                        @endphp
+
+                                        @if(is_array($cqParts) && !empty($cqParts))
+                                            <div class="relative flex flex-col ml-7 group mt-2 space-y-1.5">
+                                                @foreach ($cqParts as $part)
+                                                    <div class="flex items-start justify-between w-full">
+                                                        <div class="flex items-baseline gap-2">
+                                                            <span class="font-bold">{{ $part['label'] ?? '' }}.</span>
+                                                            <div contenteditable="false" class="inline-block">{!! $part['text'] ?? '' !!}</div>
+                                                        </div>
+                                                        @if($previewOptions['showMarksBox'] ?? false)
+                                                            <span class="font-bold ml-2 shrink-0">{{ $part['marks'] ?? '' }}</span>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    @endif
+
                                 </div>
                             @empty
                                 <div class="text-center text-gray-500 py-8">
-                                    এই প্রশ্নপত্রে এখনো কোনো প্রশ্ন যুক্ত করা হয়নি।
+                                    এই প্রশ্নপত্রে এখনো কোনো প্রশ্ন যুক্ত করা হয়নি।
                                 </div>
                             @endforelse
+
                         </div>
                     </div>
                 </div>
@@ -132,6 +183,14 @@
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
+
+                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">প্রশ্নের মান (Marks)</span>
+                                <label class="relative inline-flex items-center  cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showMarksBox">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+
                             <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">প্রশ্নের তথ্য</span>
                                 <label class="relative inline-flex  items-center  cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" value="">
@@ -159,13 +218,13 @@
                     <div class=" my-5">
                         <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">প্রশ্নের মেটাডাটা</p>
                         <div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
+                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSubSubject">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
-                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">অধ্যায়ের নাম</span>
+                            <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">অধ্যায়ের নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
                                     <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showChapter">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
@@ -302,7 +361,7 @@
                         </div>
                     </div>
                     <div class="my-5">
-                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">সহায়ক টুলস</p>
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">সহায়ক টুলস</p>
                         <div>
                             <div class="p-1.5 bg-gray-100 rounded my-1 border-2 border-rose-500 relative">
                                 <div class="flex justify-between items-center"><span class="bangla font-medium flex items-center">পুনরাবৃত্ত প্রশ্ন শনাক্ত<span class="animate-pulse ml-2 bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">নতুন</span></span>
@@ -325,7 +384,7 @@
                                 <div whiletap="[object Object]" class="cursor-pointer bg-gray-100 hover:bg-emerald-600 hover:text-white flex justify-between items-center p-2 rounded my-1">
                                     <p>শাফল (সেট কোড তৈরী) </p>
                                     <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M403.8 34.4c12-5 25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160H352c-10.1 0-19.6 4.7-25.6 12.8L284 229.3 244 176l31.2-41.6C293.3 110.2 321.8 96 352 96h32V64c0-12.9 7.8-24.6 19.8-29.6zM164 282.7L204 336l-31.2 41.6C154.7 401.8 126.2 416 96 416H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c10.1 0 19.6-4.7 25.6-12.8L164 282.7zm274.6 188c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V416H352c-30.2 0-58.7-14.2-76.8-38.4L121.6 172.8c-6-8.1-15.5-12.8-25.6-12.8H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c30.2 0 58.7 14.2 76.8 38.4L326.4 339.2c6 8.1 15.5 12.8 25.6 12.8h32V320c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64z"></path>
+                                        <path d="M403.8 34.4c12-5 25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V160H352c-10.1 0-19.6 4.7-25.6 12.8L284 229.3 244 176l31.2-41.6C293.3 110.2 321.8 96 352 96h32V64c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64zM164 282.7L204 336l-31.2 41.6C154.7 401.8 126.2 416 96 416H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c10.1 0 19.6-4.7 25.6-12.8L164 282.7zm274.6 188c-9.2 9.2-22.9 11.9-34.9 6.9s-19.8-16.6-19.8-29.6V416H352c-30.2 0-58.7-14.2-76.8-38.4L121.6 172.8c-6-8.1-15.5-12.8-25.6-12.8H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H96c30.2 0 58.7 14.2 76.8 38.4L326.4 339.2c6 8.1 15.5 12.8 25.6 12.8h32V320c0-12.9 7.8-24.6 19.8-29.6s25.7-2.2 34.9 6.9l64 64c6 6 9.4 14.1 9.4 22.6s-3.4 16.6-9.4 22.6l-64 64z"></path>
                                     </svg>
                                 </div>
                             </div>

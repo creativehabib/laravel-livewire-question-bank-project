@@ -29,4 +29,3 @@ class GeneratedQuestionSetPage extends Component
             ->layout('layouts.panel');
     }
 }
-

@@ -22,6 +22,7 @@ class Question extends Model
         'difficulty',
         'question_type',
         'marks',
+        'extra_content',
         'slug',
         'views',
         'user_id',
@@ -30,6 +31,7 @@ class Question extends Model
     protected $casts = [
         'views' => 'integer',
         'marks' => 'float',
+        'extra_content' => 'array',
     ];
 
     public function questionSets()
@@ -41,12 +43,23 @@ class Question extends Model
     protected static function boot()
     {
         parent::boot();
+
         static::creating(function ($question) {
-            $question->slug = Str::slug(Str::limit(strip_tags($question->title), 50, ''));
+            $question->slug = $question->generateUniqueSlug($question->title);
         });
+
         static::updating(function ($question) {
-            $question->slug = Str::slug(Str::limit(strip_tags($question->title), 50, ''));
+            $question->slug = $question->generateUniqueSlug($question->title);
         });
+    }
+
+    private function generateUniqueSlug($title): string
+    {
+        $baseSlug = Str::slug(Str::limit(strip_tags($title), 50, ''));
+        if (!$baseSlug) {
+            $baseSlug = 'question-' . time();
+        }
+        return $baseSlug . '-' . Str::random(4);
     }
 
     public function subject(): BelongsTo

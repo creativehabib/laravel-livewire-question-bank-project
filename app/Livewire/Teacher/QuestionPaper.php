@@ -37,12 +37,12 @@ class QuestionPaper extends Component
     {
         $qsetId = $request->query('qset');
 
-        // questions রিলেশনশিপটি Eager Load করুন
-        // এবং পিভট টেবিলের 'order' কলাম অনুযায়ী প্রশ্নগুলো সাজিয়ে নিন
+        // questions.options লোড করা হলো যাতে MCQ অপশনও সহজে চলে আসে
         $this->questionSet = QuestionSet::with(['questions' => function ($query) {
-                                $query->orderBy('pivot_order', 'asc');
-                            },'user'])
-                            ->findOrFail($qsetId);
+            $query->orderBy('pivot_order', 'asc')->with('options');
+        }, 'user'])
+            ->findOrFail($qsetId);
+
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
         $this->chapters = $this->questionSet->getRelatedChapters();
