@@ -2,23 +2,20 @@
 
 namespace App\Livewire\Teacher;
 
-use Livewire\Component;
 use App\Models\QuestionSet;
-use Illuminate\Http\Request;
 use App\Support\Fonts;
+use Illuminate\Http\Request;
+use Livewire\Component;
 
 class QuestionPaper extends Component
 {
     public QuestionSet $questionSet;
     public $questions;
-
-    // Header Info
-    public $instituteName;
     public $subject;
     public $subSubject;
     public $chapters;
 
-    // Formatting & Layout Properties
+    public string $instituteName = 'প্রতিষ্ঠানের নাম';
     public string $fontFamily = 'Bangla';
     public int $fontSize = 14;
     public string $textAlign = 'justify';
@@ -26,8 +23,6 @@ class QuestionPaper extends Component
     public string $paperSize = 'A4';
     public string $optionStyle = 'circle';
     public string $setCode = 'ক';
-
-    // Watermark Properties (ছবি অনুযায়ী)
     public int $watermarkOpacity = 20;
     public int $watermarkSize = 30;
     public string $watermarkText = 'অনলাইন ডিজিটাল স্কুল';
@@ -46,55 +41,78 @@ class QuestionPaper extends Component
         'showNotice' => true,
         'showExamName' => false,
         'showColumnDivider' => true,
-        'showWatermark' => false, // Watermark toggle
+        'showWatermark' => false,
     ];
 
-    public function mount(Request $request)
+    protected array $allowedTextAlignments = ['left', 'center', 'right', 'justify'];
+    protected array $allowedPaperSizes = ['A4', 'Letter', 'Legal', 'A5'];
+    protected array $allowedOptionStyles = ['circle', 'dot', 'bracket', 'suffix'];
+    protected array $allowedColumnCounts = [1, 2, 3];
+    protected array $setCodes = ['ক', 'খ', 'গ', 'ঘ'];
+
+    public function mount(Request $request): void
     {
         $qsetId = $request->query('qset');
 
-        $this->questionSet = QuestionSet::with(['questions' => function ($query) {
-            $query->orderBy('pivot_order', 'asc');
-        }, 'user'])->findOrFail($qsetId);
+        $this->questionSet = QuestionSet::with([
+            'questions' => fn ($query) => $query->with('options')->orderBy('pivot_order', 'asc'),
+            'user',
+        ])->findOrFail($qsetId);
 
-        // প্রশ্নগুলো আলাদা ভ্যারিয়েবলে স্টোর করা হলো যাতে শাফল করলে UI রি-রেন্ডার হয়
-        $this->questions = $this->questionSet->questions;
-
+        $this->questions = $this->questionSet->questions->values();
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
         $this->chapters = $this->questionSet->getRelatedChapters();
         $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
+        $this->watermarkText = $this->instituteName;
+    }
 
-        // ডিফল্ট ওয়াটারমার্ক টেক্সট
-        if(empty($this->watermarkText)) {
-            $this->watermarkText = $this->instituteName;
+    public function setTextAlign(string $align): void
+    {
+        if (in_array($align, $this->allowedTextAlignments, true)) {
+            $this->textAlign = $align;
         }
     }
 
-    // --- Customization Methods ---
-    public function setTextAlign($align) { $this->textAlign = $align; }
-    public function setColumnCount($count) { $this->columnCount = $count; }
-    public function setPaperSize($size) { $this->paperSize = $size; }
-    public function setOptionStyle($style) { $this->optionStyle = $style; }
-    public function increaseFontSize() { if($this->fontSize < 24) $this->fontSize++; }
-    public function decreaseFontSize() { if($this->fontSize > 10) $this->fontSize--; }
-
-    // --- Shuffle & Set Code ---
-    public function shuffleQuestions()
+    public function setColumnCount(int $count): void
     {
-        // প্রশ্নগুলো এলোমেলো (Shuffle) করা হলো
-        $this->questions = collect($this->questions)->shuffle();
-
-        // র‍্যান্ডম সেট কোড (ক, খ, গ, ঘ)
-        $codes = ['ক', 'খ', 'গ', 'ঘ'];
-        $this->setCode = $codes[array_rand($codes)];
+        if (in_array($count, $this->allowedColumnCounts, true)) {
+            $this->columnCount = $count;
+        }
     }
 
-    public function render()
+    public function setPaperSize(string $size): void
     {
-        return view('livewire.teacher.question-paper', [
-            'fontOptions' => Fonts::options(),
-        ])->layout('layouts.admin');
+        if (in_array($size, $this->allowedPaperSizes, true)) {
+            $this->paperSize = $size;
+        }
+    }
+
+    public function setOptionStyle(string $style): void
+    {
+        if (in_array($style, $this->allowedOptionStyles, true)) {
+            $this->optionStyle = $style;
+        }
+    }
+
+    public function increaseFontSize(): void
+    {
+        if ($this->fontSize < 24) {
+            $this->fontSize++;
+        }
+    }
+
+    public function decreaseFontSize(): void
+    {
+        if ($this->fontSize > 10) {
+            $this->fontSize--;
+        }
+    }
+
+    public function shuffleQuestions(): void
+    {
+        $this->questions = collect($this->questions)->shuffle()->values();
+        $this->setCode = $this->setCodes[array_rand($this->setCodes)];
     }
 
     public function updatedFontFamily(string $value): void
@@ -102,5 +120,28 @@ class QuestionPaper extends Component
         if (! in_array($value, Fonts::keys(), true)) {
             $this->fontFamily = 'Bangla';
         }
+    }
+
+    public function updatedFontSize(int $value): void
+    {
+        $this->fontSize = max(10, min(24, $value));
+    }
+
+    public function updatedWatermarkOpacity(int $value): void
+    {
+        $this->watermarkOpacity = max(5, min(60, $value));
+    }
+
+    public function updatedWatermarkSize(int $value): void
+    {
+        $this->watermarkSize = max(16, min(72, $value));
+    }
+
+    public function render()
+    {
+        return view('livewire.teacher.question-paper', [
+            'fontOptions' => Fonts::options(),
+            'questions' => collect($this->questions),
+        ])->layout('layouts.admin');
     }
 }
