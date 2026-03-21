@@ -11,22 +11,16 @@
     $fontClass = $fontClassMap[$fontFamily] ?? 'qp-font-bangla';
 
     $paperSizes = [
-        'A4' => ['width' => '210mm', 'min_height' => '297mm', 'preview_width' => '42.42px', 'preview_height' => '60px'],
-        'Letter' => ['width' => '216mm', 'min_height' => '279mm', 'preview_width' => '45px', 'preview_height' => '58.13px'],
-        'Legal' => ['width' => '216mm', 'min_height' => '356mm', 'preview_width' => '36.4px', 'preview_height' => '60px'],
-        'A5' => ['width' => '148mm', 'min_height' => '210mm', 'preview_width' => '42.29px', 'preview_height' => '60px'],
+        'A4' => ['width' => '210mm', 'minHeight' => '297mm', 'previewWidth' => '42.4242px', 'previewHeight' => '60px'],
+        'Letter' => ['width' => '216mm', 'minHeight' => '279mm', 'previewWidth' => '45px', 'previewHeight' => '58.125px'],
+        'Legal' => ['width' => '216mm', 'minHeight' => '356mm', 'previewWidth' => '36.4045px', 'previewHeight' => '60px'],
+        'A5' => ['width' => '148mm', 'minHeight' => '210mm', 'previewWidth' => '42.2857px', 'previewHeight' => '60px'],
     ];
 
     $activePaper = $paperSizes[$paperSize] ?? $paperSizes['A4'];
+    $questionItems = collect($questions);
 
-    $textAlignments = [
-        'left' => 'বাম',
-        'center' => 'মাঝখান',
-        'right' => 'ডান',
-        'justify' => 'জাস্টিফাই',
-    ];
-
-    $optionStyles = [
+    $optionStyleLabels = [
         'circle' => '○',
         'dot' => '.',
         'bracket' => '( )',
@@ -45,94 +39,133 @@
     };
 @endphp
 
-<div class="bg-gray-100 min-h-[95vh] py-4 print:bg-white print:p-0">
-    <div class="mx-4 flex flex-col justify-center gap-5 lg:flex-row print:mx-0 print:gap-0 {{ $fontClass }}">
-        <div class="print-area relative md:overflow-auto" style="width: {{ $activePaper['width'] }}; max-width: 100%;">
-            <div class="mb-3 border-t-2 border-emerald-500 bg-white print:hidden">
-                <p class="bg-emerald-50 p-1 text-center font-bold">কুইক সেটিংস</p>
+<div class="table-bordered py-4 print:overflow-hidden print:p-0 bg-gray-100 min-h-[95vh] print:bg-white">
+    <div class="bangla flex flex-col lg:flex-row justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
+        <div class="print:hidden flex gap-x-2 justify-between sticky top-12 lg:hidden p-2 text-center z-10 bg-white">
+            <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"></path></svg><span>সেটিংস</span>
+            </button>
+            <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z"></path></svg><span>উত্তরমালা</span>
+            </button>
+            <button onclick="window.print()" class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"></path></svg><span>ডাউনলোড</span>
+            </button>
+        </div>
+
+        <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
+
+        <div class="print-area relative min-w-screen md:overflow-auto {{ $fontClass }}" style="width: min({{ $activePaper['width'] }}, 100%); max-width: 100%;">
+            <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
+                <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class="p-2 flex flex-wrap gap-2">
-                    <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="bg-emerald-600 px-3 py-2 text-white hover:opacity-90">+ আরও প্রশ্ন যুক্ত করুন</a>
-                    <button type="button" onclick="window.print()" class="rounded bg-slate-700 px-3 py-2 text-white hover:bg-slate-800">প্রিন্ট / ডাউনলোড</button>
-                    <button type="button" wire:click="shuffleQuestions" class="rounded bg-amber-500 px-3 py-2 text-white hover:bg-amber-600">শাফল + সেট কোড</button>
+                    <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="bg-emerald-600 hover:opacity-90 px-2 py-1 text-white">+ আরও প্রশ্ন যুক্ত করুন</a>
+                    <button type="button" wire:click="shuffleQuestions" class="bg-amber-500 hover:opacity-90 px-2 py-1 text-white">শাফল + সেট কোড</button>
+                    <button type="button" onclick="window.print()" class="bg-slate-700 hover:opacity-90 px-2 py-1 text-white">প্রিন্ট</button>
                 </div>
             </div>
 
-            <div class="relative w-full bg-white p-[5mm] shadow-sm md:p-[10mm] print:w-full print:p-1 print:shadow-none" style="min-height: {{ $activePaper['min_height'] }};">
+            <div class="w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white relative" style="min-height: {{ $activePaper['minHeight'] }};">
                 @if($previewOptions['showWatermark'])
-                    <div class="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden">
-                        <div class="rotate-[-30deg] whitespace-nowrap font-black uppercase tracking-[0.4em] text-slate-400"
-                             style="font-size: {{ $watermarkSize }}px; opacity: {{ $watermarkOpacity / 100 }};">
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+                        <div class="rotate-[-30deg] font-black uppercase text-gray-300 whitespace-nowrap"
+                             style="font-size: {{ $watermarkSize }}px; opacity: {{ $watermarkOpacity / 100 }}; letter-spacing: 0.25em;">
                             {{ $watermarkText }}
                         </div>
                     </div>
                 @endif
 
-                <div class="relative z-10 py-2 print:py-0">
-                    <h1 class="text-center text-xl font-bold">{{ $instituteName }}</h1>
-
+                <div class="relative py-2 print:py-0 z-10">
+                    <h1 class="text-xl font-bold text-center">{{ $instituteName }}</h1>
                     @if($previewOptions['showExamName'])
-                        <p class="text-center text-lg font-bold">{{ $questionSet->name }}</p>
+                        <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline-dashed hover:outline-gray-400 editable-effect">{{ $questionSet->name }}</p>
                     @endif
 
                     <div class="relative">
-                        <p class="text-center text-lg">{{ $subject?->name }}</p>
-
-                        @if($previewOptions['showSubSubject'] && filled($subSubject?->name))
-                            <p class="text-center">{{ $subSubject?->name }}</p>
+                        <p contenteditable="true" class="text-center text-lg">{{ $subject->name ?? '' }}</p>
+                        @if($previewOptions['showSubSubject'] && ! empty($subSubject->name ?? null))
+                            <p contenteditable="true" class="text-center">{{ $subSubject->name }}</p>
                         @endif
-
-                        @if($previewOptions['showChapter'] && $chapters->isNotEmpty())
+                        @if($previewOptions['showChapter'] && $chapters && $chapters->isNotEmpty())
                             <p class="text-center text-sm">({{ $chapters->pluck('name')->implode(', ') }})</p>
                         @endif
 
                         @if($previewOptions['showSetCode'])
-                            <div class="absolute right-0 top-0 flex text-sm md:text-base">
-                                <span class="border-y border-l border-black px-2">সেট -</span>
-                                <span class="border-y border-r border-black px-2 font-bold">{{ $setCode }}</span>
+                            <div class="absolute -top-1 right-0 flex">
+                                <p class="border-y border-l pl-1 border-black" contenteditable="true">সেট -</p>
+                                <p contenteditable="true" class="border-y border-r px-1 border-black font-bold">{{ $setCode }}</p>
                             </div>
                         @endif
                     </div>
-
-                    <div class="relative flex justify-between gap-3">
-                        <div>সময় — <span class="mx-1">{{ round($questions->count() * 84 / 60) }} মিনিট</span></div>
-                        <div>পূর্ণমান — <span class="mx-1">{{ $questions->sum('marks') }}</span></div>
+                    <div class="flex justify-between relative b">
+                        <div class="flex items-center" contenteditable="true">সময়—<span class="mx-1">{{ round($questionItems->count() * 84 / 60) }} মিনিট</span></div>
+                        <div contenteditable="true">পূর্ণমান—<span class="mx-1">{{ $questionItems->sum('marks') }}</span></div>
                     </div>
-
                     @if($previewOptions['showStudentInfo'])
-                        <div class="mt-2 grid grid-cols-2 gap-3 text-sm">
-                            <div class="border-b border-dashed border-gray-500 pb-1">শিক্ষার্থীর নাম: </div>
-                            <div class="border-b border-dashed border-gray-500 pb-1">রোল: </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2 text-sm">
+                            <div class="border-b border-dashed border-gray-500 pb-1">শিক্ষার্থীর নাম:</div>
+                            <div class="border-b border-dashed border-gray-500 pb-1">রোল:</div>
                         </div>
                     @endif
-
-                    <hr class="my-2">
-
+                    <hr>
                     @if($previewOptions['showInstructions'])
-                        <div class="my-1 text-center text-sm italic">
-                            দ্রষ্টব্যঃ সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্তসমূহ হতে সঠিক উত্তরের বৃত্তটি সম্পূর্ণ ভরাট করো।
+                        <div class="text-center text-sm my-1 editable-effect" contenteditable="true"><span><i><span class="bangla-bold">দ্রষ্টব্যঃ</span> সরবরাহকৃত নৈর্ব্যত্তিক অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসম্বলিত বৃত্ত সমুহ হতে সঠিক উত্তরের বৃত্তটি</i> (
+                            <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="inline-block" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path></svg>) <i>বল পয়েন্ট কলম দ্বারা সম্পুর্ণ ভরাট করো । প্রতিটি প্রশ্নের মান ১ ।</i></span>
                         </div>
                     @endif
-
                     @if($previewOptions['showNotice'])
-                        <div class="mt-1 text-center text-sm font-bold">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবে না।</div>
+                        <div contenteditable="true" class="bangla-bold text-center text-sm mt-1 font-bold editable-effect">প্রশ্নপত্রে কোনো প্রকার দাগ/চিহ্ন দেয়া যাবেনা ।</div>
                     @endif
                 </div>
 
-                <div class="relative z-10" style="font-size: {{ $fontSize }}px; text-align: {{ $textAlign }};">
-                    <div class="gap-5"
-                         style="column-count: {{ $columnCount }}; column-gap: 24px; {{ $previewOptions['showColumnDivider'] && $columnCount > 1 ? 'column-rule: 1px solid rgba(0,0,0,.18);' : '' }}">
-                        @forelse ($questions as $question)
-                            <div class="mb-3 break-inside-avoid rounded bg-white p-1 hover:bg-gray-50" wire:key="question-{{ $question->id }}-{{ $loop->iteration }}">
-                                <div class="flex items-baseline justify-between gap-2">
-                                    <div class="flex w-full items-baseline gap-2">
-                                        <span>{{ $loop->iteration }}.</span>
-                                        <div class="w-full">
-                                            <div class="font-semibold">{!! $question->title !!}</div>
+                <div class="relative z-10" style="font-size: {{ $fontSize }}px;">
+                    <div style="text-align: {{ $textAlign }};">
+                        <div class="relative flex-1" style="column-count: {{ $columnCount }}; column-rule: {{ $previewOptions['showColumnDivider'] && $columnCount > 1 ? '1px solid rgba(0, 0, 0, 0.2)' : 'none' }}; column-gap: 20px;">
+                            @forelse ($questionItems as $question)
+                                <div class="false bg-white relative p-0.5 hover:bg-gray-50 rounded group break-inside-avoid mb-2" wire:key="question-{{ $question->id }}-{{ $loop->iteration }}">
+                                    <div class="flex items-baseline justify-between gap-x-2">
+                                        <div class="flex items-baseline gap-x-2 w-full">
+                                            <span contenteditable="true">{{ $loop->iteration }}.</span>
+                                            <div class="flex flex-wrap justify-between items-center w-full">
+                                                <div contenteditable="false" class="false bangla-bold">{!! $question->title !!}</div>
+                                            </div>
                                         </div>
+
+                                        @if($question->question_type !== 'cq' && $question->marks > 0 && ($previewOptions['showMarksBox'] ?? false))
+                                            <span class="font-bold ml-2 shrink-0">[{{ $question->marks }}]</span>
+                                        @endif
                                     </div>
 
-                                    @if($question->question_type !== 'cq' && $question->marks > 0 && $previewOptions['showMarksBox'])
-                                        <span class="shrink-0 font-bold">[{{ $question->marks }}]</span>
+                                    @php
+                                        $mcqOptions = [];
+                                        if ($question->question_type === 'mcq') {
+                                            if (!empty($question->extra_content)) {
+                                                $parsed = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
+                                                if (is_array($parsed)) {
+                                                    $mcqOptions = $parsed;
+                                                }
+                                            } elseif ($question->options && $question->options->isNotEmpty()) {
+                                                $mcqOptions = $question->options->toArray();
+                                            }
+                                        }
+                                    @endphp
+
+                                    @if($question->question_type === 'mcq' && !empty($mcqOptions))
+                                        <div class="relative grid grid-cols-2 ml-7 group mt-1 gap-x-2 gap-y-1">
+                                            @foreach ($mcqOptions as $option)
+                                                @php
+                                                    $isCorrect = !empty($option['is_correct']) && $option['is_correct'];
+                                                @endphp
+                                                <div class="option flex flex-1 items-baseline mb-0.5">
+                                                    @if($optionStyle === 'circle')
+                                                        <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet'] ?? false) {{ $isCorrect ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
+                                                    @else
+                                                        <div class="shrink-0 mr-1 min-w-[28px] font-semibold">{{ $optionMarker($optionStyle, $loop->index) }}</div>
+                                                    @endif
+                                                    <div contenteditable="false" class="false">{!! $option['option_text'] ?? '' !!}</div>
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     @endif
                                 </div>
 
@@ -146,174 +179,214 @@
                                         }
                                     }
 
-                                    $cqParts = [];
-                                    if ($question->question_type === 'cq' && !empty($question->extra_content)) {
-                                        $cqParts = is_array($question->extra_content) ? $question->extra_content : (json_decode($question->extra_content, true) ?: []);
-                                    }
-                                @endphp
+                                    @if($question->question_type === 'cq' && !empty($question->extra_content))
+                                        @php
+                                            $cqParts = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
+                                        @endphp
 
-                                @if($question->question_type === 'mcq' && ! empty($mcqOptions))
-                                    <div class="mt-2 ml-6 grid grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
-                                        @foreach ($mcqOptions as $option)
-                                            @php
-                                                $isCorrect = ! empty($option['is_correct']);
-                                            @endphp
-                                            <div class="flex items-baseline gap-2">
-                                                @if($optionStyle === 'circle')
-                                                    <div class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] {{ $previewOptions['attachAnswerSheet'] && $isCorrect ? 'border-gray-700 bg-gray-700 text-white' : 'border-gray-500' }}">
-                                                        {{ mb_chr(2453 + $loop->index) }}
+                                        @if(is_array($cqParts) && !empty($cqParts))
+                                            <div class="relative flex flex-col ml-7 group mt-2 space-y-1.5">
+                                                @foreach ($cqParts as $part)
+                                                    <div class="flex items-start justify-between w-full gap-2">
+                                                        <div class="flex items-baseline gap-2">
+                                                            <span class="font-bold">{{ $part['label'] ?? '' }}.</span>
+                                                            <div contenteditable="false" class="inline-block">{!! $part['text'] ?? '' !!}</div>
+                                                        </div>
+                                                        @if($previewOptions['showMarksBox'] ?? false)
+                                                            <span class="font-bold ml-2 shrink-0">{{ $part['marks'] ?? '' }}</span>
+                                                        @endif
                                                     </div>
                                                 @else
                                                     <div class="min-w-[2rem] shrink-0 font-semibold">{{ $optionMarker($optionStyle, $loop->index) }}</div>
                                                 @endif
                                                 <div>{!! $option['option_text'] ?? '' !!}</div>
                                             </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                @if($question->question_type === 'cq' && ! empty($cqParts))
-                                    <div class="mt-2 ml-6 space-y-1.5">
-                                        @foreach ($cqParts as $part)
-                                            <div class="flex items-start justify-between gap-3">
-                                                <div class="flex items-baseline gap-2">
-                                                    <span class="font-bold">{{ $part['label'] ?? '' }}.</span>
-                                                    <div>{!! $part['text'] ?? '' !!}</div>
-                                                </div>
-                                                @if($previewOptions['showMarksBox'])
-                                                    <span class="shrink-0 font-bold">{{ $part['marks'] ?? '' }}</span>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                        @empty
-                            <div class="py-8 text-center text-gray-500">এই প্রশ্নপত্রে এখনো কোনো প্রশ্ন যুক্ত করা হয়নি।</div>
-                        @endforelse
+                                        @endif
+                                    @endif
+                                </div>
+                            @empty
+                                <div class="text-center text-gray-500 py-8">এই প্রশ্নপত্রে এখনো কোনো প্রশ্ন যুক্ত করা হয়নি।</div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <aside class="sidebar top-16 h-screen w-full overflow-y-auto bg-white p-3 lg:sticky lg:block lg:w-80 print:hidden">
-            <div class="space-y-5">
-                <div>
-                    <h1 class="mb-2 rounded bg-gray-50 py-2 text-center text-lg shadow">সেটিংস</h1>
-                    <button type="button" onclick="window.print()" class="flex w-full items-center justify-center gap-2 rounded bg-primary-500 py-2 text-center text-white transition-all hover:bg-primary-400">ডাউনলোড</button>
-                </div>
+        <div class="hidden select-none fixed top-0 right-0 z-[1000] overflow-y-auto lg:z-0 bg-white lg:bg-none lg:sticky lg:block lg:top-16 h-screen w-72 google-shadow print:hidden overflow-y-scroll sidebar">
+            <div class="relative overflow-hidden">
+                <div class="bg-white backdrop-blur-lg p-2">
+                    <h1 class="py-2 flex items-center gap-2 justify-center rounded text-center bg-gray-50 mb-2 shadow"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-500 text-sm" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"></path></svg> <span class="text-lg">সেটিংস</span></h1>
+                    <button onclick="window.print()" class="hover:bg-primary-400 bg-primary-500 transition-all py-2 rounded w-full text-center text-white flex items-center gap-2 justify-center">
+                        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"></path></svg>ডাউনলোড
+                    </button>
 
-                <div>
-                    <p class="border-t border-emerald-500 bg-emerald-50 p-2 font-bold">প্রশ্নে সংযুক্তি</p>
-                    <div class="space-y-2 pt-2">
-                        @foreach ([
-                            'attachAnswerSheet' => 'উত্তরপত্র',
-                            'attachOmrSheet' => 'OMR সংযুক্ত',
-                            'markImportant' => 'গুরুত্বপূর্ণ প্রশ্ন',
-                            'showMarksBox' => 'প্রশ্নের মান (Marks)',
-                            'showStudentInfo' => 'শিক্ষার্থীর তথ্য',
-                        ] as $previewKey => $label)
-                            <label class="flex items-center justify-between rounded bg-gray-100 p-2">
-                                <span>{{ $label }}</span>
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600" wire:model.live="previewOptions.{{ $previewKey }}">
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div>
-                    <p class="border-t border-emerald-500 bg-emerald-50 p-2 font-bold">প্রশ্নের মেটাডাটা</p>
-                    <div class="space-y-2 pt-2">
-                        @foreach ([
-                            'showSubSubject' => 'বিষয়ের নাম',
-                            'showChapter' => 'অধ্যায়ের নাম',
-                            'showSetCode' => 'সেট কোড',
-                            'showExamName' => 'প্রোগ্রাম/পরীক্ষার নাম',
-                            'showInstructions' => 'নির্দেশনা',
-                            'showNotice' => 'নোটিশ',
-                        ] as $previewKey => $label)
-                            <label class="flex items-center justify-between rounded bg-gray-100 p-2">
-                                <span>{{ $label }}</span>
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600" wire:model.live="previewOptions.{{ $previewKey }}">
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
-
-                <div>
-                    <p class="border-t border-emerald-500 bg-emerald-50 p-2 font-bold">ডকুমেন্ট কাস্টমাইজেশন</p>
-                    <div class="space-y-3 pt-2">
-                        <div class="rounded bg-gray-100 p-2">
-                            <p class="mb-2 font-medium">টেক্সট এলাইনমেন্ট</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                @foreach($textAlignments as $alignment => $label)
-                                    <button type="button" wire:click="setTextAlign('{{ $alignment }}')"
-                                            class="rounded border px-3 py-2 text-sm {{ $textAlign === $alignment ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-gray-300 bg-white text-gray-700' }}">
-                                        {{ $label }}
-                                    </button>
-                                @endforeach
-                            </div>
-                        </div>
-
+                    <div class="my-4">
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">প্রশ্নে সংযুক্তি</p>
                         <div>
-                            <p class="mb-2 font-medium">পেপার সাইজ</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                @foreach($paperSizes as $size => $dimensions)
-                                    <button type="button" wire:click="setPaperSize('{{ $size }}')"
-                                            class="flex flex-col items-center justify-center rounded border px-2 py-2 text-sm {{ $paperSize === $size ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white hover:bg-gray-100' }}">
-                                        <span class="mb-1 border bg-white shadow-sm" style="min-width: {{ $dimensions['preview_width'] }}; min-height: {{ $dimensions['preview_height'] }};"></span>
-                                        {{ $size }}
-                                    </button>
-                                @endforeach
-                            </div>
+                            @foreach ([
+                                'attachAnswerSheet' => 'উত্তরপত্র',
+                                'attachOmrSheet' => 'OMR সংযুক্ত',
+                                'markImportant' => 'গুরুত্বপূর্ণ প্রশ্ন',
+                                'showMarksBox' => 'প্রশ্নের মান (Marks)',
+                                'showStudentInfo' => 'শিক্ষার্থীর তথ্য',
+                            ] as $key => $label)
+                                <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">{{ $label }}</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.{{ $key }}">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
+                    </div>
 
-                        <div class="rounded bg-gray-100 p-2">
-                            <p class="mb-2 font-medium">অপশন স্টাইল</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                @foreach($optionStyles as $style => $preview)
-                                    <button type="button" wire:click="setOptionStyle('{{ $style }}')"
-                                            class="rounded border px-3 py-2 text-center {{ $optionStyle === $style ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-gray-300 bg-white' }}">
-                                        {{ $preview }}
-                                    </button>
-                                @endforeach
-                            </div>
+                    <div class="my-5">
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">প্রশ্নের মেটাডাটা</p>
+                        <div>
+                            @foreach ([
+                                'showSubSubject' => 'বিষয়ের নাম',
+                                'showChapter' => 'অধ্যায়ের নাম',
+                                'showSetCode' => 'সেট কোড',
+                                'showExamName' => 'প্রোগ্রাম/পরিক্ষার নাম',
+                                'showInstructions' => 'নির্দেশনা',
+                                'showNotice' => 'নোটিশ',
+                            ] as $key => $label)
+                                <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">{{ $label }}</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.{{ $key }}">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+                            @endforeach
                         </div>
+                    </div>
 
-                        <div class="rounded bg-gray-100 p-2">
-                            <label for="font-selector" class="mb-2 block text-center font-medium">ফন্ট পরিবর্তন</label>
-                            <select id="font-selector" wire:model.live="fontFamily" class="w-full rounded-md border border-gray-300">
-                                @foreach($fontOptions as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="rounded bg-gray-100 p-2">
-                            <div class="mb-2 flex items-center justify-between">
-                                <span>ফন্ট সাইজ</span>
-                                <div class="flex items-center gap-1">
-                                    <button type="button" wire:click="decreaseFontSize" class="rounded bg-white px-2 text-lg">-</button>
-                                    <span class="rounded border bg-white px-2 py-0.5">{{ $fontSize }}</span>
-                                    <button type="button" wire:click="increaseFontSize" class="rounded bg-white px-2 text-lg">+</button>
+                    <div class="my-5">
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">ডকুমেন্ট কাস্টমাইজেসন</p>
+                        <div>
+                            <div class="bg-gray-100 p-2 rounded my-1">
+                                <div class="flex justify-between items-center"><span class="bangla"> এডিটিং মোড </span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
                                 </div>
                             </div>
-                            <input type="range" min="10" max="24" wire:model.live="fontSize" class="w-full">
-                        </div>
 
+                            <div class="bg-gray-100 p-1">
+                                <div class="flex justify-between gap-2"><p>টেক্সট এলাইনমেন্ট</p></div>
+                                <div class="flex gap-2 py-1">
+                                    @foreach (['left', 'center', 'right', 'justify'] as $align)
+                                        <button type="button" wire:click="setTextAlign('{{ $align }}')" class="p-2 rounded {{ $textAlign === $align ? 'bg-emerald-600 text-white' : 'bg-white text-gray-700' }}" title="{{ $align }}">
+                                            @if($align === 'left')
+                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12.83 352h262.34A12.82 12.82 0 0 0 288 339.17v-38.34A12.82 12.82 0 0 0 275.17 288H12.83A12.82 12.82 0 0 0 0 300.83v38.34A12.82 12.82 0 0 0 12.83 352zm0-256h262.34A12.82 12.82 0 0 0 288 83.17V44.83A12.82 12.82 0 0 0 275.17 32H12.83A12.82 12.82 0 0 0 0 44.83v38.34A12.82 12.82 0 0 0 12.83 96zM432 160H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0 256H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z"></path></svg>
+                                            @elseif($align === 'center')
+                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M352 64c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32zm96 128c0-17.7-14.3-32-32-32H32c-17.7 0-32 14.3-32 32s14.3 32 32 32H416c17.7 0 32-14.3 32-32zM0 448c0 17.7 14.3 32 32 32H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H32c-17.7 0-32 14.3-32 32zM352 320c0-17.7-14.3-32-32-32H128c-17.7 0-32 14.3-32 32s14.3 32 32 32H320c17.7 0 32-14.3 32-32z"></path></svg>
+                                            @elseif($align === 'right')
+                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16 224h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm416 192H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm3.17-384H172.83A12.82 12.82 0 0 0 160 44.83v38.34A12.82 12.82 0 0 0 172.83 96h262.34A12.82 12.82 0 0 0 448 83.17V44.83A12.82 12.82 0 0 0 435.17 32zm0 256H172.83A12.82 12.82 0 0 0 160 300.83v38.34A12.82 12.82 0 0 0 172.83 352h262.34A12.82 12.82 0 0 0 448 339.17v-38.34A12.82 12.82 0 0 0 435.17 288z"></path></svg>
+                                            @else
+                                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M432 416H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-128H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"></path></svg>
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="my-1">
+                                <p> পেপার সাইজ </p>
+                                <div class="grid grid-cols-2 gap-1.5">
+                                    @foreach($paperSizes as $size => $paper)
+                                        <button type="button" wire:click="setPaperSize('{{ $size }}')" class="flex-1 flex flex-col items-center justify-center cursor-pointer px-2 py-2 border rounded text-sm capitalize select-none {{ $paperSize === $size ? 'bg-emerald-50 border-emerald-500' : 'border-gray-200 hover:bg-gray-200' }}">
+                                            <div class="mb-1 border shadow bg-white" style="min-width: {{ $paper['previewWidth'] }}; min-height: {{ $paper['previewHeight'] }};"></div>{{ $size }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="relative bg-gray-100 p-2 rounded my-1">
+                                <p class="bangla mb-2">অপশন স্টাইল</p>
+                                <div class="flex gap-2">
+                                    @foreach($optionStyleLabels as $style => $preview)
+                                        <button type="button" wire:click="setOptionStyle('{{ $style }}')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ $optionStyle === $style ? 'bg-emerald-600 text-white' : 'bg-white hover:bg-emerald-100' }}">
+                                            @if($style === 'circle')
+                                                <div class="h-5 w-5 border border-gray-500 rounded-full {{ $optionStyle === $style ? 'bg-white' : 'bg-transparent' }}"></div>
+                                            @else
+                                                {{ $preview }}
+                                            @endif
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-100 my-1 p-2">
+                                <div class="rounded justify-between items-center">
+                                    <p class="bangla mb-1 text-center">ফন্ট পরিবর্তন</p>
+                                    <select id="font-selector" wire:model.live="fontFamily" class="w-full rounded-md border border-gray-300">
+                                        @foreach($fontOptions as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">ফন্ট সাইজ </span>
+                                <div class="flex items-center gap-1">
+                                    <button type="button" wire:click="decreaseFontSize" class="hover:bg-white px-2 rounded text-lg">-</button>
+                                    <p class="border rounded p-0.5 px-1.5 bg-white">{{ $fontSize }}</p>
+                                    <button type="button" wire:click="increaseFontSize" class="hover:bg-white px-2 rounded text-lg">+</button>
+                                </div>
+                            </div>
+
+                            <div class="my-1">
+                                <p>কলাম</p>
+                                <div class="flex gap-2 justify-center">
+                                    @foreach([1, 2, 3] as $count)
+                                        <button type="button" wire:click="setColumnCount({{ $count }})" class="border {{ $columnCount === $count ? 'border-black' : 'hover:border-gray-500' }} rounded py-2 px-3 flex-1 cursor-pointer">
+                                            <div class="flex justify-center gap-0.5 items-center">
+                                                @for($i = 0; $i < $count; $i++)
+                                                    <div class="w-4 h-6 bg-gray-300"></div>
+                                                @endfor
+                                            </div>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">কলাম ডিভাইডার</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showColumnDivider">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="my-5">
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">সহায়ক টুলস</p>
                         <div>
-                            <p class="mb-2 font-medium">কলাম</p>
-                            <div class="grid grid-cols-3 gap-2">
-                                @foreach([1, 2, 3] as $count)
-                                    <button type="button" wire:click="setColumnCount({{ $count }})"
-                                            class="rounded border px-3 py-3 {{ $columnCount === $count ? 'border-black bg-gray-100' : 'border-gray-300 bg-white' }}">
-                                        <div class="flex items-center justify-center gap-1">
-                                            @for($i = 0; $i < $count; $i++)
-                                                <div class="h-6 w-4 bg-gray-300"></div>
-                                            @endfor
-                                        </div>
-                                    </button>
-                                @endforeach
+                            <div class="p-1.5 bg-gray-100 rounded my-1 border-2 border-rose-500 relative">
+                                <div class="flex justify-between items-center"><span class="bangla font-medium flex items-center">পুনরাবৃত্ত প্রশ্ন শনাক্ত<span class="animate-pulse ml-2 bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full">নতুন</span></span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-emerald-600 relative after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                                    </label>
+                                </div>
+                                <div class="text-sm bg-white mt-1 text-center">একই প্রশ্ন একাধিকবার নির্বাচিত হলে সহজে শনাক্ত ও পরিবর্তন করা যাবে।</div>
+                            </div>
+                            <div>
+                                <div class="relative bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">শীট</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <button type="button" wire:click="shuffleQuestions" class="w-full cursor-pointer bg-gray-100 hover:bg-emerald-600 hover:text-white flex justify-between items-center p-2 rounded my-1">
+                                    <p>শাফল (সেট কোড তৈরী)</p>
+                                    <span class="font-bold">{{ $setCode }}</span>
+                                </button>
                             </div>
                         </div>
 
@@ -322,46 +395,36 @@
                             <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600" wire:model.live="previewOptions.showColumnDivider">
                         </label>
                     </div>
-                </div>
 
-                <div>
-                    <p class="border-t border-emerald-500 bg-emerald-50 p-2 font-bold">সহায়ক টুলস</p>
-                    <div class="space-y-2 pt-2">
-                        <button type="button" wire:click="shuffleQuestions" class="flex w-full items-center justify-between rounded bg-gray-100 p-3 transition hover:bg-emerald-600 hover:text-white">
-                            <span>শাফল (সেট কোড তৈরী)</span>
-                            <span class="rounded bg-white/80 px-2 py-1 text-xs font-bold text-gray-700">{{ $setCode }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <p class="border-t border-emerald-500 bg-emerald-50 p-2 font-bold">ব্র্যান্ডিং</p>
-                    <div class="space-y-3 pt-2">
-                        <label class="flex items-center justify-between rounded bg-gray-100 p-2">
-                            <span>জলছাপ</span>
-                            <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600" wire:model.live="previewOptions.showWatermark">
-                        </label>
-
-                        @if($previewOptions['showWatermark'])
-                            <div class="space-y-3 rounded bg-gray-100 p-3">
-                                <div>
-                                    <label class="mb-1 block text-sm font-medium">জলছাপের লেখা</label>
-                                    <input type="text" wire:model.live.debounce.300ms="watermarkText" class="w-full rounded border border-gray-300" placeholder="জলছাপের লেখা লিখুন">
+                    <div class="my-5">
+                        <p class="bg-emerald-50 p-2 font-bold border-t border-emerald-500">ব্রান্ডিং</p>
+                        <div>
+                            <div>
+                                <div class="bg-gray-100 p-2 rounded flex justify-between items-center my-1"><span class="bangla">ঠিকানা</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
                                 </div>
-                                <div>
-                                    <div class="mb-1 flex justify-between text-sm">
-                                        <span>স্বচ্ছতা</span>
-                                        <span>{{ $watermarkOpacity }}%</span>
+                            </div>
+                            <div class="bg-gray-100 my-1 p-2 space-y-3">
+                                <div class="rounded flex justify-between items-center"><span class="bangla">জলছাপ</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showWatermark">
+                                        <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                    </label>
+                                </div>
+                                @if($previewOptions['showWatermark'])
+                                    <input type="text" wire:model.live.debounce.300ms="watermarkText" class="w-full rounded border border-gray-300 px-2 py-1" placeholder="জলছাপের টেক্সট লিখুন">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1"><span>স্বচ্ছতা</span><span>{{ $watermarkOpacity }}%</span></div>
+                                        <input type="range" min="5" max="60" wire:model.live="watermarkOpacity" class="w-full">
                                     </div>
-                                    <input type="range" min="5" max="60" wire:model.live="watermarkOpacity" class="w-full">
-                                </div>
-                                <div>
-                                    <div class="mb-1 flex justify-between text-sm">
-                                        <span>সাইজ</span>
-                                        <span>{{ $watermarkSize }}px</span>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1"><span>সাইজ</span><span>{{ $watermarkSize }}px</span></div>
+                                        <input type="range" min="16" max="72" wire:model.live="watermarkSize" class="w-full">
                                     </div>
-                                    <input type="range" min="16" max="72" wire:model.live="watermarkSize" class="w-full">
-                                </div>
+                                @endif
                             </div>
                         @endif
                     </div>

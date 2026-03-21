@@ -11,6 +11,9 @@ class QuestionPaper extends Component
 {
     public QuestionSet $questionSet;
     public $questions;
+    public $subject;
+    public $subSubject;
+    public $chapters;
 
     public string $instituteName = 'প্রতিষ্ঠানের নাম';
     public string $fontFamily = 'Bangla';
@@ -57,6 +60,9 @@ class QuestionPaper extends Component
         ])->findOrFail($qsetId);
 
         $this->questions = $this->questionSet->questions->values();
+        $this->subject = $this->questionSet->getRelatedSubject();
+        $this->subSubject = $this->questionSet->getRelatedSubSubject();
+        $this->chapters = $this->questionSet->getRelatedChapters();
         $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
         $this->watermarkText = $this->instituteName;
     }
@@ -116,26 +122,6 @@ class QuestionPaper extends Component
         }
     }
 
-    public function updatedTextAlign(string $value): void
-    {
-        $this->setTextAlign($value);
-    }
-
-    public function updatedPaperSize(string $value): void
-    {
-        $this->setPaperSize($value);
-    }
-
-    public function updatedOptionStyle(string $value): void
-    {
-        $this->setOptionStyle($value);
-    }
-
-    public function updatedColumnCount(int $value): void
-    {
-        $this->setColumnCount($value);
-    }
-
     public function updatedFontSize(int $value): void
     {
         $this->fontSize = max(10, min(24, $value));
@@ -156,9 +142,6 @@ class QuestionPaper extends Component
         return view('livewire.teacher.question-paper', [
             'fontOptions' => Fonts::options(),
             'questions' => collect($this->questions),
-            'subject' => $this->questionSet->getRelatedSubject(),
-            'subSubject' => $this->questionSet->getRelatedSubSubject(),
-            'chapters' => $this->questionSet->getRelatedChapters(),
         ])->layout('layouts.admin');
     }
 }
