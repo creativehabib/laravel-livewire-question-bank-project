@@ -80,6 +80,7 @@
                     @if($previewOptions['showExamName'])
                         <p contenteditable="true" class="text-center text-lg font-bold outline-none hover:outline-dashed hover:outline-gray-400 editable-effect">{{ $questionSet->name }}</p>
                     @endif
+
                     <div class="relative">
                         <p contenteditable="true" class="text-center text-lg">{{ $subject->name ?? '' }}</p>
                         @if($previewOptions['showSubSubject'] && ! empty($subSubject->name ?? null))
@@ -88,6 +89,7 @@
                         @if($previewOptions['showChapter'] && $chapters && $chapters->isNotEmpty())
                             <p class="text-center text-sm">({{ $chapters->pluck('name')->implode(', ') }})</p>
                         @endif
+
                         @if($previewOptions['showSetCode'])
                             <div class="absolute -top-1 right-0 flex">
                                 <p class="border-y border-l pl-1 border-black" contenteditable="true">সেট -</p>
@@ -165,6 +167,17 @@
                                             @endforeach
                                         </div>
                                     @endif
+                                </div>
+
+                                @php
+                                    $mcqOptions = [];
+                                    if ($question->question_type === 'mcq') {
+                                        if (!empty($question->extra_content)) {
+                                            $mcqOptions = is_array($question->extra_content) ? $question->extra_content : (json_decode($question->extra_content, true) ?: []);
+                                        } elseif ($question->options && $question->options->isNotEmpty()) {
+                                            $mcqOptions = $question->options->toArray();
+                                        }
+                                    }
 
                                     @if($question->question_type === 'cq' && !empty($question->extra_content))
                                         @php
@@ -183,7 +196,10 @@
                                                             <span class="font-bold ml-2 shrink-0">{{ $part['marks'] ?? '' }}</span>
                                                         @endif
                                                     </div>
-                                                @endforeach
+                                                @else
+                                                    <div class="min-w-[2rem] shrink-0 font-semibold">{{ $optionMarker($optionStyle, $loop->index) }}</div>
+                                                @endif
+                                                <div>{!! $option['option_text'] ?? '' !!}</div>
                                             </div>
                                         @endif
                                     @endif
@@ -373,6 +389,11 @@
                                 </button>
                             </div>
                         </div>
+
+                        <label class="flex items-center justify-between rounded bg-gray-100 p-2">
+                            <span>কলাম ডিভাইডার</span>
+                            <input type="checkbox" class="h-4 w-4 rounded border-gray-300 text-emerald-600" wire:model.live="previewOptions.showColumnDivider">
+                        </label>
                     </div>
 
                     <div class="my-5">
@@ -405,11 +426,10 @@
                                     </div>
                                 @endif
                             </div>
-                        </div>
+                        @endif
                     </div>
-                    <div class="h-40"></div>
                 </div>
             </div>
-        </div>
+        </aside>
     </div>
 </div>
