@@ -27,7 +27,7 @@ class ViewQuestions extends Component
     {
         $qsetId = $request->query('qset');
 
-        // ১. QuestionSet লোড করুন এবং এর সাথে যুক্ত প্রশ্নগুলোও নিয়ে আসুন (Eager Loading)
+        // ১. QuestionSet লোড করুন এবং এর সাথে যুক্ত প্রশ্নগুলোও নিয়ে আসুন
         $this->questionSet = QuestionSet::findOrFail($qsetId);
 
         $this->selectedQuestions = $this->questionSet->questions->pluck('id')->map(fn ($id) => (string) $id)->toArray();
@@ -40,10 +40,24 @@ class ViewQuestions extends Component
         $subSubjectId = $criteria['sub_subject_id'] ?? null;
         $chapterId = $criteria['chapter_id'] ?? null;
 
-        // ৪. শর্ত অনুযায়ী প্রশ্ন খুঁজুন এবং availableQuestions প্রোপার্টিতে রাখুন
+        // ৪. শর্ত অনুযায়ী প্রশ্ন খুঁজুন
         $this->availableQuestions = Question::query()
-            ->with('options','tags')
-            ->when($type, fn ($q) => $q->where('question_type', $type))
+            ->with('options', 'tags') // options রাখা হয়েছে শুধুমাত্র পুরানো ডাটা সাপোর্ট করার জন্য
+            ->when($type, function ($q) use ($type) {
+                // ✅ Combine/Composite এর জন্য স্মার্ট ফিল্টার লজিক
+                if ($type === 'mcq') {
+                    $q->where('question_type', 'mcq');
+                } elseif ($type === 'creative' || $type === 'cq') {
+                    $q->where('question_type', 'cq');
+                } elseif ($type === 'short') {
+                    $q->where('question_type', 'short');
+                } elseif (in_array($type, ['composite', 'combine'])) {
+                    // 'combine' সিলেক্ট করলে ডাটাবেজ থেকে সব ধরনের প্রশ্ন (MCQ, CQ, Short) নিয়ে আসবে
+                    $q->whereIn('question_type', ['mcq', 'cq', 'short']);
+                } else {
+                    $q->where('question_type', $type);
+                }
+            })
             ->when($subjectId, fn ($q) => $q->where('subject_id', $subjectId))
             ->when($subSubjectId, fn ($q) => $q->where('sub_subject_id', $subSubjectId))
             ->when($chapterId, fn ($q) => $q->where('chapter_id', $chapterId))
