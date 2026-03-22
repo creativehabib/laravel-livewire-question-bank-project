@@ -24,15 +24,14 @@
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M320 400c-75.85 0-137.25-58.71-142.9-133.11L72.2 185.82c-13.79 17.3-26.48 35.59-36.72 55.59a32.35 32.35 0 0 0 0 29.19C89.71 376.41 197.07 448 320 448c26.91 0 52.87-4 77.89-10.46L346 397.39a144.13 144.13 0 0 1-26 2.61zm313.82 58.1l-110.55-85.44a331.25 331.25 0 0 0 81.25-102.07 32.35 32.35 0 0 0 0-29.19C550.29 135.59 442.93 64 320 64a308.15 308.15 0 0 0-147.32 37.7L45.46 3.37A16 16 0 0 0 23 6.18L3.37 31.45A16 16 0 0 0 6.18 53.9l588.36 454.73a16 16 0 0 0 22.46-2.81l19.64-25.27a16 16 0 0 0-2.82-22.45zm-183.72-142l-39.3-30.38A94.75 94.75 0 0 0 416 256a94.76 94.76 0 0 0-121.31-92.21A47.65 47.65 0 0 1 304 192a46.64 46.64 0 0 1-1.54 10l-73.61-56.89A142.31 142.31 0 0 1 320 112a143.92 143.92 0 0 1 144 144c0 21.63-5.29 41.79-13.9 60.11z"></path>
-                </svg><span>উত্তরমালা</span></button>
+                </svg><span>উত্তরমালা</span></button>া
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-gray-600 text-xs" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
                     <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"></path>
                 </svg><span>ডাউনলোড</span></button>
         </div>
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
-        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm] {{ $fontClass }}"
-             style="width: {{ $paperWidths[$paperSize] ?? '210mm' }}; min-height: {{ $paperMinHeights[$paperSize] ?? '297mm' }};">
+        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm] {{ $fontClass }}">
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class=" p-2">
@@ -124,10 +123,25 @@
                                     @endphp
 
                                     @if($question->question_type === 'mcq' && !empty($mcqOptions))
-                                        <div class="relative grid grid-cols-2 ml-7 group mt-1">
+                                        <div class="relative grid grid-cols-2 ml-6 group mt-1">
                                             @foreach ($mcqOptions as $option)
                                                 <div class="option flex flex-1 items-baseline mb-0.5">
-                                                    <div class="h-4 w-4 @if($previewOptions['attachAnswerSheet'] ?? false) {{ (!empty($option['is_correct']) && $option['is_correct']) ? 'bg-gray-700 text-white border border-gray-700' : 'border border-gray-500' }} @else border border-gray-500 @endif shrink-0 mr-1 rounded-full flex justify-center items-center">{{ mb_chr(2453 + $loop->index) }}</div>
+                                                    @php
+                                                        $optLetter = mb_chr(2453 + $loop->index);
+                                                        $isCorr = !empty($option['is_correct']) && $option['is_correct'];
+                                                        $ansHighlight = ($previewOptions['attachAnswerSheet'] ?? false) && $isCorr;
+                                                        $currentOptStyle = $optionStyle ?? 'circle';
+                                                    @endphp
+
+                                                    @if($currentOptStyle === 'circle')
+                                                        <div class="h-4 w-4 shrink-0 mr-1.5 rounded-full flex justify-center items-center border {{ $ansHighlight ? 'bg-gray-700 text-white border-gray-700' : 'border-gray-500 text-gray-800' }} leading-none">{{ $optLetter }}</div>
+                                                    @elseif($currentOptStyle === 'dot')
+                                                        <div class="shrink-0 mr-1.5 {{ $ansHighlight ? 'text-emerald-700 bg-emerald-100 px-1 rounded' : 'text-gray-800' }}">{{ $optLetter }}.</div>
+                                                    @elseif($currentOptStyle === 'parentheses')
+                                                        <div class="shrink-0 mr-1.5 {{ $ansHighlight ? 'text-emerald-700 bg-emerald-100 px-1 rounded' : 'text-gray-800' }}">({{ $optLetter }})</div>
+                                                    @elseif($currentOptStyle === 'minimal')
+                                                        <div class="shrink-0 mr-1.5 {{ $ansHighlight ? 'text-emerald-700 bg-emerald-100 px-1 rounded' : 'text-gray-800' }}">{{ $optLetter }})</div>
+                                                    @endif
                                                     <div contenteditable="false" class="false">{!! $option['option_text'] ?? '' !!}</div>
                                                 </div>
                                             @endforeach
@@ -143,15 +157,23 @@
                                         @endphp
 
                                         @if(is_array($cqParts) && !empty($cqParts))
-                                            <div class="relative flex flex-col ml-7 group mt-2 space-y-1.5">
+                                            <div class="relative flex flex-col ml-6 group mt-2 space-y-1.5">
                                                 @foreach ($cqParts as $part)
                                                     <div class="flex items-start justify-between w-full">
                                                         <div class="flex items-baseline gap-2">
-                                                            <span class="font-bold">{{ $part['label'] ?? '' }}.</span>
+                                                            @if($currentOptStyle === 'circle')
+                                                                <div class="h-4 w-4 shrink-0 mr-1.5 rounded-full flex justify-center items-center border {{ $ansHighlight ? 'bg-gray-700 text-white border-gray-700' : 'border-gray-500 text-gray-800' }} leading-none">{{ $optLetter }}</div>
+                                                            @elseif($currentOptStyle === 'dot')
+                                                                <span>{{ $part['label'] ?? '' }}.</span>
+                                                            @elseif($currentOptStyle === 'parentheses')
+                                                                <span>({{ $part['label'] ?? '' }})</span>
+                                                            @elseif($currentOptStyle === 'minimal')
+                                                                <span>{{ $part['label'] ?? '' }})</span>
+                                                            @endif
                                                             <div contenteditable="false" class="inline-block">{!! $part['text'] ?? '' !!}</div>
                                                         </div>
                                                         @if($previewOptions['showMarksBox'] ?? false)
-                                                            <span class="font-bold ml-2 shrink-0">{{ $part['marks'] ?? '' }}</span>
+                                                            <span class="ml-2 shrink-0">{{ $part['marks'] ?? '' }}</span>
                                                         @endif
                                                     </div>
                                                 @endforeach
@@ -323,12 +345,12 @@
                             <div class="relative bg-gray-100 p-2 rounded my-1">
                                 <p class="bangla mb-2">অপশন স্টাইল</p>
                                 <div class="flex gap-2">
-                                    <div class="p-1 flex-1 flex justify-center items-center cursor-pointer bg-emerald-600">
-                                        <div class="h-5 w-5 border border-gray-500 rounded-full bg-white"></div>
+                                    <div wire:click="setOptionStyle('circle')"  class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'circle' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">
+                                        <div class="h-5 w-5 border {{ ($optionStyle ?? 'circle') === 'circle' ? 'border-white' : 'border-gray-500' }} rounded-full bg-white"></div>
                                     </div>
-                                    <div class="p-1 flex-1 flex justify-center items-center cursor-pointer bg-white hover:bg-emerald-100">.</div>
-                                    <div class="p-1 flex-1 flex justify-center items-center cursor-pointer bg-white hover:bg-emerald-100">( )</div>
-                                    <div class="p-1 flex-1 flex justify-center items-center cursor-pointer bg-white hover:bg-emerald-100">)</div>
+                                    <div wire:click="setOptionStyle('dot')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'dot' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">.</div>
+                                    <div wire:click="setOptionStyle('parentheses')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'parentheses' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">( )</div>
+                                    <div wire:click="setOptionStyle('minimal')" class="p-1 flex-1 flex justify-center items-center cursor-pointer {{ ($optionStyle ?? 'circle') === 'minimal' ? 'bg-emerald-600 text-white shadow' : 'bg-white hover:bg-emerald-100 text-gray-700' }}">)</div>
                                 </div>
                             </div>
                             <div class="bg-gray-100 my-1 p-2">
