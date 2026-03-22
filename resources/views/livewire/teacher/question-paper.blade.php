@@ -48,6 +48,37 @@
 </style>
 
 <div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
+    <style>
+        @media screen {
+            .question-paper-preview {
+                width: min(100%, {{ $selectedPaperWidth }});
+                min-height: {{ $selectedPaperMinHeight }};
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media print {
+            @page {
+                size: {{ $selectedPaperWidth }} {{ $selectedPaperMinHeight }};
+                margin: 0;
+            }
+
+            html,
+            body {
+                width: {{ $selectedPaperWidth }};
+                min-height: {{ $selectedPaperMinHeight }};
+                background: #fff !important;
+            }
+
+            .question-paper-preview {
+                width: 100% !important;
+                min-height: {{ $selectedPaperMinHeight }};
+                margin: 0 !important;
+            }
+        }
+    </style>
+
     <div class="bangla flex flex-col lg:flex-row justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
         <div class="print:hidden  flex gap-x-2 justify-between sticky top-12 lg:hidden  p-2 text-center z-10 bg-white">
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
