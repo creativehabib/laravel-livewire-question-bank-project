@@ -12,9 +12,42 @@
     // পেপার সাইজের ডাইনামিক মাপ
     $paperWidths = ['A4' => '210mm', 'Letter' => '215.9mm', 'Legal' => '215.9mm', 'A5' => '148mm'];
     $paperMinHeights = ['A4' => '297mm', 'Letter' => '279.4mm', 'Legal' => '355.6mm', 'A5' => '210mm'];
+    $selectedPaperWidth = $paperWidths[$paperSize] ?? $paperWidths['A4'];
+    $selectedPaperMinHeight = $paperMinHeights[$paperSize] ?? $paperMinHeights['A4'];
 @endphp
 
 <div class="table-bordered py-4 print:p-0 print:overflow-hidden bg-gray-100 min-h-[95vh] print:bg-white">
+    <style>
+        @media screen {
+            .question-paper-preview {
+                width: min(100%, {{ $selectedPaperWidth }});
+                min-height: {{ $selectedPaperMinHeight }};
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        @media print {
+            @page {
+                size: {{ $selectedPaperWidth }} {{ $selectedPaperMinHeight }};
+                margin: 0;
+            }
+
+            html,
+            body {
+                width: {{ $selectedPaperWidth }};
+                min-height: {{ $selectedPaperMinHeight }};
+                background: #fff !important;
+            }
+
+            .question-paper-preview {
+                width: 100% !important;
+                min-height: {{ $selectedPaperMinHeight }};
+                margin: 0 !important;
+            }
+        }
+    </style>
+
     <div class="bangla flex flex-col lg:flex-row justify-center gap-5 print:gap-0 mx-4 print:mx-0 {{ $fontClass }}">
         <div class="print:hidden  flex gap-x-2 justify-between sticky top-12 lg:hidden  p-2 text-center z-10 bg-white">
             <button class="flex justify-center gap-1 items-center border py-1 px-2 bg-white rounded" tabindex="0">
@@ -31,14 +64,17 @@
                 </svg><span>ডাউনলোড</span></button>
         </div>
         <div class="hidden fixed print:hidden lg:hidden left-0 top-0 z-[100] h-full bg-gray-900/50 w-screen -ml-20"></div>
-        <div class="print-area relative min-w-screen md:overflow-auto lg:w-[210mm] {{ $fontClass }}">
+        <div
+            class="print-area question-paper-preview relative w-full max-w-full md:overflow-auto {{ $fontClass }}"
+            style="width: min(100%, {{ $selectedPaperWidth }}); min-height: {{ $selectedPaperMinHeight }};"
+        >
             <div class="bg-white mb-3 print:hidden border-t-2 border-emerald-500">
                 <p class="text-center font-bold bg-emerald-50 p-1">কুইক সেটিংস</p>
                 <div class=" p-2">
                     <a href="{{ route('questions.view', ['qset' => $questionSet->id]) }}" class="bg-emerald-600 hover:opacity-90 px-2 py-1 text-white ">+ আরও প্রশ্ন যুক্ত করুন</a>
                 </div>
             </div>
-            <div class=" w-full p-[5mm] md:p-[10mm] print:p-0.5 print:w-full print:shadow-none bg-white">
+            <div class="w-full bg-white p-[5mm] md:p-[10mm] print:w-full print:shadow-none print:p-[8mm]" style="min-height: {{ $selectedPaperMinHeight }};">
                 <div class="relative py-2 print:py-0">
                     <h1 class="text-xl font-bold text-center">{{ $instituteName }}</h1>
                     @if($previewOptions['showExamName'])
