@@ -63,6 +63,24 @@ class Edit extends Component
         ];
     }
 
+    // --- MCQ Options Methods (এগুলো যোগ করা হলো) ---
+    public function addOption(): void
+    {
+        // নতুন একটি অপশন যোগ করা হবে
+        $this->options[] = ['option_text' => '', 'is_correct' => false];
+        $this->dispatch('refresh-editors'); // নতুন এডিটর লোড করার জন্য ইভেন্ট ফায়ার
+    }
+
+    public function removeOption($index): void
+    {
+        // কমপক্ষে ২টি অপশন রাখতে হবে
+        if (count($this->options) > 2) {
+            unset($this->options[$index]);
+            $this->options = array_values($this->options); // ইনডেক্স রিসেট করা
+        }
+    }
+
+    // --- CQ Methods ---
     private function setCqDefaults(): void
     {
         $this->cq = [
@@ -158,7 +176,7 @@ class Edit extends Component
 
         DB::transaction(function () {
 
-            // টাইপ অনুযায়ী extra_content এ সেভ করার জন্য ডাটা প্রস্তুত করা হচ্ছে
+            // টাইপ অনুযায়ী extra_content এ সেভ করার জন্য ডাটা প্রস্তুত করা হচ্ছে
             $extraData = null;
             if ($this->question_type === 'cq') {
                 $extraData = $this->cq;
@@ -175,7 +193,7 @@ class Edit extends Component
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
-                'extra_content' => $extraData, // CQ এবং MCQ উভয়ই এখন এখানে সেভ হবে
+                'extra_content' => $extraData, // CQ এবং MCQ উভয়ই এখন এখানে সেভ হবে
             ]);
 
             $tagIds = collect($this->tagIds)->map(fn($tag) => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => $tag])->id)->toArray();

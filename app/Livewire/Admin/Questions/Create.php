@@ -41,6 +41,24 @@ class Create extends Component
         ];
     }
 
+    // --- MCQ Options Methods ---
+    public function addOption(): void
+    {
+        // নতুন একটি অপশন যোগ করা হবে
+        $this->options[] = ['option_text' => '', 'is_correct' => false];
+        $this->dispatch('refresh-editors'); // নতুন এডিটর লোড করার জন্য ইভেন্ট ফায়ার
+    }
+
+    public function removeOption($index): void
+    {
+        // কমপক্ষে ২টি অপশন রাখতে হবে
+        if (count($this->options) > 2) {
+            unset($this->options[$index]);
+            $this->options = array_values($this->options); // ইনডেক্স রিসেট করা
+        }
+    }
+
+    // --- CQ Methods ---
     private function setCqDefaults(): void
     {
         $this->cq = [
@@ -155,7 +173,7 @@ class Create extends Component
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
-                'extra_content' => $extraData, // MCQ এবং CQ উভয় অপশনই এখন JSON হিসেবে এখানে সেভ হবে
+                'extra_content' => $extraData, // MCQ এবং CQ উভয় অপশনই এখন JSON হিসেবে এখানে সেভ হবে
                 'user_id' => auth()->id(),
             ]);
 
@@ -163,8 +181,6 @@ class Create extends Component
                 $tagIds = collect($this->tagIds)->map(fn($tag) => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => $tag])->id)->toArray();
                 $question->tags()->sync($tagIds);
             }
-
-            // আগের $question->options()->createMany(...) অংশটি মুছে ফেলা হয়েছে
         });
 
         $route = auth()->user()->isTeacher() ? 'teacher.questions.index' : 'admin.questions.index';

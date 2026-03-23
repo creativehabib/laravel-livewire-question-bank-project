@@ -58,18 +58,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Subjects
     Route::get('/admin/subjects', SubjectIndex::class)->name('admin.subjects.index');
-    Route::get('/admin/subjects/create', SubjectCreate::class)->name('admin.subjects.create');
-    Route::get('/admin/subjects/{subject}/edit', SubjectEdit::class)->name('admin.subjects.edit');
 
     // Sub Subjects
     Route::get('/admin/sub-subjects', SubSubjectIndex::class)->name('admin.sub-subjects.index');
-    Route::get('/admin/sub-subjects/create', SubSubjectCreate::class)->name('admin.sub-subjects.create');
-    Route::get('/admin/sub-subjects/{subSubject}/edit', SubSubjectEdit::class)->name('admin.sub-subjects.edit');
 
     // Chapters
     Route::get('/admin/chapters', ChapterIndex::class)->name('admin.chapters.index');
-    Route::get('/admin/chapters/create', ChapterCreate::class)->name('admin.chapters.create');
-    Route::get('/admin/chapters/{chapter}/edit', ChapterEdit::class)->name('admin.chapters.edit');
 
     // Jobs
     Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');

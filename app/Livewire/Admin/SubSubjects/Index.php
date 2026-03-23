@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\SubSubject;
 use App\Models\Subject;
+use Illuminate\Validation\Rule;
 
 class Index extends Component
 {
@@ -14,40 +15,161 @@ class Index extends Component
     public $search = '';
     public $subjectId = '';
 
-    protected $listeners = [
-        'subSubjectDeleted' => '$refresh',
-        'deleteSubSubjectConfirmed' => 'delete',
-    ];
+    // --- Clone Modal Properties ---
+    public $showCloneModal = false;
+    public $cloneSourceSubjectId = '';
+    public $cloneTargetSubjectId = '';
 
-    public function updatingSearch(): void
+    // Modal Properties
+    public $name = '';
+    public $modalSubjectId = '';
+    public $editId = null; // এডিট করার জন্য আইডি ট্র্যাক করবে
+
+    protected $listeners = ['deleteSubSubjectConfirmed' => 'delete'];
+
+    public function updatingSearch()
     {
         $this->resetPage();
     }
 
-    public function updatingSubjectId(): void
+    public function updatingSubjectId()
     {
         $this->resetPage();
     }
 
+    // ক্লোন মডাল ওপেন করা
+    public function openCloneModal()
+    {
+        $this->reset(['cloneSourceSubjectId', 'cloneTargetSubjectId']);
+        $this->resetValidation();
+        $this->showCloneModal = true;
+    }
+
+    // ক্লোন করার মূল লজিক
+    public function cloneSubSubjects()
+    {
+        $this->validate([
+            'cloneSourceSubjectId' => 'required|exists:subjects,id',
+            'cloneTargetSubjectId' => 'required|exists:subjects,id|different:cloneSourceSubjectId'
+        ], [
+            'cloneTargetSubjectId.different' => 'Source এবং Target সাবজেক্ট একই হতে পারবে না!'
+        ]);
+
+        // সোর্স সাবজেক্টের সব সাব-সাবজেক্ট খুঁজে বের করা
+        $subSubjectsToCopy = SubSubject::where('subject_id', $this->cloneSourceSubjectId)->get();
+
+        if ($subSubjectsToCopy->isEmpty()) {
+            $this->addError('cloneSourceSubjectId', 'এই সাবজেক্টে কপি করার মতো কোনো সাব-সাবজেক্ট নেই!');
+            return;
+        }
+
+        $count = 0;
+        foreach ($subSubjectsToCopy as $sub) {
+            // আগে চেক করা হবে টার্গেট সাবজেক্টে একই নামের কিছু আছে কি না
+            $exists = SubSubject::where('subject_id', $this->cloneTargetSubjectId)
+                ->where('name', $sub->name)
+                ->exists();
+
+            if (!$exists) {
+                SubSubject::create([
+                    'subject_id' => $this->cloneTargetSubjectId,
+                    'name' => $sub->name,
+                ]);
+                $count++;
+            }
+        }
+
+        $this->showCloneModal = false;
+        $this->resetPage(); // টেবিল রিফ্রেশ করার জন্য
+        $this->dispatch('subSubjectSaved', message: "{$count} টি সাব-সাবজেক্ট সফলভাবে কপি হয়েছে!");
+    }
+
+
+    // ক্রিয়েট বাটনে ক্লিক করলে ফর্ম সম্পূর্ণ রিসেট হবে
+    public function openModal()
+    {
+        $this->reset(['name', 'modalSubjectId', 'editId']);
+        $this->resetValidation(); // সব এরর মেসেজ ক্লিয়ার করে দিবে
+    }
+
+    // এডিট বাটনে ক্লিক করলে ডেটা মডালে লোড হবে
+    public function edit($id)
+    {
+        $this->resetValidation();
+        $subSubject = SubSubject::findOrFail($id);
+
+        $this->editId = $subSubject->id;
+        $this->modalSubjectId = $subSubject->subject_id;
+        $this->name = $subSubject->name;
+
+        // মডাল ওপেন করার ইভেন্ট পাঠানো হচ্ছে
+        $this->dispatch('open-modal');
+    }
+
+    // নতুন সেভ বা পুরানো ডেটা আপডেট করার মেথড
+    public function save()
+    {
+        $this->validate([
+            'modalSubjectId' => 'required|exists:subjects,id',
+            'name' => [
+                'required',
+                'string',
+                Rule::unique('sub_subjects', 'name')
+                    ->where('subject_id', $this->modalSubjectId)
+                    ->ignore($this->editId) // আপডেটের সময় নিজের আইডি ইগনোর করবে যাতে এরর না দেয়
+            ],
+        ]);
+
+        if ($this->editId) {
+            // যদি editId থাকে, তবে ডেটা আপডেট হবে
+            $subSubject = SubSubject::find($this->editId);
+            $subSubject->update([
+                'subject_id' => $this->modalSubjectId,
+                'name' => $this->name,
+            ]);
+            $message = 'Sub subject updated successfully!';
+        } else {
+            // editId না থাকলে নতুন তৈরি হবে
+            SubSubject::create([
+                'subject_id' => $this->modalSubjectId,
+                'name' => $this->name,
+            ]);
+            $message = 'Sub subject created successfully!';
+        }
+
+        // ফর্ম রিসেট করা
+        $this->reset(['name', 'modalSubjectId', 'editId']);
+
+        // মডাল বন্ধ করার জন্য ব্রাউজারে ইভেন্ট পাঠানো
+        $this->dispatch('close-modal');
+        $this->dispatch('subSubjectSaved', message: $message);
+    }
+
+    // ডিলিট করার মেথড
     public function delete($id)
     {
-        SubSubject::findOrFail($id)->delete();
-
-        $this->resetPage();
-        $this->dispatch('subSubjectDeleted', message: 'Sub subject deleted successfully.');
+        $subSubject = \App\Models\SubSubject::find($id);
+        if ($subSubject) {
+            $subSubject->delete();
+            $this->dispatch('subSubjectDeleted', message: 'Sub subject deleted successfully.');
+        }
     }
 
     public function render()
     {
-        $subSubjects = SubSubject::with('subject')
-            ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
-            ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
-            ->orderBy('name')
-            ->paginate(10);
+        $query = SubSubject::query()->with('subject');
+
+        if ($this->search) {
+            $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+        if ($this->subjectId) {
+            $query->where('subject_id', $this->subjectId);
+        }
 
         return view('livewire.admin.sub-subjects.index', [
-            'subSubjects' => $subSubjects,
-            'subjects' => Subject::orderBy('name')->get(),
-        ])->layout('layouts.admin', ['title' => 'Manage Sub Subjects']);
+            'subSubjects' => $query->latest()->paginate(10),
+            'subjects' => Subject::orderBy('name')->get(), // ফিল্টার এবং মডাল উভয়ের জন্য
+        ])->layout('layouts.admin', ['title' => 'Sub Subjects']);
     }
 }
