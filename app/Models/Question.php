@@ -40,18 +40,6 @@ class Question extends Model
             ->withPivot('order');
     }
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($question) {
-            $question->slug = $question->generateUniqueSlug($question->title);
-        });
-
-        static::updating(function ($question) {
-            $question->slug = $question->generateUniqueSlug($question->title);
-        });
-    }
 
     private function generateUniqueSlug($title): string
     {

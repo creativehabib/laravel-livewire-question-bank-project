@@ -2,18 +2,21 @@
 
 namespace App\Livewire\Admin\Questions;
 
+use App\Livewire\Traits\SlugValidationTrait;
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\{Subject, SubSubject, Chapter, Question, Tag};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule; // <-- এটি যোগ করা হয়েছে
 
 class Edit extends Component
 {
-    use AuthorizesRequests;
+    use AuthorizesRequests, SlugValidationTrait;
 
     public Question $question;
     public $subject_id, $sub_subject_id, $chapter_id, $title, $description, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
-    public $cq = []; // CQ Property
+    public $cq = [];
+    public $slug;
 
     public function mount(Question $question)
     {
@@ -24,13 +27,13 @@ class Edit extends Component
         $this->sub_subject_id = $question->sub_subject_id;
         $this->chapter_id = $question->chapter_id;
         $this->title = $question->title;
+        $this->slug = $question->slug; // <-- Database থেকে Slug লোড করা হলো
         $this->description = $question->description;
         $this->difficulty = $question->difficulty;
         $this->question_type = $question->question_type ?? 'mcq';
         $this->marks = $question->marks ?? 1;
         $this->tagIds = $question->tags()->pluck('tags.id')->toArray();
 
-        // ডাটাবেজ থেকে extra_content রিড করা (String হলে Array তে কনভার্ট হবে)
         $extraData = is_string($question->extra_content) ? json_decode($question->extra_content, true) : $question->extra_content;
 
         if ($this->question_type === 'cq') {
@@ -38,7 +41,6 @@ class Edit extends Component
             if (empty($this->cq)) $this->setCqDefaults();
             $this->resetToMcq();
         } elseif ($this->question_type === 'mcq') {
-            // Backward Compatibility: যদি extra_content এ ডাটা থাকে তবে সেখান থেকে নিবে, নাহলে পুরানো options টেবিল থেকে নিবে
             if (is_array($extraData) && !empty($extraData)) {
                 $this->options = $extraData;
             } else {
@@ -63,20 +65,18 @@ class Edit extends Component
         ];
     }
 
-    // --- MCQ Options Methods (এগুলো যোগ করা হলো) ---
+    // --- MCQ Options Methods ---
     public function addOption(): void
     {
-        // নতুন একটি অপশন যোগ করা হবে
         $this->options[] = ['option_text' => '', 'is_correct' => false];
-        $this->dispatch('refresh-editors'); // নতুন এডিটর লোড করার জন্য ইভেন্ট ফায়ার
+        $this->dispatch('refresh-editors');
     }
 
     public function removeOption($index): void
     {
-        // কমপক্ষে ২টি অপশন রাখতে হবে
         if (count($this->options) > 2) {
             unset($this->options[$index]);
-            $this->options = array_values($this->options); // ইনডেক্স রিসেট করা
+            $this->options = array_values($this->options);
         }
     }
 
@@ -84,10 +84,10 @@ class Edit extends Component
     private function setCqDefaults(): void
     {
         $this->cq = [
-            ['id' => uniqid(), 'label' => 'ক', 'text' => '', 'marks' => 1],
-            ['id' => uniqid(), 'label' => 'খ', 'text' => '', 'marks' => 2],
-            ['id' => uniqid(), 'label' => 'গ', 'text' => '', 'marks' => 3],
-            ['id' => uniqid(), 'label' => 'ঘ', 'text' => '', 'marks' => 4],
+            ['id' => uniqid(), 'label' => 'ক', 'text' => '', 'answer' => '', 'marks' => 1],
+            ['id' => uniqid(), 'label' => 'খ', 'text' => '', 'answer' => '', 'marks' => 2],
+            ['id' => uniqid(), 'label' => 'গ', 'text' => '', 'answer' => '', 'marks' => 3],
+            ['id' => uniqid(), 'label' => 'ঘ', 'text' => '', 'answer' => '', 'marks' => 4],
         ];
     }
 
@@ -95,7 +95,10 @@ class Edit extends Component
     {
         $labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
         $nextLabel = $labels[count($this->cq)] ?? '*';
-        $this->cq[] = ['id' => uniqid(), 'label' => $nextLabel, 'text' => '', 'marks' => 1];
+
+        // এখানে 'answer' => '' যুক্ত করা হয়েছে
+        $this->cq[] = ['id' => uniqid(), 'label' => $nextLabel, 'text' => '', 'answer' => '', 'marks' => 1];
+
         $this->calculateCqMarks();
         $this->dispatch('refresh-editors');
     }
@@ -117,6 +120,21 @@ class Edit extends Component
         if ($this->question_type === 'cq' && str_starts_with($property, 'cq.') && str_ends_with($property, '.marks')) {
             $this->calculateCqMarks();
         }
+    }
+
+    // ইউজার স্লাগ টাইপ করার সাথে সাথে Livewire অটোমেটিক এটি চেক করবে
+    public function updatedSlug($value)
+    {
+        $this->validateOnly('slug', [
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('questions', 'slug')->ignore($this->question->id ?? null)
+            ],
+        ], [
+            'slug.unique' => 'এই স্লাগটি আগে থেকেই ব্যবহৃত হচ্ছে। দয়া করে একটু পরিবর্তন করুন।'
+        ]);
     }
 
     public function updatedQuestionType($value): void
@@ -165,6 +183,7 @@ class Edit extends Component
             'question_type' => 'required|in:mcq,cq,short',
             'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
+            'slug' => ['required', 'string', 'max:255', Rule::unique('questions', 'slug')->ignore($this->question->id)], // <-- Unique (নিজের আইডি ছাড়া)
         ];
 
         if ($this->question_type === 'mcq') {
@@ -175,8 +194,6 @@ class Edit extends Component
         $this->validate($rules);
 
         DB::transaction(function () {
-
-            // টাইপ অনুযায়ী extra_content এ সেভ করার জন্য ডাটা প্রস্তুত করা হচ্ছে
             $extraData = null;
             if ($this->question_type === 'cq') {
                 $extraData = $this->cq;
@@ -189,17 +206,17 @@ class Edit extends Component
                 'sub_subject_id' => $this->sub_subject_id ?: null,
                 'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
+                'slug' => $this->slug, // <-- Update Slug
                 'description' => $this->description,
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
-                'extra_content' => $extraData, // CQ এবং MCQ উভয়ই এখন এখানে সেভ হবে
+                'extra_content' => $extraData,
             ]);
 
             $tagIds = collect($this->tagIds)->map(fn($tag) => is_numeric($tag) ? (int) $tag : Tag::firstOrCreate(['name' => $tag])->id)->toArray();
             $this->question->tags()->sync($tagIds);
 
-            // ডাটাবেজ ক্লিনআপ: যেহেতু এখন ডাটা extra_content এ সেভ হচ্ছে, তাই পুরানো options টেবিলের ডাটা মুছে ফেলা হলো
             $this->question->options()->delete();
         });
 

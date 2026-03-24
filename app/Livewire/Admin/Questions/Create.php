@@ -2,18 +2,21 @@
 
 namespace App\Livewire\Admin\Questions;
 
+use App\Livewire\Traits\SlugValidationTrait;
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\{Subject, SubSubject, Chapter, Question, Tag};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule; // <-- এটি যোগ করা হয়েছে
 
 class Create extends Component
 {
-    use AuthorizesRequests;
+    use AuthorizesRequests, SlugValidationTrait;
 
     public $subject_id, $sub_subject_id, $chapter_id, $title, $description, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
     public $options = [];
-    public $cq = []; // CQ এর জন্য প্রপার্টি
+    public $cq = [];
+    public $slug;
 
     public function mount(): void
     {
@@ -22,12 +25,12 @@ class Create extends Component
 
     public function resetFields(): void
     {
-        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq');
+        $this->reset('subject_id', 'sub_subject_id', 'chapter_id', 'title', 'description', 'difficulty', 'question_type', 'marks', 'tagIds', 'options', 'cq', 'slug');
         $this->difficulty = 'easy';
         $this->question_type = 'mcq';
         $this->marks = 1;
         $this->resetToMcq();
-        $this->setCqDefaults(); // ব্যাকগ্রাউন্ডে CQ রেডি রাখা
+        $this->setCqDefaults();
         $this->dispatch('reset-selects');
     }
 
@@ -44,17 +47,15 @@ class Create extends Component
     // --- MCQ Options Methods ---
     public function addOption(): void
     {
-        // নতুন একটি অপশন যোগ করা হবে
         $this->options[] = ['option_text' => '', 'is_correct' => false];
-        $this->dispatch('refresh-editors'); // নতুন এডিটর লোড করার জন্য ইভেন্ট ফায়ার
+        $this->dispatch('refresh-editors');
     }
 
     public function removeOption($index): void
     {
-        // কমপক্ষে ২টি অপশন রাখতে হবে
         if (count($this->options) > 2) {
             unset($this->options[$index]);
-            $this->options = array_values($this->options); // ইনডেক্স রিসেট করা
+            $this->options = array_values($this->options);
         }
     }
 
@@ -62,10 +63,10 @@ class Create extends Component
     private function setCqDefaults(): void
     {
         $this->cq = [
-            ['id' => uniqid(), 'label' => 'ক', 'text' => '', 'marks' => 1],
-            ['id' => uniqid(), 'label' => 'খ', 'text' => '', 'marks' => 2],
-            ['id' => uniqid(), 'label' => 'গ', 'text' => '', 'marks' => 3],
-            ['id' => uniqid(), 'label' => 'ঘ', 'text' => '', 'marks' => 4],
+            ['id' => uniqid(), 'label' => 'ক', 'text' => '', 'answer' => '', 'marks' => 1],
+            ['id' => uniqid(), 'label' => 'খ', 'text' => '', 'answer' => '', 'marks' => 2],
+            ['id' => uniqid(), 'label' => 'গ', 'text' => '', 'answer' => '', 'marks' => 3],
+            ['id' => uniqid(), 'label' => 'ঘ', 'text' => '', 'answer' => '', 'marks' => 4],
         ];
     }
 
@@ -74,7 +75,9 @@ class Create extends Component
         $labels = ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'];
         $nextLabel = $labels[count($this->cq)] ?? '*';
 
-        $this->cq[] = ['id' => uniqid(), 'label' => $nextLabel, 'text' => '', 'marks' => 1];
+        // এখানে 'answer' => '' যুক্ত করা হয়েছে
+        $this->cq[] = ['id' => uniqid(), 'label' => $nextLabel, 'text' => '', 'answer' => '', 'marks' => 1];
+
         $this->calculateCqMarks();
         $this->dispatch('refresh-editors');
     }
@@ -96,6 +99,16 @@ class Create extends Component
         if ($this->question_type === 'cq' && str_starts_with($property, 'cq.') && str_ends_with($property, '.marks')) {
             $this->calculateCqMarks();
         }
+    }
+
+    // ইউজার স্লাগ টাইপ করার সাথে সাথে Livewire অটোমেটিক এটি চেক করবে
+    public function updatedSlug($value)
+    {
+        $this->validateOnly('slug', [
+            'slug' => 'required|string|max:255|unique:questions,slug',
+        ], [
+            'slug.unique' => 'এই স্লাগটি আগে থেকেই ব্যবহৃত হচ্ছে। দয়া করে একটু পরিবর্তন করুন।'
+        ]);
     }
 
     public function updatedQuestionType($value): void
@@ -145,6 +158,7 @@ class Create extends Component
             'question_type' => 'required|in:mcq,cq,short',
             'marks' => 'required|numeric|min:0',
             'tagIds' => 'nullable|array',
+            'slug' => ['required', 'string', 'max:255', Rule::unique('questions', 'slug')], // <-- Unique Validation
         ];
 
         if ($this->question_type === 'mcq') {
@@ -155,8 +169,6 @@ class Create extends Component
         $this->validate($rules);
 
         DB::transaction(function () {
-
-            // প্রশ্ন টাইপের উপর ভিত্তি করে extra_content এ কী সেভ হবে তা নির্ধারণ করা হলো
             $extraData = null;
             if ($this->question_type === 'cq') {
                 $extraData = $this->cq;
@@ -169,11 +181,12 @@ class Create extends Component
                 'sub_subject_id' => $this->sub_subject_id ?: null,
                 'chapter_id' => $this->chapter_id ?: null,
                 'title' => $this->title,
+                'slug' => $this->slug, // <-- Slug Save
                 'description' => $this->description,
                 'difficulty' => $this->difficulty,
                 'question_type' => $this->question_type,
                 'marks' => $this->marks,
-                'extra_content' => $extraData, // MCQ এবং CQ উভয় অপশনই এখন JSON হিসেবে এখানে সেভ হবে
+                'extra_content' => $extraData,
                 'user_id' => auth()->id(),
             ]);
 

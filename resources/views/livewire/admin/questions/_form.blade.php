@@ -94,6 +94,8 @@
             </select>
         </div>
 
+        <x-slug-input table="questions" :ignore-id="$question->id ?? null" />
+
         <div>
             <label class="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-2 border-b pb-1">Main Question / Stimulus (উদ্দীপক) <span class="text-red-500">*</span></label>
             <div wire:ignore class="rounded-md focus-within:ring-1 focus-within:ring-indigo-500 transition-all">
@@ -146,7 +148,7 @@
             @error('options.*.option_text')<span class="text-sm text-red-500 font-bold block mt-2 text-center bg-red-50 p-2 rounded">* সবগুলো অপশন পূরণ করা আবশ্যক।</span>@enderror
         </div>
 
-        {{-- CQ Section --}}
+        {{-- CQ Section (উন্নত টগল/কলাপ্স সিস্টেমসহ) --}}
         <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700" x-show="questionType === 'cq'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
             <div class="flex justify-between items-center mb-4">
                 <label class="text-lg font-bold text-purple-700 dark:text-purple-400 flex items-center gap-2">
@@ -162,7 +164,7 @@
                 @foreach($cq as $index => $part)
                     <div wire:key="cq-part-{{ $part['id'] ?? $index }}" class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm relative transition-all duration-200 hover:shadow-md hover:border-purple-300 group">
 
-                        <button type="button" wire:click="removeCqPart({{ $index }})" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-2 shadow-sm transition-colors opacity-0 group-hover:opacity-100">
+                        <button type="button" wire:click="removeCqPart({{ $index }})" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-2 shadow-sm transition-colors opacity-0 group-hover:opacity-100 z-10">
                             <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 352 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
                         </button>
 
@@ -177,9 +179,43 @@
                             </div>
                         </div>
 
-                        <div wire:ignore class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 focus-within:border-purple-500 transition-all">
-                            <textarea id="cq_editor_{{ $part['id'] ?? $index }}" class="cq-dynamic-editor" data-index="{{ $index }}">{!! $part['text'] ?? '' !!}</textarea>
+                        <div class="mb-3">
+                            <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase block mb-1">Question (প্রশ্ন)</span>
+                            <div wire:ignore class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 focus-within:border-purple-500 transition-all">
+                                <textarea id="cq_editor_{{ $part['id'] ?? $index }}" class="cq-dynamic-editor" data-index="{{ $index }}">{!! $part['text'] ?? '' !!}</textarea>
+                            </div>
                         </div>
+
+                        <div x-data="{
+                                showAnswer: {{ !empty($part['answer']) ? 'true' : 'false' }},
+                                initAnsEditor() {
+                                    if (typeof CKEDITOR !== 'undefined' && !CKEDITOR.instances['cq_answer_{{ $part['id'] ?? $index }}']) {
+                                        initCkEditor4('cq_answer_{{ $part['id'] ?? $index }}', 'cq.{{ $index }}.answer', true);
+                                    }
+                                }
+                             }"
+                             x-init="
+                                if(showAnswer) setTimeout(() => initAnsEditor(), 100);
+                                window.addEventListener('refresh-editors', () => {
+                                    if(showAnswer) setTimeout(() => initAnsEditor(), 350);
+                                });
+                             "
+                             class="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+
+                            <button type="button"
+                                    @click="showAnswer = !showAnswer; if(showAnswer) setTimeout(() => initAnsEditor(), 50);"
+                                    class="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1.5 focus:outline-none transition-colors w-full text-left">
+                                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1.2em" width="1.2em" xmlns="http://www.w3.org/2000/svg" class="transition-transform duration-300" :class="showAnswer ? 'rotate-180' : ''"><path d="M256 294.1L383 167c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-144 144c-9.4 9.4-24.6 9.4-33.9 0l-144-144c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0L256 294.1z"></path></svg>
+                                <span x-text="showAnswer ? 'Hide Answer (উত্তর লুকান)' : 'Add Answer / Solution (উত্তর যুক্ত করুন - ঐচ্ছিক)'"></span>
+                            </button>
+
+                            <div x-show="showAnswer" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="mt-3" style="display: none;">
+                                <div wire:ignore class="rounded-md overflow-hidden border border-gray-200 dark:border-gray-600 focus-within:border-emerald-500 transition-all">
+                                    <textarea id="cq_answer_{{ $part['id'] ?? $index }}">{!! $part['answer'] ?? '' !!}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 @endforeach
             </div>
@@ -188,7 +224,7 @@
         <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg" class="text-green-500"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path></svg>
-                Solution / Description <span class="text-xs font-normal text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full ml-1">Optional</span>
+                General Solution / Description <span class="text-xs font-normal text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full ml-1">Optional</span>
             </label>
             <div wire:ignore class="rounded-md overflow-hidden border border-gray-300 dark:border-gray-600 focus-within:border-green-500 transition-colors">
                 <textarea id="description_editor">{!! $description !!}</textarea>
@@ -212,6 +248,20 @@
         window.tsSubSubject = window.tsSubSubject || null;
         window.tsChapter = window.tsChapter || null;
         window.tsTags = window.tsTags || null;
+
+        function generateSlug(text) {
+            let div = document.createElement("div");
+            div.innerHTML = text;
+            let plainText = div.innerText || div.textContent || "";
+
+            return plainText.trim()
+                .toLowerCase()
+                .replace(/[^\w\u0980-\u09FF\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .substring(0, 100);
+        }
 
         function initCkEditor4(elementId, livewireProperty, isAdvanced = false) {
             const el = document.getElementById(elementId);
@@ -245,12 +295,34 @@
                 extraPlugins: 'mathjax,tableresize,wordcount,notification,justify,font,colorbutton',
                 mathJaxLib: '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML',
                 toolbar: toolbarConfig,
-                height: isAdvanced ? 200 : 100,
+                height: isAdvanced ? 150 : 100,
                 allowedContent: true
             });
 
+            let ckDebounceTimer;
+
             editor.on('change', function () {
-            @this.set(livewireProperty, editor.getData(), false);
+                let data = editor.getData();
+
+                clearTimeout(ckDebounceTimer);
+
+                ckDebounceTimer = setTimeout(() => {
+                @this.set(livewireProperty, data);
+
+                    if (livewireProperty === 'title') {
+                        let isEditMode = window.location.href.includes('/edit');
+                        let slugInput = document.getElementById('slug_input');
+
+                        if (slugInput) {
+                            let isManualEdited = slugInput.getAttribute('data-manual') === 'true';
+
+                            if (!isEditMode && !isManualEdited) {
+                                let newSlug = generateSlug(data);
+                                window.dispatchEvent(new CustomEvent('slug-auto-updated', { detail: newSlug }));
+                            }
+                        }
+                    }
+                }, 500);
             });
         }
 
@@ -267,6 +339,9 @@
                 let dIndex = el.getAttribute('data-index');
                 initCkEditor4(el.id, `cq.${dIndex}.text`);
             });
+
+            // FIX: Answer ফিল্ডের গ্লোবাল লোডিং এখান থেকে রিমুভ করা হয়েছে।
+            // এখন এটি Alpine.js এর @click ইভেন্টের মাধ্যমে ডাইনামিকালি লোড হবে!
 
             if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
             const subjectEl = document.getElementById('subject');
