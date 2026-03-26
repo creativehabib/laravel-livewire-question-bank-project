@@ -15,7 +15,7 @@ class QuestionPaper extends Component
     // Header Info
     public $instituteName;
     public $subject;
-    public $subSubject;
+    public $chapter;
     public $topics;
 
     // Formatting & Layout Properties
@@ -37,7 +37,7 @@ class QuestionPaper extends Component
         'attachOmrSheet' => false,
         'markImportant' => false,
         'showQuestionInfo' => true,
-        'showSubSubject' => true,
+        'showChapter' => true,
         'showTopic' => false,
         'showSetCode' => true,
         'showStudentInfo' => false,
@@ -61,7 +61,7 @@ class QuestionPaper extends Component
         $this->questions = $this->questionSet->questions;
 
         $this->subject = $this->questionSet->getRelatedSubject();
-        $this->subSubject = $this->questionSet->getRelatedSubSubject();
+        $this->chapter = $this->questionSet->getRelatedChapter();
         $this->topics = $this->questionSet->getRelatedTopics();
         $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
 

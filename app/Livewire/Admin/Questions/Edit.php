@@ -6,7 +6,7 @@ use App\Livewire\Traits\SlugValidationTrait;
 use Livewire\Component;
 use Livewire\WithFileUploads; // Image Upload এর জন্য
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, SubSubject, Topic, Question, Tag, ExamCategory};
+use App\Models\{Subject, Chapter, Topic, Question, Tag, ExamCategory};
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage; // Image delete এর জন্য
@@ -16,7 +16,7 @@ class Edit extends Component
     use AuthorizesRequests, SlugValidationTrait, WithFileUploads; // WithFileUploads যুক্ত করা হলো
 
     public Question $question;
-    public $subject_id, $sub_subject_id, $topic_id, $title, $description, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
+    public $subject_id, $chapter_id, $topic_id, $title, $description, $difficulty, $question_type = 'mcq', $marks = 1, $tagIds = [], $options = [];
     public $cq = [];
     public $slug;
     public $exam_category_ids = [];
@@ -29,7 +29,7 @@ class Edit extends Component
         $this->question = $question;
 
         $this->subject_id = $question->subject_id;
-        $this->sub_subject_id = $question->sub_subject_id;
+        $this->chapter_id = $question->chapter_id;
         $this->topic_id = $question->topic_id;
         $this->title = $question->title;
         $this->slug = $question->slug;
@@ -164,17 +164,17 @@ class Edit extends Component
 
     public function updatedSubjectId($value)
     {
-        $this->sub_subject_id = null;
+        $this->chapter_id = null;
         $this->topic_id = null;
-        $subSubjects = SubSubject::where('subject_id', $value)->get()->map(fn($s) => ['value' => $s->id, 'text' => $s->name])->all();
-        $this->dispatch('subSubjectsUpdated', subSubjects: $subSubjects);
+        $chapters = Chapter::where('subject_id', $value)->get()->map(fn($s) => ['value' => $s->id, 'text' => $s->name])->all();
+        $this->dispatch('chaptersUpdated', chapters: $chapters);
         $this->dispatch('topicsUpdated', topics: []);
     }
 
-    public function updatedSubSubjectId($value)
+    public function updatedChapterId($value)
     {
         $this->topic_id = null;
-        $topics = $value ? Topic::where('sub_subject_id', $value)->get()->map(fn($c) => ['value' => $c->id, 'text' => $c->name])->all() : [];
+        $topics = $value ? Topic::where('chapter_id', $value)->get()->map(fn($c) => ['value' => $c->id, 'text' => $c->name])->all() : [];
         $this->dispatch('topicsUpdated', topics: $topics);
     }
 
@@ -193,8 +193,8 @@ class Edit extends Component
 
         $rules = [
             'subject_id' => 'required|exists:subjects,id',
-            'sub_subject_id' => 'nullable|exists:sub_subjects,id',
-            'topic_id' => 'required_with:sub_subject_id|nullable|exists:topics,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
+            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
             'title' => 'required|string',
             'description' => 'nullable|string',
             'difficulty' => 'required|in:easy,medium,hard',
@@ -235,7 +235,7 @@ class Edit extends Component
 
             $this->question->update([
                 'subject_id' => $this->subject_id,
-                'sub_subject_id' => $this->sub_subject_id ?: null,
+                'chapter_id' => $this->chapter_id ?: null,
                 'topic_id' => $this->topic_id ?: null,
                 'title' => $this->title,
                 'slug' => $this->slug,
@@ -267,8 +267,8 @@ class Edit extends Component
         $layout = auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.panel';
         return view('livewire.admin.questions.edit', [
             'subjects' => Subject::all(),
-            'subSubjects' => SubSubject::where('subject_id', $this->subject_id)->get(),
-            'topics' => Topic::where('sub_subject_id', $this->sub_subject_id)->get(),
+            'chapters' => Chapter::where('subject_id', $this->subject_id)->get(),
+            'topics' => Topic::where('chapter_id', $this->chapter_id)->get(),
             'allTags' => Tag::all(),
             'allExamCategories' => ExamCategory::all(), // টার্গেট ক্যাটাগরি পাঠানো হলো
         ])->layout($layout, ['title' => 'Edit Question']);

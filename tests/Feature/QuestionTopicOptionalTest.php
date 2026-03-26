@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Models\{User, Subject, SubSubject, Question};
+use App\Models\{User, Subject, Chapter, Question};
 use Illuminate\Support\Facades\Validator;
 
 class QuestionTopicOptionalTest extends TestCase
@@ -18,7 +18,7 @@ class QuestionTopicOptionalTest extends TestCase
 
         $question = Question::create([
             'subject_id' => $subject->id,
-            'sub_subject_id' => null,
+            'chapter_id' => null,
             'topic_id' => null,
             'title' => 'What is 2 + 2?',
             'difficulty' => 'easy',
@@ -27,28 +27,28 @@ class QuestionTopicOptionalTest extends TestCase
 
         $this->assertDatabaseHas('questions', [
             'id' => $question->id,
-            'sub_subject_id' => null,
+            'chapter_id' => null,
             'topic_id' => null,
         ]);
     }
 
-    public function test_topic_is_required_when_sub_subject_selected(): void
+    public function test_topic_is_required_when_chapter_selected(): void
     {
         $user = User::factory()->create();
         $subject = Subject::create(['name' => 'Math']);
-        $sub = SubSubject::create(['subject_id' => $subject->id, 'name' => 'Algebra']);
+        $sub = Chapter::create(['subject_id' => $subject->id, 'name' => 'Algebra']);
 
         $validator = Validator::make([
             'subject_id' => $subject->id,
-            'sub_subject_id' => $sub->id,
+            'chapter_id' => $sub->id,
             'topic_id' => null,
             'title' => 'What is 2 + 2?',
             'difficulty' => 'easy',
             'user_id' => $user->id,
         ], [
             'subject_id' => 'required|exists:subjects,id',
-            'sub_subject_id' => 'nullable|exists:sub_subjects,id',
-            'topic_id' => 'required_with:sub_subject_id|nullable|exists:topics,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
+            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
             'title' => 'required|string',
             'difficulty' => 'required',
             'user_id' => 'required',

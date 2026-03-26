@@ -4,20 +4,20 @@ namespace App\Livewire\Admin\Questions;
 
 use Livewire\Component;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Subject, SubSubject, Topic, Question, Tag};
+use App\Models\{Subject, Chapter, Topic, Question, Tag};
 
 class QuestionForm extends Component
 {
     use AuthorizesRequests;
 
     public $questionId;  // যদি edit হয় তাহলে এই আইডি আসবে
-    public $subject_id, $sub_subject_id, $topic_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
+    public $subject_id, $chapter_id, $topic_id, $title, $difficulty = 'easy', $question_type = 'mcq', $marks = 1, $tagIds = [];
     public $options = [];
 
     public function mount($id = null)
     {
         $this->subject_id = '';
-        $this->sub_subject_id = '';
+        $this->chapter_id = '';
         $this->topic_id = '';
 
         if ($id) {
@@ -27,7 +27,7 @@ class QuestionForm extends Component
             $this->authorize('update', $q);
 
             $this->subject_id = $q->subject_id;
-            $this->sub_subject_id = $q->sub_subject_id;
+            $this->chapter_id = $q->chapter_id;
             $this->topic_id = $q->topic_id;
             $this->title = $q->title;
             $this->difficulty = $q->difficulty;
@@ -64,11 +64,11 @@ class QuestionForm extends Component
 
     public function updatedSubjectId()
     {
-        $this->sub_subject_id = '';
+        $this->chapter_id = '';
         $this->topic_id = '';
     }
 
-    public function updatedSubSubjectId()
+    public function updatedChapterId()
     {
         $this->topic_id = '';
     }
@@ -77,8 +77,8 @@ class QuestionForm extends Component
     {
         $rules = [
             'subject_id' => 'required|exists:subjects,id',
-            'sub_subject_id' => 'nullable|exists:sub_subjects,id',
-            'topic_id' => 'required_with:sub_subject_id|nullable|exists:topics,id',
+            'chapter_id' => 'nullable|exists:chapters,id',
+            'topic_id' => 'required_with:chapter_id|nullable|exists:topics,id',
             'title' => 'required|string',
             'difficulty' => 'required|in:easy,medium,hard',
             'question_type' => 'required|in:mcq,cq,short',
@@ -104,7 +104,7 @@ class QuestionForm extends Component
             $this->authorize('update', $q);
             $q->update([
                 'subject_id' => $this->subject_id,
-                'sub_subject_id' => $this->sub_subject_id ?: null,
+                'chapter_id' => $this->chapter_id ?: null,
                 'topic_id' => $this->topic_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
@@ -120,7 +120,7 @@ class QuestionForm extends Component
             $this->authorize('create', Question::class);
             $q = Question::create([
                 'subject_id' => $this->subject_id,
-                'sub_subject_id' => $this->sub_subject_id ?: null,
+                'chapter_id' => $this->chapter_id ?: null,
                 'topic_id' => $this->topic_id ?: null,
                 'title' => $this->title,
                 'difficulty' => $this->difficulty,
@@ -143,8 +143,8 @@ class QuestionForm extends Component
     {
         return view('livewire.admin.questions.question-form', [
             'subjects' => Subject::all(),
-            'subSubjects' => $this->subject_id ? SubSubject::where('subject_id', $this->subject_id)->get() : collect(),
-            'topics' => $this->sub_subject_id ? Topic::where('sub_subject_id', $this->sub_subject_id)->get() : collect(),
+            'chapters' => $this->subject_id ? Chapter::where('subject_id', $this->subject_id)->get() : collect(),
+            'topics' => $this->chapter_id ? Topic::where('chapter_id', $this->chapter_id)->get() : collect(),
             'allTags' => Tag::all(),
         ]);
     }

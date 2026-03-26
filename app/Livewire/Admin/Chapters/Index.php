@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Livewire\Admin\SubSubjects;
+namespace App\Livewire\Admin\Chapters;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\SubSubject;
+use App\Models\Chapter;
 use App\Models\Subject;
 use Illuminate\Validation\Rule;
 
@@ -25,7 +25,7 @@ class Index extends Component
     public $modalSubjectId = '';
     public $editId = null; // এডিট করার জন্য আইডি ট্র্যাক করবে
 
-    protected $listeners = ['deleteSubSubjectConfirmed' => 'delete'];
+    protected $listeners = ['deleteChapterConfirmed' => 'delete'];
 
     public function updatingSearch()
     {
@@ -46,7 +46,7 @@ class Index extends Component
     }
 
     // ক্লোন করার মূল লজিক
-    public function cloneSubSubjects()
+    public function cloneChapters()
     {
         $this->validate([
             'cloneSourceSubjectId' => 'required|exists:subjects,id',
@@ -56,22 +56,22 @@ class Index extends Component
         ]);
 
         // সোর্স সাবজেক্টের সব সাব-সাবজেক্ট খুঁজে বের করা
-        $subSubjectsToCopy = SubSubject::where('subject_id', $this->cloneSourceSubjectId)->get();
+        $chaptersToCopy = Chapter::where('subject_id', $this->cloneSourceSubjectId)->get();
 
-        if ($subSubjectsToCopy->isEmpty()) {
+        if ($chaptersToCopy->isEmpty()) {
             $this->addError('cloneSourceSubjectId', 'এই সাবজেক্টে কপি করার মতো কোনো সাব-সাবজেক্ট নেই!');
             return;
         }
 
         $count = 0;
-        foreach ($subSubjectsToCopy as $sub) {
+        foreach ($chaptersToCopy as $sub) {
             // আগে চেক করা হবে টার্গেট সাবজেক্টে একই নামের কিছু আছে কি না
-            $exists = SubSubject::where('subject_id', $this->cloneTargetSubjectId)
+            $exists = Chapter::where('subject_id', $this->cloneTargetSubjectId)
                 ->where('name', $sub->name)
                 ->exists();
 
             if (!$exists) {
-                SubSubject::create([
+                Chapter::create([
                     'subject_id' => $this->cloneTargetSubjectId,
                     'name' => $sub->name,
                 ]);
@@ -81,7 +81,7 @@ class Index extends Component
 
         $this->showCloneModal = false;
         $this->resetPage(); // টেবিল রিফ্রেশ করার জন্য
-        $this->dispatch('subSubjectSaved', message: "{$count} টি সাব-সাবজেক্ট সফলভাবে কপি হয়েছে!");
+        $this->dispatch('chapterSaved', message: "{$count} টি সাব-সাবজেক্ট সফলভাবে কপি হয়েছে!");
     }
 
 
@@ -96,11 +96,11 @@ class Index extends Component
     public function edit($id)
     {
         $this->resetValidation();
-        $subSubject = SubSubject::findOrFail($id);
+        $chapter = Chapter::findOrFail($id);
 
-        $this->editId = $subSubject->id;
-        $this->modalSubjectId = $subSubject->subject_id;
-        $this->name = $subSubject->name;
+        $this->editId = $chapter->id;
+        $this->modalSubjectId = $chapter->subject_id;
+        $this->name = $chapter->name;
 
         // মডাল ওপেন করার ইভেন্ট পাঠানো হচ্ছে
         $this->dispatch('open-modal');
@@ -114,7 +114,7 @@ class Index extends Component
             'name' => [
                 'required',
                 'string',
-                Rule::unique('sub_subjects', 'name')
+                Rule::unique('chapters', 'name')
                     ->where('subject_id', $this->modalSubjectId)
                     ->ignore($this->editId) // আপডেটের সময় নিজের আইডি ইগনোর করবে যাতে এরর না দেয়
             ],
@@ -122,15 +122,15 @@ class Index extends Component
 
         if ($this->editId) {
             // যদি editId থাকে, তবে ডেটা আপডেট হবে
-            $subSubject = SubSubject::find($this->editId);
-            $subSubject->update([
+            $chapter = Chapter::find($this->editId);
+            $chapter->update([
                 'subject_id' => $this->modalSubjectId,
                 'name' => $this->name,
             ]);
             $message = 'Sub subject updated successfully!';
         } else {
             // editId না থাকলে নতুন তৈরি হবে
-            SubSubject::create([
+            Chapter::create([
                 'subject_id' => $this->modalSubjectId,
                 'name' => $this->name,
             ]);
@@ -142,22 +142,22 @@ class Index extends Component
 
         // মডাল বন্ধ করার জন্য ব্রাউজারে ইভেন্ট পাঠানো
         $this->dispatch('close-modal');
-        $this->dispatch('subSubjectSaved', message: $message);
+        $this->dispatch('chapterSaved', message: $message);
     }
 
     // ডিলিট করার মেথড
     public function delete($id)
     {
-        $subSubject = \App\Models\SubSubject::find($id);
-        if ($subSubject) {
-            $subSubject->delete();
-            $this->dispatch('subSubjectDeleted', message: 'Sub subject deleted successfully.');
+        $chapter = \App\Models\Chapter::find($id);
+        if ($chapter) {
+            $chapter->delete();
+            $this->dispatch('chapterDeleted', message: 'Sub subject deleted successfully.');
         }
     }
 
     public function render()
     {
-        $query = SubSubject::query()->with('subject');
+        $query = Chapter::query()->with('subject');
 
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
@@ -167,9 +167,9 @@ class Index extends Component
             $query->where('subject_id', $this->subjectId);
         }
 
-        return view('livewire.admin.sub-subjects.index', [
-            'subSubjects' => $query->latest()->paginate(10),
+        return view('livewire.admin.chapters.index', [
+            'chapters' => $query->latest()->paginate(10),
             'subjects' => Subject::orderBy('name')->get(), // ফিল্টার এবং মডাল উভয়ের জন্য
-        ])->layout('layouts.admin', ['title' => 'Sub Subjects']);
+        ])->layout('layouts.admin', ['title' => 'Chapters']);
     }
 }

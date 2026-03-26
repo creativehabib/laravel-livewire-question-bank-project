@@ -3,18 +3,18 @@
 namespace App\Livewire\Student;
 
 use Livewire\Component;
-use App\Models\{Subject, SubSubject, Topic, Question, ExamResult};
+use App\Models\{Subject, Chapter, Topic, Question, ExamResult};
 
 class Exam extends Component
 {
     public $subjectId = '';
-    public $subSubjectId = '';
+    public $chapterId = '';
     public $topicId = '';
     public $totalQuestions = 20;
     public $duration = 20; // minutes
 
     public $subjects = [];
-    public $subSubjects = [];
+    public $chapters = [];
     public $topics = [];
 
     public $questions = [];
@@ -28,14 +28,14 @@ class Exam extends Component
     public function mount(): void
     {
         $this->subjects = Subject::orderBy('name')->get();
-        $this->loadSubSubjects();
+        $this->loadChapters();
         $this->loadTopics();
     }
 
-    protected function loadSubSubjects(): void
+    protected function loadChapters(): void
     {
-        $this->subSubjects = $this->subjectId
-            ? SubSubject::where('subject_id', $this->subjectId)
+        $this->chapters = $this->subjectId
+            ? Chapter::where('subject_id', $this->subjectId)
                 ->orderBy('name')
                 ->get()
             : collect();
@@ -45,7 +45,7 @@ class Exam extends Component
     {
         $this->topics = Topic::query()
             ->when($this->subjectId, fn ($query) => $query->where('subject_id', $this->subjectId))
-            ->when($this->subSubjectId, fn ($query) => $query->where('sub_subject_id', $this->subSubjectId))
+            ->when($this->chapterId, fn ($query) => $query->where('chapter_id', $this->chapterId))
             ->orderBy('name')
             ->get();
     }
@@ -53,12 +53,12 @@ class Exam extends Component
     public function updatedSubjectId(): void
     {
         $this->topicId = '';
-        $this->subSubjectId = '';
-        $this->loadSubSubjects();
+        $this->chapterId = '';
+        $this->loadChapters();
         $this->loadTopics();
     }
 
-    public function updatedSubSubjectId(): void
+    public function updatedChapterId(): void
     {
         $this->topicId = '';
         $this->loadTopics();
@@ -72,8 +72,8 @@ class Exam extends Component
             $query->where('subject_id', $this->subjectId);
         }
 
-        if ($this->subSubjectId) {
-            $query->where('sub_subject_id', $this->subSubjectId);
+        if ($this->chapterId) {
+            $query->where('chapter_id', $this->chapterId);
         }
 
         if ($this->topicId) {
@@ -149,7 +149,7 @@ class Exam extends Component
     {
         return view('livewire.student.exam')
             ->with([
-                'subSubjects' => $this->subSubjects,
+                'chapters' => $this->chapters,
             ])
             ->layout('layouts.admin', ['title' => 'Exam']);
     }

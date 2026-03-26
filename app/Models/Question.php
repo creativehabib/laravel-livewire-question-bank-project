@@ -15,7 +15,7 @@ class Question extends Model
 
     protected $fillable = [
         'subject_id',
-        'sub_subject_id',
+        'chapter_id',
         'topic_id',
         'title',
         'description',
@@ -58,9 +58,9 @@ class Question extends Model
         return $this->belongsTo(Subject::class);
     }
 
-    public function subSubject(): BelongsTo
+    public function chapter(): BelongsTo
     {
-        return $this->belongsTo(SubSubject::class);
+        return $this->belongsTo(Chapter::class);
     }
 
     public function topic(): BelongsTo

@@ -46,8 +46,8 @@
                     @endif
                     <div class="relative">
                         <p contenteditable="true" class="text-center text-lg">{{ $subject->name }}</p>
-                        @if($previewOptions['showSubSubject'] && ! empty($subSubject->name))
-                            <p contenteditable="true" class="text-center">{{ $subSubject->name }}</p>
+                        @if($previewOptions['showChapter'] && ! empty($chapter->name))
+                            <p contenteditable="true" class="text-center">{{ $chapter->name }}</p>
                         @endif
                         @if($previewOptions['showTopic'] && $topics->isNotEmpty())
                             <p class="text-center text-sm">({{ $topics->pluck('name')->implode(', ') }})</p>
@@ -267,7 +267,7 @@
                         <div>
                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1"><span class="bangla">বিষয়ের নাম</span>
                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSubSubject">
+                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showChapter">
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                 </label>
                             </div>
