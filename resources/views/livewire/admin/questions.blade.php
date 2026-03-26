@@ -21,7 +21,7 @@
 
                 <select wire:model.live="chapterId"
                         class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
-                    <option value="">All Chapters</option>
+                    <option value="">All Topics</option>
                     @foreach($chapters as $ch)
                         <option value="{{ $ch->id }}">{{ $ch->name }}</option>
                     @endforeach

@@ -64,11 +64,11 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="chapter">অধ্যায়</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="chapter">টপিক</label>
                     <select id="chapter" wire:model="chapterId"
                             class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
                             @disabled(empty($chapters))>
-                        <option value="">সমস্ত অধ্যায়</option>
+                        <option value="">সমস্ত টপিক</option>
                         @foreach($chapters as $chapter)
                             <option value="{{ $chapter['id'] }}">{{ $chapter['name'] }}</option>
                         @endforeach
@@ -446,7 +446,7 @@
                                                 </label>
                                             </div>
                                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1">
-                                                <span class="bangla">অধ্যায়ের নাম</span>
+                                                <span class="bangla">টপিকের নাম</span>
                                                 <label class="relative inline-flex items-center  cursor-pointer">
                                                     <input type="checkbox" class="sr-only peer" checked="" wire:model.live="previewOptions.showChapter">
                                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>

@@ -93,7 +93,7 @@
                     </a>
                     <a wire:navigate href="{{ route('admin.chapters.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/chapters*') ? $submenuActiveClasses : '' }}">
-                        <span class="sidebar-text">Chapters</span>
+                        <span class="sidebar-text">Topics</span>
                     </a>
                     <a wire:navigate href="{{ route('admin.tags.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/tags*') ? $submenuActiveClasses : '' }}">

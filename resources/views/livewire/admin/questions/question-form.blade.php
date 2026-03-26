@@ -22,9 +22,9 @@
             </select>
         </div>
 
-        {{-- Chapter (Optional) --}}
+        {{-- Topic (Optional) --}}
         <div>
-            <label>Chapter (Optional)</label>
+            <label>Topic (Optional)</label>
             <select wire:model="chapter_id" class="border p-2 rounded w-full" {{ $sub_subject_id ? '' : 'disabled' }}>
                 <option value="">-- Select --</option>
                 @foreach($chapters as $c)

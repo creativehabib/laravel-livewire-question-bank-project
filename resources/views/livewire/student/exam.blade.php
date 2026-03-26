@@ -16,7 +16,7 @@
             </select>
 
             <select wire:model="chapterId" class="w-full border rounded px-3 py-2">
-                <option value="">অধ্যায় সিলেক্ট করো</option>
+                <option value="">টপিক সিলেক্ট করো</option>
                 @foreach($chapters as $chapter)
                     <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
                 @endforeach

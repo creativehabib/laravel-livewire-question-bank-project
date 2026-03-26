@@ -7,7 +7,7 @@
             @endforeach
         </select>
         <select wire:model.live="chapterId" class="border rounded px-3 py-2">
-            <option value="">All Chapters</option>
+            <option value="">All Topics</option>
             @foreach($chapters as $chapter)
                 <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
             @endforeach

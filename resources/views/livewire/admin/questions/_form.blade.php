@@ -42,9 +42,9 @@
                 </div>
 
                 <div wire:ignore wire:key="chapter-select-{{ $question->id ?? 'create' }}">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Chapter</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic</label>
                     <select id="chapter" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
-                        <option value="">-- Select Chapter --</option>
+                        <option value="">-- Select Topic --</option>
                         @foreach($chapters as $c) <option value="{{ $c->id }}" @selected($c->id == $chapter_id)>{{ $c->name }}</option> @endforeach
                     </select>
                 </div>
@@ -443,7 +443,7 @@
                 if (window.tsChapter) {
                     window.tsChapter.clear(true);
                     window.tsChapter.clearOptions();
-                    window.tsChapter.addOption({value: '', text: '-- Select Chapter --'});
+                    window.tsChapter.addOption({value: '', text: '-- Select Topic --'});
                     window.tsChapter.addOptions(e.detail.chapters);
                     window.tsChapter.refreshOptions(false);
                 }
