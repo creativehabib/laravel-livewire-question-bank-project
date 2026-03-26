@@ -5617,7 +5617,7 @@
                         <div class="my-2">
                             <div class="bg-white border rounded-lg my-4">
                                 <div class="p-2 bg-gray-100 ">
-                                    <p class="font-bold">টপিক - <span class="font-normal truncate">অধ্যায় ১ - বাস্তব সংখ্যা</span>
+                                    <p class="font-bold">টপিক - <span class="font-normal truncate">টপিক ১ - বাস্তব সংখ্যা</span>
                                     </p>
                                 </div>
                                 <div class="border-t text-gray-700">

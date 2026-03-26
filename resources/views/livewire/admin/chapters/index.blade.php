@@ -11,7 +11,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                     </div>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search chapters..."
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search topics..."
                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 transition-shadow text-sm" />
                 </div>
 
@@ -27,7 +27,7 @@
             <button @click="showModal = true; $wire.openModal();"
                     class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white font-medium text-sm rounded-lg shadow-sm hover:bg-indigo-700 hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 shrink-0">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1.1em" width="1.1em" xmlns="http://www.w3.org/2000/svg"><path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
-                New Chapter
+                New Topic
             </button>
         </div>
     </div>
@@ -37,7 +37,7 @@
             <thead>
             <tr class="bg-gray-50/80 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-300">
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs w-24">#ID</th>
-                <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Chapter Name</th>
+                <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Topic Name</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Subject</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Sub Subject</th>
                 <th class="px-6 py-4 text-right font-semibold uppercase tracking-wider text-xs w-32">Actions</th>
@@ -90,7 +90,7 @@
                                             }
                                         });
                                     } else {
-                                        if(confirm('Are you sure you want to delete this chapter?')) {
+                                        if(confirm('Are you sure you want to delete this topic?')) {
                                             $wire.delete({{ $chapter->id }});
                                         }
                                     }
@@ -105,7 +105,7 @@
                     <td colspan="5" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="mb-3 text-gray-300 dark:text-gray-600" height="3em" width="3em" xmlns="http://www.w3.org/2000/svg"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-                            <p class="text-lg font-medium">No chapters found</p>
+                            <p class="text-lg font-medium">No topics found</p>
                             <p class="text-sm mt-1">Try adjusting your search or filter to find what you're looking for.</p>
                         </div>
                     </td>
@@ -143,7 +143,7 @@
 
                 <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <h3 class="text-lg leading-6 font-bold text-gray-900 dark:text-white" id="modal-title">
-                        {{ $editId ? 'Edit Chapter' : 'Create New Chapter' }}
+                        {{ $editId ? 'Edit Topic' : 'Create New Topic' }}
                     </h3>
                     <button @click="showModal = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                         <span class="sr-only">Close</span>
@@ -177,8 +177,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Chapter Name <span class="text-red-500">*</span></label>
-                            <input type="text" wire:model="name" placeholder="e.g. Chapter 1: Motion" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Topic Name <span class="text-red-500">*</span></label>
+                            <input type="text" wire:model="name" placeholder="e.g. Topic 1: Motion" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-gray-700 dark:text-white dark:border-gray-600">
                             @error('name') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
@@ -190,7 +190,7 @@
                         </button>
                         <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 flex items-center gap-2">
                             <svg wire:loading wire:target="save" class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                            <span wire:loading.remove wire:target="save">{{ $editId ? 'Update Chapter' : 'Save Chapter' }}</span>
+                            <span wire:loading.remove wire:target="save">{{ $editId ? 'Update Topic' : 'Save Topic' }}</span>
                             <span wire:loading wire:target="save">{{ $editId ? 'Updating...' : 'Saving...' }}</span>
                         </button>
                     </div>
@@ -223,7 +223,7 @@
 
         // Delete এর পর টোস্ট দেখানো
         window.addEventListener('chapterDeleted', e => {
-            showToast(e.detail.message || 'Chapter has been deleted successfully.');
+            showToast(e.detail.message || 'Topic has been deleted successfully.');
         });
     </script>
 @endpush
