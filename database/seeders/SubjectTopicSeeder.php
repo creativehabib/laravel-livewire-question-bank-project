@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Chapter;
+use App\Models\Topic;
 use App\Models\Subject;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class SubjectChapterSeeder extends Seeder
+class SubjectTopicSeeder extends Seeder
 {
     public function run(): void
     {
@@ -15,10 +15,10 @@ class SubjectChapterSeeder extends Seeder
         $phy  = Subject::firstOrCreate(['name' => 'Physics']);
 
         foreach (['Algebra','Geometry','Calculus'] as $c) {
-            Chapter::firstOrCreate(['subject_id' => $math->id, 'name' => $c]);
+            Topic::firstOrCreate(['subject_id' => $math->id, 'name' => $c]);
         }
         foreach (['Mechanics','Optics'] as $c) {
-            Chapter::firstOrCreate(['subject_id' => $phy->id, 'name' => $c]);
+            Topic::firstOrCreate(['subject_id' => $phy->id, 'name' => $c]);
         }
     }
 }

@@ -6,7 +6,7 @@ use App\Models\Question;
 use App\Models\SubSubject;
 use Livewire\Component;
 use App\Models\Subject;
-use App\Models\Chapter;
+use App\Models\Topic;
 use App\Models\QuestionSet;
 
 class CreateQuestionSet extends Component
@@ -19,11 +19,11 @@ class CreateQuestionSet extends Component
     // Properties for dynamic dropdowns
     public $classes = [];
     public $subjects = [];
-    public $chapters = [];
+    public $topics = [];
 
     public $selectedClass = null;
     public $selectedSubject = null;
-    public $selectedChapters = [];
+    public $selectedTopics = [];
 
     // Load initial data when the component mounts
     public function mount()
@@ -40,19 +40,19 @@ class CreateQuestionSet extends Component
             $this->subjects = [];
         }
         $this->selectedSubject = null;
-        $this->chapters = [];
-        $this->selectedChapters = [];
+        $this->topics = [];
+        $this->selectedTopics = [];
     }
 
     // This runs when the 'selectedSubject' property changes
     public function updatedSelectedSubject($subject_id)
     {
         if(!empty($subject_id)) {
-            $this->chapters = Chapter::where('sub_subject_id', $subject_id)->get();
+            $this->topics = Topic::where('sub_subject_id', $subject_id)->get();
         } else {
-            $this->chapters = [];
+            $this->topics = [];
         }
-        $this->selectedChapters = [];
+        $this->selectedTopics = [];
     }
 
     // This method is called when the form is submitted
@@ -62,7 +62,7 @@ class CreateQuestionSet extends Component
             'name' => 'required|string|max:255',
             'selectedClass' => 'required|exists:subjects,id',
             'selectedSubject' => 'required|exists:sub_subjects,id',
-            'selectedChapters' => 'required|array|min:1',
+            'selectedTopics' => 'required|array|min:1',
             'type' => 'required|in:mcq,cq,combine',
             'quantity' => 'required|integer|min:1',
         ]);
@@ -71,13 +71,13 @@ class CreateQuestionSet extends Component
         $criteria = [
             'subject_id' => $this->selectedClass,
             'sub_subject_id' => $this->selectedSubject,
-            'chapter_ids' => $this->selectedChapters,
+            'topic_ids' => $this->selectedTopics,
             'type' => $this->type,
             'quantity' => $this->quantity
         ];
 
         // প্রশ্ন খুঁজে বের করা
-        $questions = Question::whereIn('chapter_id', $this->selectedChapters)
+        $questions = Question::whereIn('topic_id', $this->selectedTopics)
             ->inRandomOrder()
             ->limit($this->quantity)
             ->pluck('id');

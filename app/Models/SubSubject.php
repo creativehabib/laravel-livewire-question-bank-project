@@ -15,9 +15,9 @@ class SubSubject extends Model
         return $this->belongsTo(Subject::class);
     }
 
-    public function chapters(): HasMany
+    public function topics(): HasMany
     {
-        return $this->hasMany(Chapter::class);
+        return $this->hasMany(Topic::class);
     }
 
     public function questions(): HasMany

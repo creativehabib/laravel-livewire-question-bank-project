@@ -5,7 +5,7 @@ namespace App\Livewire\Admin;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\{Question, Subject, Chapter};
+use App\Models\{Question, Subject, Topic};
 
 class Questions extends Component
 {
@@ -22,9 +22,9 @@ class Questions extends Component
     public $subjectId = '';
 
     /**
-     * Selected chapter filter.
+     * Selected topic filter.
      */
-    public $chapterId = '';
+    public $topicId = '';
 
     /**
      * Refresh the component when a question is deleted.
@@ -47,10 +47,10 @@ class Questions extends Component
     public function updatingSubjectId(): void
     {
         $this->resetPage();
-        $this->chapterId = '';
+        $this->topicId = '';
     }
 
-    public function updatingChapterId(): void
+    public function updatingTopicId(): void
     {
         $this->resetPage();
     }
@@ -77,23 +77,23 @@ class Questions extends Component
     {
         $user = auth()->user();
 
-        $questions = Question::with('subject', 'chapter')
+        $questions = Question::with('subject', 'topic')
             ->when($user->isTeacher(), fn($q) => $q->where('user_id', $user->id))
             ->when($this->search, function ($q) {
                 $search = '%' . $this->search . '%';
                 $q->where('title', 'like', $search)
                     ->orWhereRelation('subject', 'name', 'like', $search)
-                    ->orWhereRelation('chapter', 'name', 'like', $search);
+                    ->orWhereRelation('topic', 'name', 'like', $search);
             })
             ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
-            ->when($this->chapterId, fn($q) => $q->where('chapter_id', $this->chapterId))
+            ->when($this->topicId, fn($q) => $q->where('topic_id', $this->topicId))
             ->latest()
             ->paginate(10);
 
         return view('livewire.admin.questions', [
             'questions' => $questions,
             'subjects' => Subject::orderBy('name')->get(),
-            'chapters' => Chapter::when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
+            'topics' => Topic::when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
                 ->orderBy('name')
                 ->get(),
         ])->layout($user->isAdmin() ? 'layouts.admin' : 'layouts.panel', ['title' => 'Manage Questions']);

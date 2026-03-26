@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use App\Models\Question;
 use App\Models\Subject;
-use App\Models\Chapter;
+use App\Models\Topic;
 use App\Models\User;
 use App\Services\QuestionViewService;
 use Illuminate\Support\Facades\Cache;
@@ -18,10 +18,10 @@ class QuestionViewServiceTest extends TestCase
 
         $user = User::factory()->create();
         $subject = Subject::create(['name' => 'Math']);
-        $chapter = Chapter::create(['subject_id' => $subject->id, 'name' => 'Algebra']);
+        $topic = Topic::create(['subject_id' => $subject->id, 'name' => 'Algebra']);
         $question = Question::create([
             'subject_id' => $subject->id,
-            'chapter_id' => $chapter->id,
+            'topic_id' => $topic->id,
             'title' => '1 + 1 = ?',
             'difficulty' => 'easy',
             'slug' => '1-plus-1',

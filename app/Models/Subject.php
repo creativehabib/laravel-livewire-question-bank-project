@@ -9,9 +9,9 @@ class Subject extends Model
 {
     protected $fillable = ['name'];
 
-    public function chapters(): HasMany
+    public function topics(): HasMany
     {
-        return $this->hasMany(Chapter::class);
+        return $this->hasMany(Topic::class);
     }
 
     public function subSubjects(): HasMany

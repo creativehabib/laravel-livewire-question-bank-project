@@ -3,19 +3,19 @@
 namespace App\Livewire\Student;
 
 use Livewire\Component;
-use App\Models\{Subject, SubSubject, Chapter, Question, ExamResult};
+use App\Models\{Subject, SubSubject, Topic, Question, ExamResult};
 
 class Exam extends Component
 {
     public $subjectId = '';
     public $subSubjectId = '';
-    public $chapterId = '';
+    public $topicId = '';
     public $totalQuestions = 20;
     public $duration = 20; // minutes
 
     public $subjects = [];
     public $subSubjects = [];
-    public $chapters = [];
+    public $topics = [];
 
     public $questions = [];
     public $selectedOptions = [];
@@ -29,7 +29,7 @@ class Exam extends Component
     {
         $this->subjects = Subject::orderBy('name')->get();
         $this->loadSubSubjects();
-        $this->loadChapters();
+        $this->loadTopics();
     }
 
     protected function loadSubSubjects(): void
@@ -41,9 +41,9 @@ class Exam extends Component
             : collect();
     }
 
-    protected function loadChapters(): void
+    protected function loadTopics(): void
     {
-        $this->chapters = Chapter::query()
+        $this->topics = Topic::query()
             ->when($this->subjectId, fn ($query) => $query->where('subject_id', $this->subjectId))
             ->when($this->subSubjectId, fn ($query) => $query->where('sub_subject_id', $this->subSubjectId))
             ->orderBy('name')
@@ -52,16 +52,16 @@ class Exam extends Component
 
     public function updatedSubjectId(): void
     {
-        $this->chapterId = '';
+        $this->topicId = '';
         $this->subSubjectId = '';
         $this->loadSubSubjects();
-        $this->loadChapters();
+        $this->loadTopics();
     }
 
     public function updatedSubSubjectId(): void
     {
-        $this->chapterId = '';
-        $this->loadChapters();
+        $this->topicId = '';
+        $this->loadTopics();
     }
 
     public function startExam(): void
@@ -76,8 +76,8 @@ class Exam extends Component
             $query->where('sub_subject_id', $this->subSubjectId);
         }
 
-        if ($this->chapterId) {
-            $query->where('chapter_id', $this->chapterId);
+        if ($this->topicId) {
+            $query->where('topic_id', $this->topicId);
         }
 
         $this->questions = $query->inRandomOrder()->take($this->totalQuestions)->get();

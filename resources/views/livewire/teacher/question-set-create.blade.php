@@ -67,15 +67,15 @@
                             অধ্যায় নির্বাচন করুন (এক বা একাধিক)
                         </label>
 
-                        @if(!empty($chapters))
+                        @if(!empty($topics))
                             <div class="mt-2 space-y-2 border rounded-md p-3 max-h-40 overflow-y-auto">
-                                @foreach($chapters as $chapter)
+                                @foreach($topics as $topic)
                                     <label class="flex items-center">
                                         <input type="checkbox"
-                                               wire:model="selectedChapters"
-                                               value="{{ $chapter->id }}"
+                                               wire:model="selectedTopics"
+                                               value="{{ $topic->id }}"
                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ $chapter->name }}</span>
+                                        <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">{{ $topic->name }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -83,7 +83,7 @@
                             <p class="text-sm text-gray-500 mt-2">অনুগ্রহ করে প্রথমে বিষয় এবং উপ-বিষয় নির্বাচন করুন।</p>
                         @endif
 
-                        @error('selectedChapters')
+                        @error('selectedTopics')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>

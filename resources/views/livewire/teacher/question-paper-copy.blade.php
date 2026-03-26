@@ -6,7 +6,7 @@
 
         <div class="text-lg text-gray-600 mt-2">
             <p>বিষয়: {{ $subSubject->name ?? 'N/A' }} {{ $subSubject->name ? '(' . $subject->name . ')' : '' }}</p>
-            <p>টপিক: {{ $chapter->name }}</p>
+            <p>টপিক: {{ $topic->name }}</p>
         </div>
     </div>
 

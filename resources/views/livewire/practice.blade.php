@@ -6,10 +6,10 @@
                 <option value="{{ $subject->id }}">{{ $subject->name }}</option>
             @endforeach
         </select>
-        <select wire:model.live="chapterId" class="border rounded px-3 py-2">
+        <select wire:model.live="topicId" class="border rounded px-3 py-2">
             <option value="">All Topics</option>
-            @foreach($chapters as $chapter)
-                <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
+            @foreach($topics as $topic)
+                <option value="{{ $topic->id }}">{{ $topic->name }}</option>
             @endforeach
         </select>
         <button wire:click="loadRandom" class="bg-indigo-500 hover:bg-indigo-600 transition-colors text-white px-4 py-2 rounded">Load</button>

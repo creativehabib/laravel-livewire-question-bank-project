@@ -15,10 +15,10 @@
                 @endforeach
             </select>
 
-            <select wire:model="chapterId" class="w-full border rounded px-3 py-2">
+            <select wire:model="topicId" class="w-full border rounded px-3 py-2">
                 <option value="">টপিক সিলেক্ট করো</option>
-                @foreach($chapters as $chapter)
-                    <option value="{{ $chapter->id }}">{{ $chapter->name }}</option>
+                @foreach($topics as $topic)
+                    <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                 @endforeach
             </select>
 

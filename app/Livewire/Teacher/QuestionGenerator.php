@@ -4,7 +4,7 @@ namespace App\Livewire\Teacher;
 
 use Livewire\Component;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\{Subject, SubSubject, Chapter, Question};
+use App\Models\{Subject, SubSubject, Topic, Question};
 use App\Support\Fonts;
 
 class QuestionGenerator extends Component
@@ -12,7 +12,7 @@ class QuestionGenerator extends Component
     public string $examName = '';
     public ?int $subjectId = null;
     public ?int $subSubjectId = null;
-    public ?int $chapterId = null;
+    public ?int $topicId = null;
     public string $questionType = 'mcq';
     public int $questionCount = 5;
 
@@ -35,7 +35,7 @@ class QuestionGenerator extends Component
         'markImportant' => false,
         'showQuestionInfo' => true,
         'showSubSubject' => true,
-        'showChapter' => true,
+        'showTopic' => true,
         'showSetCode' => true,
         'showStudentInfo' => false,
         'showMarksBox' => false,
@@ -54,7 +54,7 @@ class QuestionGenerator extends Component
     public array $subSubjects = [];
 
     /** @var array<int, array{id:int,name:string}> */
-    public array $chapters = [];
+    public array $topics = [];
 
     /** @var array<int, array<string, mixed>> */
     public array $generatedQuestions = [];
@@ -76,7 +76,7 @@ class QuestionGenerator extends Component
         'examName' => 'required|string|min:3',
         'subjectId' => 'required|exists:subjects,id',
         'subSubjectId' => 'nullable|exists:sub_subjects,id',
-        'chapterId' => 'nullable|exists:chapters,id',
+        'topicId' => 'nullable|exists:topics,id',
         'questionType' => 'required|string|in:mcq,creative,composite',
         'questionCount' => 'required|integer|min:1|max:50',
         'programName' => 'nullable|string|max:191',
@@ -93,7 +93,7 @@ class QuestionGenerator extends Component
         'examName' => 'পরীক্ষার নাম',
         'subjectId' => 'বিষয়',
         'subSubjectId' => 'সাব-বিষয়',
-        'chapterId' => 'অধ্যায়',
+        'topicId' => 'অধ্যায়',
         'questionType' => 'প্রশ্নের ধরন',
         'questionCount' => 'প্রশ্নের সংখ্যা',
         'selectedQuestionIds' => 'নির্বাচিত প্রশ্ন',
@@ -115,7 +115,7 @@ class QuestionGenerator extends Component
 
     public function updatedSubjectId($value): void
     {
-        $this->chapterId = null;
+        $this->topicId = null;
         $this->subSubjectId = null;
         $this->subSubjects = $value
             ? SubSubject::query()
@@ -126,50 +126,50 @@ class QuestionGenerator extends Component
                 ->all()
             : [];
 
-        $this->chapters = [];
+        $this->topics = [];
 
         if ($value && empty($this->subSubjects)) {
-            $this->chapters = Chapter::query()
+            $this->topics = Topic::query()
                 ->where('subject_id', $value)
                 ->orderBy('name')
                 ->get(['id', 'name'])
-                ->map(fn (Chapter $chapter) => ['id' => $chapter->id, 'name' => $chapter->name])
+                ->map(fn (Topic $topic) => ['id' => $topic->id, 'name' => $topic->name])
                 ->all();
         }
     }
 
     public function updatedSubSubjectId($value): void
     {
-        $this->chapterId = null;
+        $this->topicId = null;
 
         if (! $value) {
-            $this->chapters = [];
+            $this->topics = [];
             return;
         }
 
-        $this->chapters = Chapter::query()
+        $this->topics = Topic::query()
             ->where('sub_subject_id', $value)
             ->orderBy('name')
             ->get(['id', 'name'])
-            ->map(fn (Chapter $chapter) => ['id' => $chapter->id, 'name' => $chapter->name])
+            ->map(fn (Topic $topic) => ['id' => $topic->id, 'name' => $topic->name])
             ->all();
     }
 
-    public function updatedChapterId($value): void
+    public function updatedTopicId($value): void
     {
         if (! $value) {
             return;
         }
 
-        if ($this->subSubjectId && ! Chapter::where('id', $value)->where('sub_subject_id', $this->subSubjectId)->exists()) {
-            $this->addError('chapterId', __('নির্বাচিত অধ্যায় এই সাব-বিষয়ের অন্তর্ভুক্ত নয়।'));
-            $this->chapterId = null;
+        if ($this->subSubjectId && ! Topic::where('id', $value)->where('sub_subject_id', $this->subSubjectId)->exists()) {
+            $this->addError('topicId', __('নির্বাচিত অধ্যায় এই সাব-বিষয়ের অন্তর্ভুক্ত নয়।'));
+            $this->topicId = null;
             return;
         }
 
-        if ($this->subjectId && ! Chapter::where('id', $value)->where('subject_id', $this->subjectId)->exists()) {
-            $this->addError('chapterId', __('নির্বাচিত অধ্যায় এই বিষয়ের অন্তর্ভুক্ত নয়।'));
-            $this->chapterId = null;
+        if ($this->subjectId && ! Topic::where('id', $value)->where('subject_id', $this->subjectId)->exists()) {
+            $this->addError('topicId', __('নির্বাচিত অধ্যায় এই বিষয়ের অন্তর্ভুক্ত নয়।'));
+            $this->topicId = null;
         }
     }
 
@@ -180,15 +180,15 @@ class QuestionGenerator extends Component
         $this->showPreview = false;
 
         $baseQuery = Question::query()
-            ->with(['chapter.subSubject', 'subject', 'tags'])
+            ->with(['topic.subSubject', 'subject', 'tags'])
             ->where('subject_id', $this->subjectId);
 
         if ($this->subSubjectId) {
             $baseQuery->where('sub_subject_id', $this->subSubjectId);
         }
 
-        if ($this->chapterId) {
-            $baseQuery->where('chapter_id', $this->chapterId);
+        if ($this->topicId) {
+            $baseQuery->where('topic_id', $this->topicId);
         }
 
         $typeKeywords = $this->questionTypeKeywords($this->questionType);
@@ -230,7 +230,7 @@ class QuestionGenerator extends Component
             ->map(fn (Question $question) => [
                 'id' => $question->id,
                 'title' => $question->title,
-                'chapter' => optional($question->chapter)->name,
+                'topic' => optional($question->topic)->name,
                 'subject' => optional($question->subject)->name,
                 'difficulty' => $question->difficulty,
                 'created_at' => optional($question->created_at)->getTimestamp() ?? 0,
@@ -260,7 +260,7 @@ class QuestionGenerator extends Component
         ]);
 
         $relations = [
-            'chapter.subSubject',
+            'topic.subSubject',
             'subject',
         ];
 
@@ -285,9 +285,9 @@ class QuestionGenerator extends Component
             'program_name' => $this->programName ?: $this->examName,
             'subject' => optional($selectedQuestions->first()->subject)->name,
             'sub_subject' => $this->subSubjectId
-                ? optional($selectedQuestions->first()->chapter?->subSubject)->name
+                ? optional($selectedQuestions->first()->topic?->subSubject)->name
                 : ($hasSubSubjects ? __('বহু সাব-বিষয়') : __('সাব-বিষয় প্রযোজ্য নয়')),
-            'chapter' => $this->chapterId ? optional($selectedQuestions->first()->chapter)->name : __('বহু অধ্যায়'),
+            'topic' => $this->topicId ? optional($selectedQuestions->first()->topic)->name : __('বহু অধ্যায়'),
             'type' => $this->questionTypeLabel($this->questionType),
             'type_key' => $this->questionType,
             'total_questions' => $selectedQuestions->count(),
@@ -300,7 +300,7 @@ class QuestionGenerator extends Component
             'questions' => $selectedQuestions->map(fn (Question $question) => [
                 'id' => $question->id,
                 'title' => $question->title,
-                'chapter' => optional($question->chapter)->name,
+                'topic' => optional($question->topic)->name,
                 'options' => $this->questionType === 'mcq'
                     ? $question->options
                         ->map(static fn ($option) => $option->option_text)
@@ -391,7 +391,7 @@ class QuestionGenerator extends Component
             'subjects' => Subject::orderBy('name')->get(['id', 'name']),
             'typeOptions' => $this->questionTypeOptions(),
             'subSubjects' => $this->subSubjects,
-            'chapters' => $this->chapters,
+            'topics' => $this->topics,
             'sortOptions' => $this->sortOptions(),
             'fontOptions' => $this->fontFamilyOptions(),
         ])->layout('layouts.admin', ['title' => __('প্রশ্ন ক্রিয়েট')]);

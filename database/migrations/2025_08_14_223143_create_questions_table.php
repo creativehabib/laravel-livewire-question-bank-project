@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('chapter_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('topic_id')->constrained()->cascadeOnDelete();
             $table->longText('title');           // HTML from TinyMCE + MathType
             $table->enum('difficulty', ['easy','medium','hard'])->default('easy');
             $table->timestamps();

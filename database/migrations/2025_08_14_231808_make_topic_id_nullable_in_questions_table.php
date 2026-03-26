@@ -10,26 +10,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('questions', function (Blueprint $table) {
-            $table->dropForeign(['chapter_id']);
+            $table->dropForeign(['topic_id']);
         });
 
-        DB::statement('ALTER TABLE questions MODIFY chapter_id BIGINT UNSIGNED NULL');
+        DB::statement('ALTER TABLE questions MODIFY topic_id BIGINT UNSIGNED NULL');
 
         Schema::table('questions', function (Blueprint $table) {
-            $table->foreign('chapter_id')->references('id')->on('chapters')->cascadeOnDelete();
+            $table->foreign('topic_id')->references('id')->on('topics')->cascadeOnDelete();
         });
     }
 
     public function down(): void
     {
         Schema::table('questions', function (Blueprint $table) {
-            $table->dropForeign(['chapter_id']);
+            $table->dropForeign(['topic_id']);
         });
 
-        DB::statement('ALTER TABLE questions MODIFY chapter_id BIGINT UNSIGNED NOT NULL');
+        DB::statement('ALTER TABLE questions MODIFY topic_id BIGINT UNSIGNED NOT NULL');
 
         Schema::table('questions', function (Blueprint $table) {
-            $table->foreign('chapter_id')->references('id')->on('chapters')->cascadeOnDelete();
+            $table->foreign('topic_id')->references('id')->on('topics')->cascadeOnDelete();
         });
     }
 };

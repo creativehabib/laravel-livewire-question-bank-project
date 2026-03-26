@@ -16,7 +16,7 @@ class QuestionPaper extends Component
     public $instituteName;
     public $subject;
     public $subSubject;
-    public $chapters;
+    public $topics;
 
     // Formatting & Layout Properties
     public string $fontFamily = 'Bangla';
@@ -38,7 +38,7 @@ class QuestionPaper extends Component
         'markImportant' => false,
         'showQuestionInfo' => true,
         'showSubSubject' => true,
-        'showChapter' => false,
+        'showTopic' => false,
         'showSetCode' => true,
         'showStudentInfo' => false,
         'showMarksBox' => false,
@@ -62,7 +62,7 @@ class QuestionPaper extends Component
 
         $this->subject = $this->questionSet->getRelatedSubject();
         $this->subSubject = $this->questionSet->getRelatedSubSubject();
-        $this->chapters = $this->questionSet->getRelatedChapters();
+        $this->topics = $this->questionSet->getRelatedTopics();
         $this->instituteName = $this->questionSet->user->institution_name ?? 'প্রতিষ্ঠানের নাম';
 
         // ডিফল্ট ওয়াটারমার্ক টেক্সট
