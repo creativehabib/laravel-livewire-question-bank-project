@@ -77,7 +77,7 @@
                 <div x-show="open" x-collapse x-cloak class="{{ $submenuPanelClasses }}">
                     <a wire:navigate href="{{ route('admin.questions.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/questions*') ? $submenuActiveClasses : '' }}">
-                        <span class="sidebar-text">All Questions</span>
+                        <span class="sidebar-text">Questions</span>
                     </a>
                     <a wire:navigate href="{{ route('admin.exam-categories.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/exam-categories*') ? $submenuActiveClasses : '' }}">
