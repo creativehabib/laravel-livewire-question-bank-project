@@ -12,7 +12,7 @@
         || request()->is('admin/exam-categories')
         || request()->is('admin/subjects*')
         || request()->is('admin/sub-subjects*')
-        || request()->is('admin/chapters*')
+        || request()->is('admin/topics*')
         || request()->is('admin/tags*');
 
     $jobsActive = request()->is('admin/jobs*')
@@ -91,8 +91,8 @@
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/sub-subjects*') ? $submenuActiveClasses : '' }}">
                         <span class="sidebar-text">Sub Subjects</span>
                     </a>
-                    <a wire:navigate href="{{ route('admin.chapters.index') }}"
-                       class="{{ $submenuLinkClasses }} {{ request()->is('admin/chapters*') ? $submenuActiveClasses : '' }}">
+                    <a wire:navigate href="{{ route('admin.topics.index') }}"
+                       class="{{ $submenuLinkClasses }} {{ request()->is('admin/topics*') ? $submenuActiveClasses : '' }}">
                         <span class="sidebar-text">Topics</span>
                     </a>
                     <a wire:navigate href="{{ route('admin.tags.index') }}"

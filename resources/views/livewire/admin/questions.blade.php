@@ -19,10 +19,10 @@
                     @endforeach
                 </select>
 
-                <select wire:model.live="chapterId"
+                <select wire:model.live="topicId"
                         class="px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 text-sm font-medium text-gray-600 bg-white">
                     <option value="">All Topics</option>
-                    @foreach($chapters as $ch)
+                    @foreach($topics as $ch)
                         <option value="{{ $ch->id }}">{{ $ch->name }}</option>
                     @endforeach
                 </select>
@@ -71,10 +71,10 @@
                     <td class="px-6 py-4">
                         <div class="flex flex-col gap-1">
                             <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{{ $q->subject->name }}</span>
-                            @if($q->chapter)
+                            @if($q->topic)
                                 <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                         <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                        {{ $q->chapter->name }}
+                                        {{ $q->topic->name }}
                                     </span>
                             @endif
                         </div>

@@ -64,16 +64,16 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="chapter">টপিক</label>
-                    <select id="chapter" wire:model="chapterId"
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="topic">টপিক</label>
+                    <select id="topic" wire:model="topicId"
                             class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
-                            @disabled(empty($chapters))>
+                            @disabled(empty($topics))>
                         <option value="">সমস্ত টপিক</option>
-                        @foreach($chapters as $chapter)
-                            <option value="{{ $chapter['id'] }}">{{ $chapter['name'] }}</option>
+                        @foreach($topics as $topic)
+                            <option value="{{ $topic['id'] }}">{{ $topic['name'] }}</option>
                         @endforeach
                     </select>
-                    @error('chapterId')
+                    @error('topicId')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -217,12 +217,12 @@
                                     {!! $question['title'] !!}
                                 </div>
                                 <div class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                    @if($question['chapter'])
+                                    @if($question['topic'])
                                         <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-200 rounded-full">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h13.5M3 9h9m-9 9h13.5m-13.5-4.5h9m5.25-9L21 6.75 17.25 9" />
                                             </svg>
-                                            {{ $question['chapter'] }}
+                                            {{ $question['topic'] }}
                                         </span>
                                     @endif
                                     <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
@@ -317,8 +317,8 @@
                                         @if($previewOptions['showSubSubject'] && ! empty($summary['sub_subject']))
                                         <p contenteditable="true" class="text-center editable-effect">{{ $summary['sub_subject'] }}</p>
                                         @endif
-                                        @if($previewOptions['showChapter'] && ! empty($summary['chapter']))
-                                        <p contenteditable="true" class="text-center editable-effect">{{ $summary['chapter'] }}</p>
+                                        @if($previewOptions['showTopic'] && ! empty($summary['topic']))
+                                        <p contenteditable="true" class="text-center editable-effect">{{ $summary['topic'] }}</p>
                                         @endif
                                         <div class="absolute -top-1 right-0 flex">
                                             <p class="border-y border-l pl-1 border-black editable-effect" contenteditable="true">সেট -</p>
@@ -448,7 +448,7 @@
                                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1">
                                                 <span class="bangla">টপিকের নাম</span>
                                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                                    <input type="checkbox" class="sr-only peer" checked="" wire:model.live="previewOptions.showChapter">
+                                                    <input type="checkbox" class="sr-only peer" checked="" wire:model.live="previewOptions.showTopic">
                                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                                 </label>
                                             </div>

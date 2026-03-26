@@ -25,9 +25,9 @@
         {{-- Topic (Optional) --}}
         <div>
             <label>Topic (Optional)</label>
-            <select wire:model="chapter_id" class="border p-2 rounded w-full" {{ $sub_subject_id ? '' : 'disabled' }}>
+            <select wire:model="topic_id" class="border p-2 rounded w-full" {{ $sub_subject_id ? '' : 'disabled' }}>
                 <option value="">-- Select --</option>
-                @foreach($chapters as $c)
+                @foreach($topics as $c)
                     <option value="{{ $c->id }}">{{ $c->name }}</option>
                 @endforeach
             </select>

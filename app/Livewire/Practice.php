@@ -5,7 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Question;
 use App\Models\Subject;
-use App\Models\Chapter;
+use App\Models\Topic;
 use App\Services\QuestionViewService;
 
 class Practice extends Component
@@ -13,16 +13,16 @@ class Practice extends Component
     public $current, $selectedOption;
 
     /**
-     * Selected subject and chapter identifiers.
+     * Selected subject and topic identifiers.
      */
     public $subjectId = '';
-    public $chapterId = '';
+    public $topicId = '';
 
     /**
-     * Cached lists of subjects and chapters for the dropdowns.
+     * Cached lists of subjects and topics for the dropdowns.
      */
     public $subjects = [];
-    public $chapters = [];
+    public $topics = [];
 
     /**
      * Service used to record unique question views.
@@ -40,21 +40,21 @@ class Practice extends Component
     public function mount(): void
     {
         $this->subjects = Subject::orderBy('name')->get();
-        $this->loadChapters();
+        $this->loadTopics();
         $this->loadRandom();
     }
 
-    protected function loadChapters(): void
+    protected function loadTopics(): void
     {
-        $this->chapters = $this->subjectId
-            ? Chapter::where('subject_id', $this->subjectId)->orderBy('name')->get()
-            : Chapter::orderBy('name')->get();
+        $this->topics = $this->subjectId
+            ? Topic::where('subject_id', $this->subjectId)->orderBy('name')->get()
+            : Topic::orderBy('name')->get();
     }
 
     public function updatedSubjectId(): void
     {
-        $this->chapterId = '';
-        $this->loadChapters();
+        $this->topicId = '';
+        $this->loadTopics();
     }
 
     public function loadRandom()
@@ -65,8 +65,8 @@ class Practice extends Component
             $query->where('subject_id', $this->subjectId);
         }
 
-        if ($this->chapterId) {
-            $query->where('chapter_id', $this->chapterId);
+        if ($this->topicId) {
+            $query->where('topic_id', $this->topicId);
         }
 
         $this->current = $query->inRandomOrder()->first();

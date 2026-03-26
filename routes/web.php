@@ -19,9 +19,9 @@ use App\Livewire\Admin\Subjects\Edit as SubjectEdit;
 use App\Livewire\Admin\SubSubjects\Index as SubSubjectIndex;
 use App\Livewire\Admin\SubSubjects\Create as SubSubjectCreate;
 use App\Livewire\Admin\SubSubjects\Edit as SubSubjectEdit;
-use App\Livewire\Admin\Chapters\Index as ChapterIndex;
-use App\Livewire\Admin\Chapters\Create as ChapterCreate;
-use App\Livewire\Admin\Chapters\Edit as ChapterEdit;
+use App\Livewire\Admin\Topics\Index as TopicIndex;
+use App\Livewire\Admin\Topics\Create as TopicCreate;
+use App\Livewire\Admin\Topics\Edit as TopicEdit;
 use App\Livewire\Admin\Tags\Index as TagIndex;
 use App\Livewire\Admin\Users\Index as UserIndex;
 use App\Livewire\Admin\Jobs\Index as JobIndex;
@@ -65,8 +65,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Sub Subjects
     Route::get('/admin/sub-subjects', SubSubjectIndex::class)->name('admin.sub-subjects.index');
 
-    // Chapters
-    Route::get('/admin/chapters', ChapterIndex::class)->name('admin.chapters.index');
+    // Topics
+    Route::get('/admin/topics', TopicIndex::class)->name('admin.topics.index');
 
     // Jobs
     Route::get('/admin/jobs', JobIndex::class)->name('admin.jobs.index');

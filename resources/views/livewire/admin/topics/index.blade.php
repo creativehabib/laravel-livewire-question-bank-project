@@ -44,32 +44,32 @@
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
-            @forelse($chapters as $chapter)
+            @forelse($topics as $topic)
                 <tr class="hover:bg-indigo-50/50 dark:hover:bg-gray-700/50 transition-colors group">
                     <td class="px-6 py-4">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                            #{{ $chapter->id }}
+                            #{{ $topic->id }}
                         </span>
                     </td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">
-                        {{ $chapter->name }}
+                        {{ $topic->name }}
                     </td>
                     <td class="px-6 py-4">
                         <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-md border border-indigo-100 dark:border-indigo-800">
-                            {{ $chapter->subject->name }}
+                            {{ $topic->subject->name }}
                         </span>
                     </td>
                     <td class="px-6 py-4">
-                        @if($chapter->subSubject)
+                        @if($topic->subSubject)
                             <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-md border border-emerald-100 dark:border-emerald-800">
-                                {{ $chapter->subSubject->name }}
+                                {{ $topic->subSubject->name }}
                             </span>
                         @else
                             <span class="text-xs text-gray-400 dark:text-gray-500 italic">N/A</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 text-right space-x-1">
-                        <button type="button" wire:click="edit({{ $chapter->id }})"
+                        <button type="button" wire:click="edit({{ $topic->id }})"
                                 class="inline-flex items-center justify-center w-8 h-8 rounded-md text-indigo-500 hover:text-white hover:bg-indigo-500 transition-colors border border-indigo-100 hover:border-transparent dark:border-gray-600 dark:hover:bg-indigo-600" title="Edit">
                             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
@@ -86,12 +86,12 @@
                                             confirmButtonText: 'Yes, delete it!'
                                         }).then((result) => {
                                             if (result.isConfirmed) {
-                                                $wire.delete({{ $chapter->id }});
+                                                $wire.delete({{ $topic->id }});
                                             }
                                         });
                                     } else {
                                         if(confirm('Are you sure you want to delete this topic?')) {
-                                            $wire.delete({{ $chapter->id }});
+                                            $wire.delete({{ $topic->id }});
                                         }
                                     }
                                 "
@@ -115,9 +115,9 @@
         </table>
     </div>
 
-    @if($chapters->hasPages())
+    @if($topics->hasPages())
         <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50/30 dark:bg-gray-800/30">
-            {{ $chapters->links() }}
+            {{ $topics->links() }}
         </div>
     @endif
 
@@ -217,12 +217,12 @@
         }
 
         // Create বা Update এর পর টোস্ট দেখানো
-        window.addEventListener('chapterSaved', e => {
+        window.addEventListener('topicSaved', e => {
             showToast(e.detail.message);
         });
 
         // Delete এর পর টোস্ট দেখানো
-        window.addEventListener('chapterDeleted', e => {
+        window.addEventListener('topicDeleted', e => {
             showToast(e.detail.message || 'Topic has been deleted successfully.');
         });
     </script>
