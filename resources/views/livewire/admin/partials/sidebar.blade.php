@@ -9,6 +9,7 @@
     };
 
     $questionsActive = request()->is('admin/questions*')
+        || request()->is('admin/exam-categories')
         || request()->is('admin/subjects*')
         || request()->is('admin/sub-subjects*')
         || request()->is('admin/chapters*')
@@ -77,6 +78,10 @@
                     <a wire:navigate href="{{ route('admin.questions.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/questions*') ? $submenuActiveClasses : '' }}">
                         <span class="sidebar-text">All Questions</span>
+                    </a>
+                    <a wire:navigate href="{{ route('admin.exam-categories.index') }}"
+                       class="{{ $submenuLinkClasses }} {{ request()->is('admin/exam-categories*') ? $submenuActiveClasses : '' }}">
+                        <span class="sidebar-text">Exam Categories</span>
                     </a>
                     <a wire:navigate href="{{ route('admin.subjects.index') }}"
                        class="{{ $submenuLinkClasses }} {{ request()->is('admin/subjects*') ? $submenuActiveClasses : '' }}">

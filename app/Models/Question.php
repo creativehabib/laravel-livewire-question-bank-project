@@ -40,7 +40,10 @@ class Question extends Model
             ->withPivot('order');
     }
 
-
+    public function examCategories()
+    {
+        return $this->belongsToMany(ExamCategory::class, 'exam_category_question');
+    }
     private function generateUniqueSlug($title): string
     {
         $baseSlug = Str::slug(Str::limit(strip_tags($title), 50, ''));

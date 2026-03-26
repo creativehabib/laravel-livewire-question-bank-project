@@ -12,6 +12,7 @@ use App\Livewire\Admin\Questions;
 use App\Livewire\Admin\Questions\Create;
 use App\Livewire\Admin\Questions\Edit;
 use App\Livewire\Admin\Settings;
+use App\Livewire\Admin\ExamCategory\Index as ExamCategoryIndex;
 use App\Livewire\Admin\Subjects\Index as SubjectIndex;
 use App\Livewire\Admin\Subjects\Create as SubjectCreate;
 use App\Livewire\Admin\Subjects\Edit as SubjectEdit;
@@ -53,6 +54,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/questions/create', Create::class)->name('admin.questions.create');
     Route::get('/admin/questions/{question}/edit', Edit::class)->name('admin.questions.edit');
 
+    // Exam categories
+    Route::get('/admin/exam-categories', ExamCategoryIndex::class)->name('admin.exam-categories.index');
     // Tags
     Route::get('/admin/tags', TagIndex::class)->name('admin.tags.index');
 

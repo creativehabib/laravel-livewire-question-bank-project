@@ -69,6 +69,7 @@
                     <option value="mcq">Multiple Choice (MCQ)</option>
                     <option value="cq">Creative Question (CQ)</option>
                     <option value="short">Short Question</option>
+                    <option value="written">Written Question (লিখিত)</option>
                 </select>
             </div>
 
@@ -87,11 +88,25 @@
             </div>
         </div>
 
-        <div wire:ignore>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags <span class="text-gray-400 font-normal">(Type and press enter)</span></label>
-            <select id="tags" class="w-full" multiple>
-                @foreach($allTags as $tag) <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option> @endforeach
-            </select>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tags <span class="text-gray-400 font-normal">(Type and press enter)</span></label>
+                <select id="tags" class="w-full" multiple>
+                    @foreach($allTags as $tag) <option value="{{ $tag->id }}" {{ in_array($tag->id, $tagIds) ? 'selected' : '' }}>{{ $tag->name }}</option> @endforeach
+                </select>
+            </div>
+
+            <div wire:ignore>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Audience / Exam Category <span class="text-red-500">*</span></label>
+                <select id="exam_categories" class="w-full" multiple placeholder="সিলেক্ট করুন (Job, Admission, Class 9)...">
+                    @foreach($allExamCategories as $category)
+                        <option value="{{ $category->id }}" {{ in_array($category->id, $exam_category_ids) ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('exam_category_ids')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
+            </div>
         </div>
 
         <x-slug-input table="questions" :ignore-id="$question->id ?? null" />
@@ -102,6 +117,50 @@
                 <textarea id="editor">{!! $title !!}</textarea>
             </div>
             @error('title')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
+        </div>
+
+        <div x-show="questionType === 'written'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" class="pt-4 border-t border-gray-100 dark:border-gray-700">
+            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1.2em" width="1.2em" xmlns="http://www.w3.org/2000/svg" class="text-indigo-500"><path d="M432 112V96a48.14 48.14 0 0 0-48-48H64a48.14 48.14 0 0 0-48 48v256a48.14 48.14 0 0 0 48 48h16v16a48.14 48.14 0 0 0 48 48h320a48.14 48.14 0 0 0 48-48V160a48.14 48.14 0 0 0-48-48zM96 128h272.24l-37.81-48.4a15.89 15.89 0 0 0-25-.63L234.62 170.81l-40.42-37.2a15.87 15.87 0 0 0-22.18 1.14l-81.82 93V96a16 16 0 0 1 16-16h320a16 16 0 0 1 16 16v224H128a48.06 48.06 0 0 0-32 12.31V144a16 16 0 0 1 0-16zM464 416a16 16 0 0 1-16 16H128a16 16 0 0 1-16-16V160a16 16 0 0 1 16-16h320a16 16 0 0 1 16 16z"></path><circle cx="336" cy="192" r="32"></circle></svg>
+                Reference Image / Attachment <span class="text-xs font-normal text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full ml-1">Optional</span>
+            </label>
+            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-xl hover:border-indigo-500 transition-colors bg-gray-50 dark:bg-gray-800">
+                <div class="space-y-1 text-center w-full">
+
+                    @if ($image)
+                        <div class="relative w-max mx-auto mb-4 group">
+                            <img src="{{ $image->temporaryUrl() }}" class="mx-auto h-48 object-contain rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+                            <button type="button" wire:click="$set('image', null)" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm transition-colors opacity-0 group-hover:opacity-100">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    @elseif(!empty($existingImage))
+                        <div class="relative w-max mx-auto mb-4 group">
+                            <img src="{{ Storage::url($existingImage) }}" class="mx-auto h-48 object-contain rounded-lg shadow-md border border-gray-200 dark:border-gray-600">
+                            <button type="button" wire:click="removeExistingImage" class="absolute -top-3 -right-3 bg-red-100 hover:bg-red-500 text-red-500 hover:text-white rounded-full p-1.5 shadow-sm transition-colors opacity-0 group-hover:opacity-100" title="Remove Image">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    @else
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    @endif
+
+                    <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center mt-4">
+                        <label for="file-upload" class="relative cursor-pointer bg-white dark:bg-gray-700 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 shadow-sm focus-within:outline-none transition-colors">
+                            <span>Upload a file</span>
+                            <input id="file-upload" wire:model="image" type="file" class="sr-only" accept="image/png, image/jpeg, image/jpg, image/webp">
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">PNG, JPG up to 2MB</p>
+
+                    <div wire:loading wire:target="image" class="text-xs text-indigo-500 font-bold mt-2 animate-pulse">
+                        Uploading image... Please wait.
+                    </div>
+                </div>
+            </div>
+            @error('image')<span class="text-xs text-red-500 mt-1 block font-medium">{{ $message }}</span>@enderror
         </div>
 
         <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700" x-show="questionType === 'mcq'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
@@ -148,7 +207,7 @@
             @error('options.*.option_text')<span class="text-sm text-red-500 font-bold block mt-2 text-center bg-red-50 p-2 rounded">* সবগুলো অপশন পূরণ করা আবশ্যক।</span>@enderror
         </div>
 
-        {{-- CQ Section (উন্নত টগল/কলাপ্স সিস্টেমসহ) --}}
+        {{-- CQ Section --}}
         <div class="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-700" x-show="questionType === 'cq'" style="display: none;" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">
             <div class="flex justify-between items-center mb-4">
                 <label class="text-lg font-bold text-purple-700 dark:text-purple-400 flex items-center gap-2">
@@ -248,6 +307,7 @@
         window.tsSubSubject = window.tsSubSubject || null;
         window.tsChapter = window.tsChapter || null;
         window.tsTags = window.tsTags || null;
+        window.tsExamCategories = window.tsExamCategories || null;
 
         function generateSlug(text) {
             let div = document.createElement("div");
@@ -340,9 +400,6 @@
                 initCkEditor4(el.id, `cq.${dIndex}.text`);
             });
 
-            // FIX: Answer ফিল্ডের গ্লোবাল লোডিং এখান থেকে রিমুভ করা হয়েছে।
-            // এখন এটি Alpine.js এর @click ইভেন্টের মাধ্যমে ডাইনামিকালি লোড হবে!
-
             if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
             const subjectEl = document.getElementById('subject');
             if (subjectEl) window.tsSubject = new TomSelect(subjectEl, { onChange: (v) => @this.set('subject_id', v) });
@@ -358,6 +415,16 @@
             if (window.tsTags) { window.tsTags.destroy(); window.tsTags = null; }
             const tagsEl = document.getElementById('tags');
             if (tagsEl) window.tsTags = new TomSelect(tagsEl, { plugins: ['remove_button'], persist: false, create: true, onChange: (v) => @this.set('tagIds', v) });
+
+            // NEW: Exam Categories Initialization
+            if (window.tsExamCategories) { window.tsExamCategories.destroy(); window.tsExamCategories = null; }
+            const examCategoriesEl = document.getElementById('exam_categories');
+            if (examCategoriesEl) window.tsExamCategories = new TomSelect(examCategoriesEl, {
+                plugins: ['remove_button'],
+                persist: false,
+                create: false,
+                onChange: (v) => @this.set('exam_category_ids', v)
+            });
         }
 
         if (!window.hasRegisteredQuestionEvents) {
@@ -386,6 +453,7 @@
                 window.tsSubject?.clear(true);
                 window.tsSubSubject?.clear(true);
                 window.tsChapter?.clear(true);
+                window.tsExamCategories?.clear(true);
             });
 
             window.addEventListener('refresh-editors', () => setTimeout(initEditors, 350));
@@ -403,6 +471,7 @@
                 if (window.tsSubSubject) { window.tsSubSubject.destroy(); window.tsSubSubject = null; }
                 if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
                 if (window.tsTags) { window.tsTags.destroy(); window.tsTags = null; }
+                if (window.tsExamCategories) { window.tsExamCategories.destroy(); window.tsExamCategories = null; }
             });
 
             window.hasRegisteredQuestionEvents = true;
