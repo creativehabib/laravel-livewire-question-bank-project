@@ -39,7 +39,7 @@
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs w-24">#ID</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Topic Name</th>
                 <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Subject</th>
-                <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Sub Subject</th>
+                <th class="px-6 py-4 text-left font-semibold uppercase tracking-wider text-xs">Chapter</th>
                 <th class="px-6 py-4 text-right font-semibold uppercase tracking-wider text-xs w-32">Actions</th>
             </tr>
             </thead>
@@ -60,9 +60,9 @@
                         </span>
                     </td>
                     <td class="px-6 py-4">
-                        @if($topic->subSubject)
+                        @if($topic->chapter)
                             <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-3 py-1 rounded-md border border-emerald-100 dark:border-emerald-800">
-                                {{ $topic->subSubject->name }}
+                                {{ $topic->chapter->name }}
                             </span>
                         @else
                             <span class="text-xs text-gray-400 dark:text-gray-500 italic">N/A</span>
@@ -163,17 +163,17 @@
                             @error('modalSubjectId') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
-                        <div wire:key="sub-subject-group-{{ $modalSubjectId ?? 'empty' }}">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Sub Subject <span class="text-xs font-normal text-gray-400">(Optional)</span></label>
-                            <select wire:model="modalSubSubjectId"
+                        <div wire:key="chapter-group-{{ $modalSubjectId ?? 'empty' }}">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Chapter <span class="text-xs font-normal text-gray-400">(Optional)</span></label>
+                            <select wire:model="modalChapterId"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:bg-gray-700 dark:text-white dark:border-gray-600 disabled:opacity-50"
                                     @if(!$modalSubjectId) disabled @endif>
                                 <option value="">-- None --</option>
-                                @foreach($modalSubSubjects as $ss)
+                                @foreach($modalChapters as $ss)
                                     <option value="{{ $ss->id }}">{{ $ss->name }}</option>
                                 @endforeach
                             </select>
-                            @error('modalSubSubjectId') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
+                            @error('modalChapterId') <span class="text-xs text-red-500 mt-1 block">{{ $message }}</span> @enderror
                         </div>
 
                         <div>

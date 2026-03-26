@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Topic;
 use App\Models\Subject;
-use App\Models\SubSubject;
+use App\Models\Chapter;
 use Illuminate\Validation\Rule;
 
 class Index extends Component
@@ -19,7 +19,7 @@ class Index extends Component
     // Modal Properties
     public $name = '';
     public $modalSubjectId = '';
-    public $modalSubSubjectId = null; // চ্যাপ্টারের ক্ষেত্রে সাব-সাবজেক্ট থাকতে পারে
+    public $modalChapterId = null; // চ্যাপ্টারের ক্ষেত্রে সাব-সাবজেক্ট থাকতে পারে
     public $editId = null;
 
     protected $listeners = ['deleteTopicConfirmed' => 'delete'];
@@ -37,13 +37,13 @@ class Index extends Component
     // মডালে যখন সাবজেক্ট পরিবর্তন করা হবে, তখন সাব-সাবজেক্ট রিসেট হয়ে যাবে
     public function updatedModalSubjectId()
     {
-        $this->modalSubSubjectId = null;
+        $this->modalChapterId = null;
     }
 
     // ক্রিয়েট বাটনে ক্লিক করলে ফর্ম রিসেট হবে
     public function openModal()
     {
-        $this->reset(['name', 'modalSubjectId', 'modalSubSubjectId', 'editId']);
+        $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->resetValidation();
     }
 
@@ -55,7 +55,7 @@ class Index extends Component
 
         $this->editId = $topic->id;
         $this->modalSubjectId = $topic->subject_id;
-        $this->modalSubSubjectId = $topic->sub_subject_id;
+        $this->modalChapterId = $topic->chapter_id;
         $this->name = $topic->name;
 
         // মডাল ওপেন করার ইভেন্ট
@@ -67,13 +67,13 @@ class Index extends Component
     {
         $this->validate([
             'modalSubjectId' => 'required|exists:subjects,id',
-            'modalSubSubjectId' => 'nullable|exists:sub_subjects,id',
+            'modalChapterId' => 'nullable|exists:chapters,id',
             'name' => [
                 'required',
                 'string',
                 Rule::unique('topics', 'name')
                     ->where('subject_id', $this->modalSubjectId)
-                    ->where('sub_subject_id', $this->modalSubSubjectId)
+                    ->where('chapter_id', $this->modalChapterId)
                     ->ignore($this->editId) // আপডেটের সময় নিজের আইডি ইগনোর করবে
             ],
         ]);
@@ -83,7 +83,7 @@ class Index extends Component
             $topic = Topic::find($this->editId);
             $topic->update([
                 'subject_id' => $this->modalSubjectId,
-                'sub_subject_id' => $this->modalSubSubjectId ?: null, // খালি থাকলে null সেভ হবে
+                'chapter_id' => $this->modalChapterId ?: null, // খালি থাকলে null সেভ হবে
                 'name' => $this->name,
             ]);
             $message = 'Topic updated successfully!';
@@ -91,13 +91,13 @@ class Index extends Component
             // Create
             Topic::create([
                 'subject_id' => $this->modalSubjectId,
-                'sub_subject_id' => $this->modalSubSubjectId ?: null,
+                'chapter_id' => $this->modalChapterId ?: null,
                 'name' => $this->name,
             ]);
             $message = 'Topic created successfully!';
         }
 
-        $this->reset(['name', 'modalSubjectId', 'modalSubSubjectId', 'editId']);
+        $this->reset(['name', 'modalSubjectId', 'modalChapterId', 'editId']);
         $this->dispatch('close-modal');
         $this->dispatch('topicSaved', message: $message);
     }
@@ -115,21 +115,21 @@ class Index extends Component
 
     public function render()
     {
-        $topics = Topic::with('subject', 'subSubject')
+        $topics = Topic::with('subject', 'chapter')
             ->when($this->subjectId, fn($q) => $q->where('subject_id', $this->subjectId))
             ->when($this->search, fn($q) => $q->where('name', 'like', '%'.$this->search.'%'))
             ->orderBy('name')
             ->paginate(10);
 
         // মডালের জন্য ডাইনামিক সাব-সাবজেক্ট লোড করা (যদি সাবজেক্ট সিলেক্ট করা থাকে)
-        $modalSubSubjects = $this->modalSubjectId
-            ? SubSubject::where('subject_id', $this->modalSubjectId)->orderBy('name')->get()
+        $modalChapters = $this->modalSubjectId
+            ? Chapter::where('subject_id', $this->modalSubjectId)->orderBy('name')->get()
             : [];
 
         return view('livewire.admin.topics.index', [
             'topics' => $topics,
             'subjects' => Subject::orderBy('name')->get(),
-            'modalSubSubjects' => $modalSubSubjects, // মডালে পাঠানোর জন্য
+            'modalChapters' => $modalChapters, // মডালে পাঠানোর জন্য
         ])->layout('layouts.admin', ['title' => 'Manage Topics']);
     }
 }

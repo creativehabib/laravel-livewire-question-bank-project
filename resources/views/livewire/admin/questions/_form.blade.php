@@ -34,10 +34,10 @@
                 </div>
 
                 <div wire:ignore wire:key="subsubject-select-{{ $question->id ?? 'create' }}">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sub-Subject</label>
-                    <select id="sub_subject" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
-                        <option value="">-- Select Sub-Subject --</option>
-                        @foreach($subSubjects as $ss) <option value="{{ $ss->id }}" @selected($ss->id == $sub_subject_id)>{{ $ss->name }}</option> @endforeach
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Chapter</label>
+                    <select id="chapter" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-200">
+                        <option value="">-- Select Chapter --</option>
+                        @foreach($chapters as $ss) <option value="{{ $ss->id }}" @selected($ss->id == $chapter_id)>{{ $ss->name }}</option> @endforeach
                     </select>
                 </div>
 
@@ -304,7 +304,7 @@
 
     <script>
         window.tsSubject = window.tsSubject || null;
-        window.tsSubSubject = window.tsSubSubject || null;
+        window.tsChapter = window.tsChapter || null;
         window.tsTopic = window.tsTopic || null;
         window.tsTags = window.tsTags || null;
         window.tsExamCategories = window.tsExamCategories || null;
@@ -404,9 +404,9 @@
             const subjectEl = document.getElementById('subject');
             if (subjectEl) window.tsSubject = new TomSelect(subjectEl, { onChange: (v) => @this.set('subject_id', v) });
 
-            if (window.tsSubSubject) { window.tsSubSubject.destroy(); window.tsSubSubject = null; }
-            const subSubjectEl = document.getElementById('sub_subject');
-            if (subSubjectEl) window.tsSubSubject = new TomSelect(subSubjectEl, { onChange: (v) => @this.set('sub_subject_id', v) });
+            if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
+            const chapterEl = document.getElementById('chapter');
+            if (chapterEl) window.tsChapter = new TomSelect(chapterEl, { onChange: (v) => @this.set('chapter_id', v) });
 
             if (window.tsTopic) { window.tsTopic.destroy(); window.tsTopic = null; }
             const topicEl = document.getElementById('topic');
@@ -429,13 +429,13 @@
 
         if (!window.hasRegisteredQuestionEvents) {
 
-            window.addEventListener('subSubjectsUpdated', e => {
-                if (window.tsSubSubject) {
-                    window.tsSubSubject.clear(true);
-                    window.tsSubSubject.clearOptions();
-                    window.tsSubSubject.addOption({value: '', text: '-- Select Sub-Subject --'});
-                    window.tsSubSubject.addOptions(e.detail.subSubjects);
-                    window.tsSubSubject.refreshOptions(false);
+            window.addEventListener('chaptersUpdated', e => {
+                if (window.tsChapter) {
+                    window.tsChapter.clear(true);
+                    window.tsChapter.clearOptions();
+                    window.tsChapter.addOption({value: '', text: '-- Select Chapter --'});
+                    window.tsChapter.addOptions(e.detail.chapters);
+                    window.tsChapter.refreshOptions(false);
                 }
             });
 
@@ -451,7 +451,7 @@
 
             window.addEventListener('reset-selects', () => {
                 window.tsSubject?.clear(true);
-                window.tsSubSubject?.clear(true);
+                window.tsChapter?.clear(true);
                 window.tsTopic?.clear(true);
                 window.tsExamCategories?.clear(true);
             });
@@ -468,7 +468,7 @@
                 }
 
                 if (window.tsSubject) { window.tsSubject.destroy(); window.tsSubject = null; }
-                if (window.tsSubSubject) { window.tsSubSubject.destroy(); window.tsSubSubject = null; }
+                if (window.tsChapter) { window.tsChapter.destroy(); window.tsChapter = null; }
                 if (window.tsTopic) { window.tsTopic.destroy(); window.tsTopic = null; }
                 if (window.tsTags) { window.tsTags.destroy(); window.tsTags = null; }
                 if (window.tsExamCategories) { window.tsExamCategories.destroy(); window.tsExamCategories = null; }

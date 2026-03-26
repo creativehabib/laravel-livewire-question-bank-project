@@ -3,7 +3,7 @@
 namespace App\Livewire\Teacher;
 
 use App\Models\Question;
-use App\Models\SubSubject;
+use App\Models\Chapter;
 use Livewire\Component;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -35,7 +35,7 @@ class CreateQuestionSet extends Component
     public function updatedSelectedClass($class_id)
     {
         if(!empty($class_id)) {
-            $this->subjects = SubSubject::where('subject_id', $class_id)->get();
+            $this->subjects = Chapter::where('subject_id', $class_id)->get();
         } else {
             $this->subjects = [];
         }
@@ -48,7 +48,7 @@ class CreateQuestionSet extends Component
     public function updatedSelectedSubject($subject_id)
     {
         if(!empty($subject_id)) {
-            $this->topics = Topic::where('sub_subject_id', $subject_id)->get();
+            $this->topics = Topic::where('chapter_id', $subject_id)->get();
         } else {
             $this->topics = [];
         }
@@ -61,7 +61,7 @@ class CreateQuestionSet extends Component
         $this->validate([
             'name' => 'required|string|max:255',
             'selectedClass' => 'required|exists:subjects,id',
-            'selectedSubject' => 'required|exists:sub_subjects,id',
+            'selectedSubject' => 'required|exists:chapters,id',
             'selectedTopics' => 'required|array|min:1',
             'type' => 'required|in:mcq,cq,combine',
             'quantity' => 'required|integer|min:1',
@@ -70,7 +70,7 @@ class CreateQuestionSet extends Component
         // Prepare the generation criteria JSON data
         $criteria = [
             'subject_id' => $this->selectedClass,
-            'sub_subject_id' => $this->selectedSubject,
+            'chapter_id' => $this->selectedSubject,
             'topic_ids' => $this->selectedTopics,
             'type' => $this->type,
             'quantity' => $this->quantity

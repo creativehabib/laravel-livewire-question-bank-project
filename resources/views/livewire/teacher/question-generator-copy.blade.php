@@ -49,16 +49,16 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="subSubject">সাব-বিষয়</label>
-                    <select id="subSubject" wire:model="subSubjectId"
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1" for="chapter">সাব-বিষয়</label>
+                    <select id="chapter" wire:model="chapterId"
                             class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100 focus:border-indigo-500 focus:ring-indigo-500"
-                            @disabled(empty($subSubjects))>
+                            @disabled(empty($chapters))>
                         <option value="">সাব-বিষয় নির্বাচন করুন</option>
-                        @foreach($subSubjects as $subSubject)
-                            <option value="{{ $subSubject['id'] }}">{{ $subSubject['name'] }}</option>
+                        @foreach($chapters as $chapter)
+                            <option value="{{ $chapter['id'] }}">{{ $chapter['name'] }}</option>
                         @endforeach
                     </select>
-                    @error('subSubjectId')
+                    @error('chapterId')
                         <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -314,8 +314,8 @@
                                     <h1 class="text-xl font-bold text-center">{{ $summary['program_name'] ?? $summary['exam_name'] }}</h1>
                                     <div class="relative">
                                         <p contenteditable="true" class="text-center text-lg editable-effect">{{ $summary['subject'] }}</p>
-                                        @if($previewOptions['showSubSubject'] && ! empty($summary['sub_subject']))
-                                        <p contenteditable="true" class="text-center editable-effect">{{ $summary['sub_subject'] }}</p>
+                                        @if($previewOptions['showChapter'] && ! empty($summary['chapter']))
+                                        <p contenteditable="true" class="text-center editable-effect">{{ $summary['chapter'] }}</p>
                                         @endif
                                         @if($previewOptions['showTopic'] && ! empty($summary['topic']))
                                         <p contenteditable="true" class="text-center editable-effect">{{ $summary['topic'] }}</p>
@@ -441,7 +441,7 @@
                                             <div class="bg-gray-100 p-2 rounded  flex justify-between items-center my-1">
                                                 <span class="bangla">বিষয়ের নাম</span>
                                                 <label class="relative inline-flex items-center  cursor-pointer">
-                                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showSubSubject">
+                                                    <input type="checkbox" class="sr-only peer" wire:model.live="previewOptions.showChapter">
                                                     <div class="w-11 h-6 bg-gray-200 rounded-full peerdark:peer-focus:ring-emerald-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
                                                 </label>
                                             </div>

@@ -37,7 +37,7 @@ class ViewQuestions extends Component
         $type = $criteria['type'] ?? 'mcq';
         $quantity = $criteria['quantity'] ?? 100;
         $subjectId = $criteria['subject_id'] ?? null;
-        $subSubjectId = $criteria['sub_subject_id'] ?? null;
+        $chapterId = $criteria['chapter_id'] ?? null;
         $topicId = $criteria['topic_id'] ?? null;
 
         // ৪. শর্ত অনুযায়ী প্রশ্ন খুঁজুন
@@ -59,7 +59,7 @@ class ViewQuestions extends Component
                 }
             })
             ->when($subjectId, fn ($q) => $q->where('subject_id', $subjectId))
-            ->when($subSubjectId, fn ($q) => $q->where('sub_subject_id', $subSubjectId))
+            ->when($chapterId, fn ($q) => $q->where('chapter_id', $chapterId))
             ->when($topicId, fn ($q) => $q->where('topic_id', $topicId))
             ->inRandomOrder()
             ->limit($quantity)

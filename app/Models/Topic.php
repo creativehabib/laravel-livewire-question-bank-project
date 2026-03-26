@@ -8,16 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Topic extends Model
 {
-    protected $fillable = ['subject_id', 'sub_subject_id', 'name'];
+    protected $fillable = ['subject_id', 'chapter_id', 'name'];
 
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
     }
 
-    public function subSubject(): BelongsTo
+    public function chapter(): BelongsTo
     {
-        return $this->belongsTo(SubSubject::class);
+        return $this->belongsTo(Chapter::class);
     }
 
     public function questions(): HasMany

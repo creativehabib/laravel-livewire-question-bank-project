@@ -35,10 +35,10 @@ class QuestionSet extends Model
         return $subjectId ? Subject::find($subjectId) : null;
     }
 
-    public function getRelatedSubSubject()
+    public function getRelatedChapter()
     {
-        $subSubjectId = $this->generation_criteria['sub_subject_id'] ?? null;
-        return $subSubjectId ? SubSubject::find($subSubjectId) : null;
+        $chapterId = $this->generation_criteria['chapter_id'] ?? null;
+        return $chapterId ? Chapter::find($chapterId) : null;
     }
 
 
@@ -57,9 +57,9 @@ class QuestionSet extends Model
         return $this->belongsTo(Subject::class);
     }
 
-    public function subSubject()
+    public function chapter()
     {
-        return $this->belongsTo(SubSubject::class);
+        return $this->belongsTo(Chapter::class);
     }
     public function topics()
     {
@@ -78,7 +78,7 @@ class QuestionSet extends Model
 
         // ২. শর্তগুলো থেকে প্রয়োজনীয় আইডি এবং তথ্য বের করুন
         $subjectId = $criteria['subject_id'] ?? null;
-        $subSubjectId = $criteria['sub_subject_id'] ?? null; // নতুন শর্ত
+        $chapterId = $criteria['chapter_id'] ?? null; // নতুন শর্ত
         $topicIds = $criteria['topic_ids'] ?? [];
         $type = $criteria['type'] ?? 'mcq';
         $difficulty = $criteria['difficulty'] ?? null;
@@ -94,18 +94,18 @@ class QuestionSet extends Model
             ->whereIn('topic_id', $topicIds);
 
 
-        // 'topic' রিলেশনশিপ ব্যবহার করে subject এবং sub_subject অনুযায়ী ফিল্টার করুন
+        // 'topic' রিলেশনশিপ ব্যবহার করে subject এবং chapter অনুযায়ী ফিল্টার করুন
         if ($subjectId) {
-            $query->whereHas('topic', function ($topicQuery) use ($subjectId, $subSubjectId) {
+            $query->whereHas('topic', function ($topicQuery) use ($subjectId, $chapterId) {
 
                 // Topic-এর সাথে সম্পর্কিত Subject-এর উপর শর্ত
                 $topicQuery->where('subject_id', $subjectId);
 
-                // যদি sub_subject_id থাকে, তাহলে Subject-এর সাথে সম্পর্কিত SubSubject-এর উপর শর্ত
-                if ($subSubjectId) {
-                    $topicQuery->whereHas('subject', function ($subjectQuery) use ($subSubjectId) {
-                        // আপনার Subject ও SubSubject মডেলের মধ্যে সম্পর্ক অনুযায়ী এখানে কুয়েরি করতে হবে
-                        // উদাহরণস্বরূপ: $subjectQuery->where('sub_subject_id', $subSubjectId);
+                // যদি chapter_id থাকে, তাহলে Subject-এর সাথে সম্পর্কিত Chapter-এর উপর শর্ত
+                if ($chapterId) {
+                    $topicQuery->whereHas('subject', function ($subjectQuery) use ($chapterId) {
+                        // আপনার Subject ও Chapter মডেলের মধ্যে সম্পর্ক অনুযায়ী এখানে কুয়েরি করতে হবে
+                        // উদাহরণস্বরূপ: $subjectQuery->where('chapter_id', $chapterId);
                     });
                 }
             });
