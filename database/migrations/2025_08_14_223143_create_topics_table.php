@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('topics', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('chapter_id')->nullable()->constrained('chapters')->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
             $table->unique(['subject_id','name']);

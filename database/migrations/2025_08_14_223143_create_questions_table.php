@@ -14,9 +14,19 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('topic_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('chapter_id')->nullable()->constrained('chapters')->cascadeOnDelete();
+            $table->foreignId('topic_id')->nullable()->constrained('topics')->cascadeOnDelete();
+            $table->foreignId('user_id')->after('id')->constrained()->cascadeOnDelete();
+
             $table->longText('title');           // HTML from TinyMCE + MathType
+            $table->longText('description')->nullable();
+            $table->json('extra_content')->nullable();
+            $table->decimal('marks', 8, 2)->default(0);
+            $table->string('slug')->unique();
             $table->enum('difficulty', ['easy','medium','hard'])->default('easy');
+            $table->enum('question_type', ['mcq','cq', 'short'])->default('mcq');
+            $table->unsignedBigInteger('views')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
